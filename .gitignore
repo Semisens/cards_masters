@@ -26,3 +26,6 @@ dist-ssr
 # Tests Playwright
 playwright-report
 test-results
+
+# Ressources
+build_ressources
