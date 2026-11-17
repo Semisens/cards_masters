@@ -21,6 +21,7 @@ export function DesignSystemPage() {
           <Button variant="soleil">Jouer</Button>
           <Button variant="cerise">Retirer</Button>
           <Button variant="ciel">Précédent</Button>
+          <Button variant="blanc">Règles complètes</Button>
           <Button variant="soleil" disabled>
             Désactivé
           </Button>

@@ -1,0 +1,74 @@
+.intro {
+  margin: 0;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.count {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--mc-space-1) * 1.5);
+  padding: var(--mc-space-1) 0;
+}
+
+.label {
+  flex: 1;
+}
+
+.round {
+  min-width: var(--mc-touch-min);
+  min-height: var(--mc-touch-min);
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--mc-touch-min) / 2);
+  background: var(--mc-color-soleil);
+  color: var(--mc-text-on-soleil);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--mc-text-min) * 1.25);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.round:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.number {
+  width: var(--mc-space-4);
+  font-family: var(--mc-font-title);
+  font-size: calc(var(--mc-text-min) * 1.5);
+  text-align: center;
+}
+
+.field {
+  padding: var(--mc-space-1) 0;
+  border-top: calc(var(--mc-space-1) / 4) solid var(--mc-color-bordure);
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--mc-touch-min);
+  padding: 0 calc(var(--mc-space-1) * 1.5);
+  border: medium solid var(--mc-color-bordure);
+  border-radius: var(--mc-radius-s);
+  background: var(--mc-card-face);
+  color: var(--mc-color-encre);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: var(--mc-text-min);
+}
+
+.input::placeholder {
+  color: var(--mc-color-texte-secondaire);
+  opacity: 1;
+}
+
+.input:focus-visible {
+  outline: medium solid var(--mc-color-nuit);
+  outline-offset: 2px;
+}

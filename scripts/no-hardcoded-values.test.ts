@@ -20,6 +20,8 @@ const files = walk(srcDir).filter(
     /\.(css|tsx?)$/.test(f) &&
     !/\.test\.tsx?$/.test(f) &&
     !f.includes('.generated.') &&
+    // La boîte à outils des couleurs construit des valeurs de couleur : c'est son rôle.
+    !f.endsWith(join('src', 'core', 'color.ts')) &&
     !f.includes(`${join('src', 'test')}`),
 )
 

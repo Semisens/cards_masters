@@ -1,0 +1,43 @@
+.band {
+  box-sizing: border-box;
+  padding: max(var(--mc-space-5), env(safe-area-inset-top)) var(--mc-space-3) var(--mc-space-4);
+  border-radius: 0 0 var(--mc-radius-l) var(--mc-radius-l);
+  background: var(--game-bg);
+  color: var(--game-fg);
+  text-align: center;
+  box-shadow: 0 var(--mc-elevation-l) 0 var(--game-shadow);
+}
+
+.back {
+  position: relative;
+  display: block;
+  color: inherit;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: none;
+  white-space: pre;
+}
+
+/* Zone tactile de 44 px : elle déborde du texte, sans changer la hauteur de la ligne (22 px comme la maquette). */
+.back::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--mc-space-1) * -1.375) 0;
+}
+
+.back:focus-visible {
+  outline: medium solid currentColor;
+  outline-offset: 2px;
+}
+
+.name {
+  margin: var(--mc-space-2) 0 0;
+  font-family: var(--game-font);
+  font-weight: var(--game-font-weight);
+  font-size: calc(var(--mc-text-min) * 3.5);
+  line-height: 1.2;
+}
+
+.facts {
+  margin: 0;
+}

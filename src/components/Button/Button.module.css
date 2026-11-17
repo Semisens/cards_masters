@@ -3,8 +3,9 @@
   position: relative;
   box-sizing: border-box;
   min-width: var(--mc-touch-min);
-  min-height: var(--mc-touch-min);
-  padding: var(--mc-space-2) var(--mc-space-4);
+  /* Bouton principal des maquettes : 52 px de haut (44 px de zone tactile + 8 px). */
+  min-height: calc(var(--mc-touch-min) + var(--mc-space-1));
+  padding: 0 var(--mc-space-2);
   border: 0;
   border-radius: var(--mc-radius-m);
   background: var(--btn-bg);
@@ -65,4 +66,34 @@
   --btn-bg: var(--mc-color-ciel);
   --btn-fg: var(--mc-text-on-ciel);
   --btn-shadow: var(--mc-color-nuit);
+}
+
+/* Un lien n'a ni bordure ni soulignement, et son contenu est centré. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+
+.link:active {
+  transform: translateY(var(--mc-elevation-m));
+  box-shadow: 0 0 0 var(--btn-shadow);
+}
+
+/* Pleine largeur, comme les boutons principaux des maquettes. */
+.block {
+  width: 100%;
+}
+
+.block.link {
+  display: flex;
+}
+
+/* Bouton blanc : action secondaire (« Règles complètes »). Texte et relief peuvent être repris par la page (--btn-fg, --btn-shadow). */
+.blanc {
+  --btn-bg: var(--mc-card-face);
+  --btn-fg: var(--mc-color-nuit);
+  --btn-shadow: var(--mc-color-bordure);
 }

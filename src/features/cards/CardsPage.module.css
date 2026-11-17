@@ -1,0 +1,17 @@
+/* La liste défile dans son cadre, au doigt : la page, elle, ne bouge pas. Pas de barre de défilement (app mobile). */
+.list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--mc-space-1);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  /* Le relief des lignes dépasse vers le bas : on laisse la place. */
+  padding-bottom: var(--mc-space-1);
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}

@@ -6,8 +6,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 // Les couleurs viennent de la charte, jamais écrites ici.
 const charte = JSON.parse(readFileSync(new URL('./charte/mastercards-charte.json', import.meta.url), 'utf8'))
 const ciel: string = charte.colors.ciel
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [
     react(),
     {

@@ -1,0 +1,31 @@
+.ghost {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--mc-touch-min);
+  aspect-ratio: 1 / var(--mc-card-ratio-list);
+  border: var(--mc-card-frame-list) dashed var(--mc-color-bordure);
+  border-radius: var(--mc-card-radius);
+  background: var(--mc-ghost-bg);
+  color: var(--mc-ghost-text);
+}
+
+.label {
+  position: absolute;
+  top: calc(var(--mc-space-1) / 4);
+  left: calc(var(--mc-space-1) * 0.75);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--mc-text-min) * 0.875);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.circle {
+  width: calc(var(--mc-text-min) * 1.375);
+  height: calc(var(--mc-text-min) * 1.375);
+  stroke-width: var(--mc-icon-stroke);
+}

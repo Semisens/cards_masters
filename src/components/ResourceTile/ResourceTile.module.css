@@ -1,0 +1,44 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--mc-space-1) / 2);
+  box-sizing: border-box;
+  min-height: calc(var(--mc-touch-min) * 2);
+  border-radius: var(--mc-radius-m);
+  background: var(--mc-card-face);
+  color: var(--mc-color-encre);
+  font-family: var(--mc-font-title);
+  font-weight: 600;
+  font-size: calc(var(--mc-text-min) * 1.125);
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 var(--mc-elevation-m) 0 var(--tile-shadow);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tile:active {
+  transform: translateY(var(--mc-elevation-m));
+  box-shadow: none;
+}
+
+.tile:focus-visible {
+  outline: medium solid var(--mc-color-blanc-carte);
+  outline-offset: 2px;
+}
+
+.icon {
+  width: calc(var(--mc-text-min) * 1.625);
+  height: calc(var(--mc-text-min) * 1.625);
+  stroke: var(--tile-accent);
+  stroke-width: var(--mc-icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile:active {
+    transform: none;
+  }
+}

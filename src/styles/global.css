@@ -23,9 +23,10 @@ body {
   background-image: linear-gradient(to bottom, var(--mc-color-ciel-from), var(--mc-color-ciel-to));
   color: var(--mc-text-on-ciel);
   font-family: var(--mc-font-text);
-  font-weight: 600;
+  /* Réglages des maquettes : Nunito 700, interligne normal. */
+  font-weight: 700;
   font-size: var(--mc-text-min);
-  line-height: 1.5;
+  line-height: normal;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -40,14 +41,4 @@ h3 {
 
 p {
   margin: 0;
-}
-
-/* Zones sûres : encoche iOS, barre de gestes Android. */
-#root {
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding-top: env(safe-area-inset-top);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
 }

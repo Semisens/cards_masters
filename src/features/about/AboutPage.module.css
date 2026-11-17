@@ -1,0 +1,13 @@
+.title {
+  font-size: calc(var(--mc-text-min) * 2);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mc-space-1);
+}
+
+.heading {
+  font-size: calc(var(--mc-text-min) * 1.25);
+}

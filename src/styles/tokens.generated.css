@@ -30,6 +30,7 @@
   --mc-radius-s: 12px;
   --mc-radius-m: 20px;
   --mc-radius-l: 28px;
+  --mc-radius-ligne: 16px;
   --mc-elevation-s: 4px;
   --mc-elevation-m: 6px;
   --mc-elevation-l: 8px;
@@ -51,13 +52,21 @@
   --mc-card-red: #D93A34;
   --mc-card-black: #14213D;
   --mc-card-symbol-ratio: 0.62;
+  --mc-card-symbol-ratio-list: 0.54;
+  --mc-card-ratio-list: 1.3864;
+  --mc-card-frame-list: 3px;
+  --mc-card-frame-focus: 4px;
   --mc-chip-inner-border: 3px;
   --mc-chip-stripe: 15deg;
-  --mc-color-cerise-ombre: #8C3653;
-  --mc-tapis-jaune-ombre: #A38E4C;
-  --mc-tapis-vert-ombre: #145E53;
-  --mc-tapis-rouge-ombre: #77304E;
-  --mc-tapis-bleu-ombre: #1A59B0;
+  --mc-color-cerise-ombre: #8D2622;
+  --mc-tapis-jaune-ombre: #B98300;
+  --mc-tapis-vert-ombre: #0F4F20;
+  --mc-tapis-rouge-ombre: #78201D;
+  --mc-tapis-bleu-ombre: #164B83;
+  --mc-ghost-bg: #E9EFFB;
+  --mc-ghost-text: #A9B7DA;
+  --mc-veil: rgba(0, 0, 0, 0.2);
+  --mc-veil-shadow: rgba(0, 0, 0, 0.3);
   --mc-chip-inner-color: rgba(255, 255, 255, 0.6);
   --mc-card-back-stripe: rgba(255, 255, 255, 0.18);
 }

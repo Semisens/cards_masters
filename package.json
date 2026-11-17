@@ -17,7 +17,9 @@
     "test:visual": "playwright test",
     "cap:sync": "npm run build && cap sync",
     "icons": "node scripts/gen-icons.ts",
-    "phone": "sh scripts/phone.sh"
+    "phone": "sh scripts/phone.sh",
+    "dev:phone": "sh scripts/dev-phone.sh",
+    "maquettes": "node scripts/render-maquettes.ts"
   },
   "dependencies": {
     "@capacitor/core": "^8.6.2",
@@ -42,11 +44,15 @@
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.12",
     "@types/node": "^26.6.6",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "ajv": "^8.20.0",
     "jsdom": "^29.1.1",
     "oxlint": "^1.94.0",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.10.1",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",

@@ -35,6 +35,12 @@ export const tokens = {
     "tapis_bleu": "#FFFFFF",
     "tapis_jaune": "#14213D"
   },
+  "tapisOmbres": {
+    "jaune": "#B98300",
+    "vert": "#0F4F20",
+    "rouge": "#78201D",
+    "bleu": "#164B83"
+  },
   "card": {
     "ratio": 1.4,
     "red": "#D93A34",

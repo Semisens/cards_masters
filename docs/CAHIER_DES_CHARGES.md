@@ -1,8 +1,8 @@
 # Cahier des charges : MasterCards
 
-Version 1.1 · Plateformes : PWA installable (web) + iOS et Android via Capacitor · Base écran : 390 × 844
+Version 1.2 · Plateformes : PWA installable (web) + iOS et Android via Capacitor · Base écran : 390 × 844
 
-> Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor.
+> Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor. Version 1.2 : écrans de Trio alignés sur les maquettes (charte v6).
 > Raisons : contenu statique et hors ligne, aucune API native nécessaire, partage par lien, référencement web, pas de review de store pour la v1. Voir `docs/contexte/mastercards-contexte.md`.
 
 ---
@@ -23,8 +23,10 @@ Joueurs occasionnels et amateurs de jeux de société, en soirée, en voyage ou 
 ### 1.4 Deux modes de lecture
 | Mode | Pour qui | Contenu |
 |---|---|---|
-| **Classique** | Tout le monde | Règles expliquées **uniquement** avec les cartes choisies. **Aucun vocabulaire du jeu d'origine** (pas de « garde », « princesse », etc.). |
-| **Connaisseur** | Tu connais déjà le jeu | Correspondance **carte → personnage**, pouvoir, et règle d'origine. |
+| **Classique** | Tout le monde | Les cartes à garder expliquées avec **ton paquet** : « Vaut 1. », « Valent 2 à 6. ». |
+| **Connaisseur** | Tu connais déjà le jeu | La même vue, avec la **correspondance** avec le jeu d'origine (« 2–6 → 2 à 6 », carte d'origine en pointillés) et son pouvoir d'origine. |
+
+Le mode se choisit **après le choix du jeu**, avec la bascule de l'écran « Tes cartes ». Il ne change que les écrans de cartes (liste et vue à balayer) : la mise en place, le tour de jeu et les règles complètes sont les mêmes dans les deux modes.
 
 ---
 
@@ -32,8 +34,9 @@ Joueurs occasionnels et amateurs de jeux de société, en soirée, en voyage ou 
 
 ### 2.1 Inclus (v1)
 - Écran d'accueil avec la liste des jeux.
-- Fiche jeu : cartes à garder, accès aux règles.
-- Règle pas à pas en mode classique et en mode connaisseur.
+- Page du jeu : « Jouer » (le tutoriel puis la partie) et « Règles complètes ».
+- Tutoriel : choix des cartes (liste et vue à balayer, deux modes), mise en place, un tour de jeu.
+- **Partie en cours** : les joueurs, leurs trios gagnés, la saisie des scores, des raccourcis vers les règles. Mémorisée sur l'appareil.
 - Thème visuel propre à chaque jeu.
 - Fonctionnement 100 % hors ligne.
 - **Installable** depuis le navigateur (manifeste + service worker).
@@ -41,8 +44,8 @@ Joueurs occasionnels et amateurs de jeux de société, en soirée, en voyage ou 
 
 ### 2.2 Hors périmètre (v1)
 - Compte utilisateur, connexion, cloud.
-- Partie en ligne ou multijoueur.
-- Gestion de la partie (scores, tours) : l'app **explique**, elle ne **joue** pas.
+- Partie en ligne ou multijoueur sur plusieurs appareils.
+- Détection automatique du gagnant et gestion fine des tours : l'app **compte les trios**, elle ne **joue** pas à la place des joueurs.
 - Règles de jeux de cartes classiques.
 - Création de jeux par l'utilisateur (à envisager en v2).
 - Achats intégrés et publicité (à trancher avec le modèle économique, question 5).
@@ -54,7 +57,7 @@ Joueurs occasionnels et amateurs de jeux de société, en soirée, en voyage ou 
 - **Tutoiement** partout.
 - **Phrases courtes.**
 - Français (v1). Prévoir l'internationalisation dès le départ (fichiers de traduction JSON par langue, clés stables).
-- Mode classique : aucun terme du jeu d'origine.
+- Le mode classique privilégie les mots simples. Un jeu peut **interdire** certains termes d'origine (champ `classic_forbidden_terms`, vérifié par test) ; pour Trio il n'y en a aucun : le nom du jeu est lui-même le vocabulaire (« trio »), et les maquettes l'emploient partout.
 - Mode connaisseur : termes d'origine autorisés, utilisés dans la correspondance.
 
 Exemple de ton : « Garde les as, les 2 et les 3. Mélange. Distribue une carte à chacun. »
@@ -116,20 +119,19 @@ Un tapis (couleur) par jeu : jaune, vert, rouge, bleu.
 
 ## 5. Personnalisation par jeu
 
-Chaque jeu possède son propre thème :
+Chaque jeu possède son propre thème et son propre contenu (détail et règles de validation en 9.2) :
 
 | Champ | Description |
 |---|---|
 | `name` | Nom du jeu |
-| `font` | Police du nom (licence libre, embarquée). Défaut : Fredoka 600. Ex. Love Letter : Great Vibes |
-| `pile` | Pioche : dos de cartes à la couleur du jeu |
+| `font` | Police du nom (licence libre, embarquée). Défaut : Fredoka 700. Ex. Love Letter : Great Vibes |
+| pioche | Dos de cartes à la couleur du jeu (automatique) |
 | `logo` | Optionnel. Image **originale ou redessinée**. Sinon : initiale dans un rond blanc |
 | `background_color` | jaune, vert, rouge, bleu ou libre. Texte blanc ou encre choisi **automatiquement** (contraste ≥ 4,5) |
-| `kept_cards` | Liste des cartes du paquet à garder |
-| `rules.classic` | Règles sans vocabulaire d'origine |
-| `rules.expert` | Correspondance carte → personnage, pouvoir, règle d'origine |
+| `card_groups` | Les cartes du paquet à garder, regroupées (une ligne de la liste, une page de la vue à balayer), avec leur correspondance d'origine |
+| `tutorial`, `full_rules` | Mise en place, un tour de jeu, règles complètes |
 
-Règle de contraste automatique : calculer le ratio WCAG entre la couleur de fond libre et blanc / encre, choisir le meilleur, et refuser (ou ajuster) si aucun n'atteint 4,5. Implémentée dans `src/core/contrast.ts` (`pickTextColor`).
+Règle de contraste automatique : calculer le ratio WCAG entre la couleur de fond libre et blanc / encre, choisir le meilleur, et refuser si aucun n'atteint 4,5. Implémentée dans `src/core/contrast.ts` (`pickTextColor`).
 
 ---
 
@@ -147,34 +149,64 @@ Règle de contraste automatique : calculer le ratio WCAG entre la couleur de fon
 
 ## 7. Écrans
 
-### 7.1 Accueil
-- Titre MasterCards, fond ciel.
-- Liste/grille des jeux : vignette avec tapis, logo ou initiale, nom dans sa police.
-- Bascule globale **Classique / Connaisseur** (mémorisée).
-- Accès à « À propos / mentions légales ».
+Les écrans sont ceux des **maquettes de Trio** (`maquettes/trio/*.png`, sources HTML dans `maquettes/trio/source/`). L'app est **comparée pixel à pixel** à chacune par `e2e/maquettes.spec.ts`.
 
-### 7.2 Fiche jeu
-- En-tête aux couleurs du jeu (tapis, pioche, logo, nom).
-- Résumé : nombre de joueurs, durée, but du jeu en 1-2 phrases.
-- **Choix des cartes à garder** : affichage des cartes à garder (composant carte de la charte) et celles à retirer. Indication du nombre total de cartes du paquet de jeu.
-- Boutons : « Règle classique » et « Règle connaisseur ».
+### 7.0 Parcours et principes
+Accueil → le jeu → **Jouer** : Tes cartes (liste) → *[détail d'un groupe : vue à balayer]* → Mise en place → Un tour de jeu → Qui joue ? → Partie en cours ⇄ Trios gagnés.
+Le jeu → **Règles complètes**.
 
-### 7.3 Règle pas à pas (classique)
-- Étapes courtes, une par écran (ou carte swipable).
-- Barre de progression, boutons Précédent / Suivant en relief.
-- Illustrations avec les composants carte et jeton.
-- Uniquement les cartes choisies, sans vocabulaire d'origine.
+- **Le mode se choisit après le jeu**, avec la bascule de « Tes cartes ».
+- **Chaque écran tient sans défilement vertical** : vérifié sur tous les écrans, à 390 × 844 et à 393 × 852, y compris une partie à 6 joueurs. Seule la liste des cartes défile **dans son cadre** si un jeu a beaucoup plus de groupes que Trio.
+- Format des maquettes : 390 × 844, marges 48 / 24 / 24, blocs espacés de 16.
 
-### 7.4 Règle pas à pas (connaisseur)
-- Même navigation.
-- **Tableau de correspondance** : carte → personnage → pouvoir → règle d'origine.
-- Rappel de ce qui change par rapport au jeu d'origine.
+### 7.1 Accueil *(sans maquette)*
+Titre MasterCards, mot de bienvenue au premier lancement, liste des jeux (vignette : tapis, logo ou initiale, nom dans sa police, joueurs et durée), accès à « À propos ». Aucun choix de mode ici.
 
-### 7.5 Mentions / À propos
+### 7.2 Le jeu (maquette *GameDetail*)
+Bandeau plein cadre aux couleurs du jeu (« ‹ Retour », nom en grand, « 3–6 joueurs · 15 min »), carte blanche (phrase d'accroche en gras + texte), boutons **Jouer** et **Règles complètes**.
+
+### 7.3 Tes cartes : vue liste (maquettes *List classic* et *List expert*)
+En-tête (voir « Navigation » ci-dessous). Titre, **bascule Classique / Connaisseur**, puis une ligne par **groupe de cartes** (6 pour Trio : A, 2 à 6, 7, 8 à 10, Valet, Dame) : mini-carte, titre, « ×15 · Valent 2 à 6. », pastille éventuelle (« Spécial »). En bas, le bandeau jaune **dérivé des données** (« Retire les carreaux et les rois. Garde 36 cartes. »). La liste défile au doigt dans son cadre, **sans barre de défilement** (app mobile) ; le bandeau et le bouton « Suivant » restent fixes en dessous.
+- **Classique** : la liste.
+- **Connaisseur** : la même liste, sans légende, carte d'origine en pointillés → carte du paquet, titre « 2–6 → 2 à 6 ».
+
+### 7.4 Vue à balayer (maquette *Swipe*)
+Un clic sur une ligne ouvre cette vue sur le groupe touché. « Groupe 3 / 6 », grande carte (200 × 280, cadre soleil), flèches ‹ ›, points de progression, carte d'explication (« ×3 · Le 7 est spécial. » + texte), bouton « Suivant ». On balaie, on touche les flèches ou le bouton, ou on utilise le clavier. Mode connaisseur : une ligne grise ajoute la carte d'origine et son pouvoir. Après le dernier groupe : « Terminer » ramène à la liste.
+
+### 7.5 Mise en place et un tour de jeu (maquettes *Setup* et *TurnFlow*)
+Mise en place : schéma (ta main, triée / au centre, cachées) et 4 étapes numérotées. Un tour de jeu : 4 étapes (Retourne, Compare, Trio, Raté), « Gagner », bouton « Jouer ».
+
+### 7.6 Règles complètes (maquette *FullRules*)
+Une carte blanche avec toutes les sections : But, Mise en place, Un tour, Trio, Cartes différentes, Mode piquant.
+
+### 7.7 Partie en cours et Trios gagnés (maquettes *Play* et *ScoreEntry*)
+Fond du tapis du jeu ; jetons des joueurs (cercle à bord pointillé, trios, nom) ; tuiles Règles / Mise en place / Cartes / Un tour (elles ouvrent ces écrans, avec retour à la partie) ; « Noter les scores » ; « Terminer la partie » (efface la partie). Trios gagnés : un compteur − / + par joueur, « Valider » enregistre.
+- *Ajout (absent des maquettes)* : **Qui joue ?**, le nombre de joueurs (dans les limites du jeu) et leurs prénoms.
+
+### 7.8 Mentions / À propos
 Crédits, licences des polices, avertissement légal, version.
 
-### 7.6 États à prévoir
-Chargement, erreur de lecture du contenu, liste vide, premier lancement.
+### 7.9 États à prévoir
+Premier lancement, liste vide, jeu / groupe / page introuvable (avec retour), partie absente (on demande qui joue), donnée mémorisée abîmée (traitée comme « pas de partie »).
+
+### 7.9 bis Navigation (la même dans toute l'app)
+
+- **En haut à gauche** : « ‹ Retour », toujours ce libellé, jamais le nom d'un écran (composant `StepHeader`, ou le bandeau du jeu).
+- **En haut à droite** : pastille « Quitter le tutoriel », sur les écrans du tutoriel (Tes cartes, vue à balayer, Mise en place, Un tour). Absente quand l'écran est ouvert depuis la partie.
+- **En bas de page** : le bouton principal de l'étape, toujours à la même place : « Suivant » (Tes cartes, vue à balayer, Mise en place), « Jouer » à la dernière étape du tutoriel. Depuis la partie : « Retour à la partie ».
+- Le libellé du retour n'est pas personnalisable : `StepHeader` n'accepte que l'adresse.
+
+### 7.10 Écarts assumés avec les maquettes
+| Écart | Raison |
+|---|---|
+| Navigation homogène (voir ci-dessous) ; sur « Tes cartes » : bandeau « Retire… » en bas, bouton « Suivant » en bas, pas de légende en connaisseur, liste sans barre de défilement | Demandé par l'utilisateur après la reprise des maquettes. Les sources `maquettes/trio/source/01`, `02`, `03`, `04`, `07` et `08` ont été modifiées de même (libellés de retour, pastille, bouton), pour que le test de fidélité reste la référence. |
+| Écran « Qui joue ? » | Les maquettes montrent la partie (Léa, Tom, Inès) mais pas sa création. |
+| Texte du « Mode piquant » | La maquette contient « [Deux trios liés. À détailler.] » : remplacé par un texte publiable. |
+| « − » grisé quand un score est à 0 | On ne descend pas sous zéro ; la maquette montre le bouton actif. |
+| Cœurs à la place des symboles provisoires | Les mini-cartes de la maquette sont toutes des cœurs ; l'app montre les vrais symboles, avec la même alternance rouge / noir. |
+| Chiffre des jetons joueurs | Couleur choisie selon la charte (`text_on`, contraste ≥ 4,5) : encre sur jaune et bleu clair, là où la maquette met du blanc. |
+| Zones tactiles de 44 px | Les liens « ‹ Retour » ont une zone tactile qui déborde du texte, sans changer la mise en page. |
+| Rang à 14 px sur les mini-cartes | Valeur de la maquette (la charte dit 16 px minimum) ; la mini-carte est décorative, le texte de la ligne porte l'information. |
 
 ---
 
@@ -182,68 +214,88 @@ Chargement, erreur de lecture du contenu, liste vide, premier lancement.
 
 Composants React dans `src/components/`, un dossier par composant (TSX + CSS Module + test).
 
-- `Button` (relief, états : normal / pressé / désactivé, variantes soleil, cerise, ciel). *Réalisé (jalon 1).*
-- `PlayingCard` (rang, symbole, couleur rouge/noir, dos de pioche coloré). *Réalisé (jalon 1).*
-- `CardRow` (rangée de cartes).
-- `PokerChip` (4 couleurs, valeur). *Réalisé (jalon 1).*
-- `GameTile` (vignette de jeu).
-- `GameHeader` (tapis + logo + nom).
-- `ModeToggle` (Classique / Connaisseur).
-- `StepPager` (étapes, progression).
-- `CorrespondenceTable` (mode connaisseur).
+- **Structure** : `Screen` (fond, marges des maquettes, zones sûres ; options `solid`, `bare`, `fixed`, `tight`), `StepHeader` (« ‹ Retour » + pastille), `PillLink`, `PageTitle`, `Panel` (carte blanche), `Notice` (bandeau jaune), `EmptyState`.
+- **Boutons** : `Button` et `ButtonLink` (variantes soleil, cerise, ciel, **blanc** ; option `block` pleine largeur).
+- **Cartes et jetons** : `PlayingCard` (variantes `standard`, `list`, `focus` ; lettres V / D / R), `GhostCard` (carte d'origine en pointillés), `PokerChip`, `PlayerChip`, `SuitIcon`, `CardRow`.
+- **Choix des cartes** : `ModeToggle` (bascule Classique / Connaisseur), `CardGroupRow` (ligne de la liste).
+- **Jeu** : `GameBand` (bandeau), `GameTile` (vignette d'accueil), `GameLogo`, `PileDiagram` (schéma de mise en place).
+- **Partie** : `ResourceTile` (tuiles de raccourci), `ScoreStepper` (compteur − / +).
 
-Les symboles de cartes (♠ ♥ ♦ ♣) sont dessinés en **vectoriel** (tracés SVG dans `PlayingCard/symbols.ts`), pas en texte, pour un rendu identique partout. Les mêmes tracés servent à générer l'icône de l'app.
+Hook `useSwipe` (`src/core/`) : balayage tactile et flèches du clavier. Les symboles ♠ ♥ ♦ ♣ sont dessinés en **vectoriel** (`PlayingCard/symbols.ts`), pas en texte.
 
 ---
 
 ## 9. Données et contenu
 
 ### 9.1 Principe
-Le contenu des jeux est **externe au code** : un fichier JSON par jeu dans `src/content/games/<id>/game.json`, chargé avec `import.meta.glob`. Les fichiers sont donc **embarqués dans le build** (et précachés pour le hors ligne). Ajouter un jeu = ajouter un fichier + ses assets, **sans toucher au code**.
+Le contenu des jeux est **externe au code** : un dossier par jeu, `src/content/games/<id>/`, avec un `game.json` et, si besoin, un logo (`svg` ou `png`). Les fichiers sont chargés avec `import.meta.glob` : ils sont donc **embarqués dans le build** (et précachés pour le hors ligne). Ajouter un jeu = ajouter ce dossier, **sans toucher au code**. C'est vérifié : un jeu ajouté apparaît sur l'accueil avec son thème, et les tests de validation s'appliquent à lui automatiquement.
 
-### 9.2 Modèle (proposition)
+Une seule exception : une **nouvelle police** de nom de jeu doit être embarquée (paquet `@fontsource`, import dans `main.tsx`, ligne dans `src/core/fonts.ts`) pour que l'app reste fidèle hors ligne.
+
+### 9.2 Modèle
+
+Source de vérité : `src/content/game.schema.json` (types TypeScript miroirs dans `src/data/types.ts`).
 
 ```json
 {
-  "id": "love-letter",
-  "name": "Love Letter",
-  "font": "Great Vibes",
-  "background_color": "rouge",
-  "logo": "logo.svg",
-  "players": { "min": 2, "max": 6 },
-  "duration_min": 20,
-  "summary": "Garde ta carte en main. Fais tomber les autres.",
-  "kept_cards": [
-    { "rank": "A", "count": 5, "suits": ["any"] }
-  ],
-  "rules": {
-    "classic": [
-      { "title": "Prépare le paquet", "text": "…", "cards_shown": ["A", "2"] }
-    ],
-    "expert": {
-      "mapping": [
-        { "card": "A", "character": "…", "power": "…", "original_rule": "…" }
-      ],
-      "steps": [
-        { "title": "…", "text": "…" }
-      ]
+  "id": "trio",
+  "name": "Trio",
+  "background_color": "vert",
+  "tagline": "Trouve trois cartes identiques.",
+  "description": "Retourne des cartes au centre ou chez tes rivaux…",
+  "players": { "min": 3, "max": 6 },
+  "duration_min": 15,
+  "card_groups": [
+    {
+      "label": "2 à 6",
+      "ranks": ["2", "3", "4", "5", "6"],
+      "count": 15,
+      "suits": ["spades", "hearts", "clubs"],
+      "display": { "rank": "2", "suit": "spades" },
+      "short": "Valent 2 à 6.",
+      "badge": "Spécial",
+      "detail": { "title": "Cinq valeurs à retenir.", "text": "…" },
+      "expert": { "original": "2–6", "power": "…" }
     }
-  }
+  ],
+  "tutorial": {
+    "setup": { "title": "Mise en place", "hand": "Ta main, triée", "center": "Au centre, cachées", "steps": ["…"] },
+    "turn": { "title": "Un tour de jeu", "steps": [{ "label": "Retourne.", "text": "…" }], "win": { "title": "Gagner", "text": "…" } }
+  },
+  "full_rules": [{ "title": "But", "text": "…" }]
 }
 ```
 
-Un schéma JSON (`game.schema.json`) valide chaque fichier. Un test automatisé (Vitest + Ajv) vérifie tous les jeux au build.
+| Champ | Règle |
+|---|---|
+| `id` | Identifiant d'URL. Doit être égal au nom du dossier. |
+| `font` | Absent : Fredoka 700. Sinon une police embarquée (`Fredoka`, `Great Vibes`). |
+| `background_color` | `jaune`, `vert`, `rouge`, `bleu` ou `#RRGGBB`. Le texte est **choisi automatiquement** ; une couleur sans contraste ≥ 4,5 est refusée. L'ombre vient de `tapis_ombres` (charte) ou, pour une couleur libre, de la couleur assombrie. |
+| `card_groups` | Une ligne de la liste = une page de la vue à balayer. `ranks` : les rangs réunis ; `suits` listé : `count` = rangs × couleurs ; `display` : la carte montrée ; `short` : sous le titre, après « ×15 · » ; `badge` : pastille facultative ; `detail` : carte d'explication de la vue à balayer ; `expert.original` : la carte d'origine (« 2–6 ») ; `expert.power` : son pouvoir, en une proposition. |
+| bandeau « Retire… Garde… » | **Dérivé** de `card_groups` (`removalList` dans `src/data/deck.ts`) : couleurs puis valeurs jamais gardées. Rien à écrire. |
+| `classic_forbidden_terms` | Facultatif. Vocabulaire d'origine interdit dans les textes (test). Absent pour Trio. |
+| pioche | Pas de champ : le dos prend la couleur du jeu. |
+
+Un test automatisé (`src/data/games.test.ts`, Vitest + Ajv) vérifie **chaque jeu** :
+- conformité au schéma, id égal au dossier, logo existant ;
+- groupes : rangs jamais répétés, `count` = rangs × couleurs, carte montrée dans le groupe, tient dans 52 cartes, chaque groupe a son `expert.original` ;
+- contraste texte / fond ≥ 4,5 ;
+- vocabulaire interdit par le jeu absent des textes ;
+- **ton** : tutoiement, phrases de 22 mots au plus.
 
 ### 9.3 Jeux livrés en v1
-1. **Love Letter** (16 cartes d'origine). À titre d'exemple de correspondance : as ×5, 2 ×2, 3 ×2, 4 ×2, 5 ×2, 6, 7, 8.
-2. **Trio** (36 cartes d'origine, valeurs 1 à 12 en trois exemplaires, soit 12 rangs × 3 couleurs).
+1. **Trio** *(réalisé, d'après les maquettes)*. 36 cartes d'origine (valeurs 1 à 12 en trois exemplaires) jouées avec le paquet de 52 : on garde pique, cœur et trèfle de l'As à la Dame, et on **retire les carreaux et les rois**. As = 1, Valet = 11, Dame = 12. Six groupes : A, 2 à 6, 7 (« Spécial »), 8 à 10, Valet, Dame. 3 à 6 joueurs, environ 15 minutes. Le mode « Piquant » n'est pas jouable : ses liens entre numéros sont imprimés sur les cartes d'origine.
+2. **Love Letter** (16 cartes d'origine) : à reprendre. L'exemple « as ×5 » du cahier d'origine n'est pas réalisable tel quel avec 4 as (voir question 11).
 
-> Le contenu exact des règles et des correspondances est à **rédiger et relire** par l'équipe éditoriale. Il n'est pas fourni dans ce cahier des charges.
+> Les textes de Trio viennent des **maquettes, mot pour mot**. Seuls cinq textes manquaient (la vue à balayer n'est montrée que pour le 7) : ceux des groupes A, 2 à 6, 8 à 10, Valet et Dame, rédigés sur le même modèle, à relire. Le contenu de Love Letter reste à rédiger et à relire.
 
 ### 9.4 Persistance locale
-Préférences uniquement : mode choisi, dernier jeu consulté, éventuellement étape de lecture en cours. Via `src/core/storage.ts` : `@capacitor/preferences` dans les apps natives (non purgé par le système), `localStorage` sur le web, avec repli silencieux si le navigateur le bloque. Aucune donnée n'est indispensable au fonctionnement : sans stockage, l'app reste utilisable.
+Via `src/core/storage.ts` : `@capacitor/preferences` dans les apps natives (non purgé par le système), `localStorage` sur le web, avec repli silencieux si le navigateur le bloque.
+- **Mode de lecture** (Classique / Connaisseur), changé par la bascule de « Tes cartes ».
+- **Message de bienvenue** déjà vu.
+- **Partie en cours**, par jeu (`session:<id>`) : joueurs et trios gagnés. Relue avec validation stricte : une donnée abîmée est ignorée, l'app démarre normalement. « Terminer la partie » l'efface.
 
----
+Aucune donnée n'est indispensable au fonctionnement : sans stockage, l'app reste utilisable.
 
 ## 10. Spécifications techniques
 
@@ -279,6 +331,23 @@ charte/  docs/  maquettes/
 android/  ios/   # projets natifs Capacitor
 ```
 
+### 10.2 bis Adresses
+| Adresse | Écran |
+|---|---|
+| `/` | Accueil : choix du jeu |
+| `/jeu/:id` | Le jeu : « Jouer » ou « Règles complètes » |
+| `/jeu/:id/regles` | Règles complètes |
+| `/jeu/:id/tutoriel/cartes` | Tes cartes : vue liste (bascule de mode) |
+| `/jeu/:id/tutoriel/cartes/3` | Vue à balayer, ouverte sur le groupe 3 (à partir de 1) |
+| `/jeu/:id/tutoriel/mise-en-place` | Mise en place |
+| `/jeu/:id/tutoriel/tour` | Un tour de jeu |
+| `/jeu/:id/joueurs` | Qui joue ? |
+| `/jeu/:id/partie` | Partie en cours |
+| `/jeu/:id/partie/scores` | Trios gagnés |
+| `/a-propos` | Mentions légales, crédits, version |
+
+Toutes les adresses sont construites par `src/routes.ts`. Depuis la partie, les écrans de règles, cartes, mise en place et tour s'ouvrent avec `?depuis=partie` : le retour mène à la partie. Un groupe, un jeu ou une page inconnus affichent « introuvable ».
+
 ### 10.3 Performance
 - Démarrage < 2 s sur appareil milieu de gamme.
 - 60 fps dans les écrans de règles (animations en `transform` et `opacity` uniquement).
@@ -311,10 +380,12 @@ Aucune collecte en v1, aucun compte, pas de tracking. Si des statistiques sont a
 
 ## 11. Critères d'acceptation
 
-- [ ] Tous les écrans respectent la charte et les maquettes (tolérance visuelle à valider).
+- [x] Chaque écran de Trio est **conforme à sa maquette, mesuré** : moins de 1 % de pixels différents (`e2e/maquettes.spec.ts`), écarts assumés listés en 7.10.
+- [x] Chaque écran tient sans défilement vertical à 390 × 844 et 393 × 852 (test automatisé).
+- [x] Le mode de lecture se choisit après le jeu, jamais à l'accueil.
 - [ ] Aucune couleur / rayon / espacement / taille de texte en dur (test automatisé vert).
 - [ ] Un nouveau jeu s'ajoute avec un seul JSON + assets, sans modification de code.
-- [ ] Le mode classique ne contient aucun terme du jeu d'origine (relecture + test de liste de mots interdits par jeu).
+- [ ] Les termes d'origine interdits par un jeu n'apparaissent pas dans ses textes (test, champ `classic_forbidden_terms`).
 - [ ] Contraste ≥ 4,5 pour tous les couples texte/fond, y compris fond « libre ».
 - [ ] Aucun logo ou lettrage officiel dans le dépôt.
 - [ ] App 100 % fonctionnelle hors ligne (test Playwright : rechargement sans réseau).
@@ -334,24 +405,21 @@ Projet Vite + React + TypeScript strict, structure de dossiers, lint (oxlint + P
 **Jalon 1 : design system** *(réalisé)*
 Tokens générés depuis le JSON (variables CSS + TypeScript), garde-fou « aucune valeur en dur », contraste WCAG, polices embarquées, `Button`, `PlayingCard`, `PokerChip`, page de visite `/dev/design-system`, tests de composants et captures Playwright.
 
-**Jalon 2 : données**
-Modèles TypeScript, schéma JSON, chargement des jeux (`import.meta.glob`), dépôt, test de validation des jeux. Love Letter en contenu d'exemple.
+**Jalon 2 : données** *(réalisé, avec Trio)*
+Types, schéma JSON, chargement des jeux (`import.meta.glob`), plan du paquet (`deckPlan`, `removalList`), thème par jeu, tests de validation éditoriale. Trio en contenu de référence.
 
-**Jalon 3 : accueil et fiche jeu**
-Liste des jeux, thème par jeu (couleur, police, logo/initiale, contraste auto), choix des cartes à garder, bascule Classique / Connaisseur mémorisée.
+**Jalons 3 et 4 : écrans de Trio d'après les maquettes** *(réalisés)*
+Page du jeu, tutoriel (Tes cartes en deux modes, vue à balayer, mise en place, un tour), règles complètes, partie en cours, trios gagnés, plus « Qui joue ? ». Charte v6 (ombres de tapis, carte fantôme, voile, rayon 16). **Test de fidélité pixel à pixel** aux maquettes.
 
-**Jalon 4 : règles pas à pas**
-`StepPager`, mode classique, mode connaisseur, tableau de correspondance.
-
-**Jalon 5 : second jeu et finitions**
-Trio, mentions légales, états vides/erreur, accessibilité, performances (Lighthouse).
+**Jalon 5 : second jeu et finitions** *(en partie)*
+Fait : page À propos et mentions légales, états vides, erreur et premier lancement. Reste : second jeu (Love Letter, avec ses maquettes), accessibilité à auditer sur appareil, performances (Lighthouse), maquette de l'accueil.
 
 **Jalon 6 : publication**
 Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capacitor/assets`), vérification des droits (voir section 6), puis, si décidé : builds Android et iOS, fiches et captures de stores, plugin d'écran maintenu allumé.
 
 ### Prompt de démarrage conseillé pour Claude Code
 
-> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 2. Utilise `charte/mastercards-charte.json` comme seule source des tokens et regarde les images dans `maquettes/`. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
+> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (second jeu). Utilise `charte/mastercards-charte.json` comme seule source des tokens et les images de `maquettes/trio/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
 
 ---
 
@@ -367,3 +435,9 @@ Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capa
 8. Hébergement web et nom de domaine.
 9. Identifiant d'application définitif (`io.mastercards.app` est provisoire) : à fixer avant toute publication sur un store.
 10. Prérendu statique des pages par jeu pour le référencement : nécessaire ou non ?
+11. Love Letter : comment représenter les cartes avec un paquet de 52 ? Le modèle limite chaque rang à 4 cartes ; il faudra décider quelles cartes jouent le rôle de chaque personnage.
+12. Relecture éditoriale de Trio : les textes viennent des maquettes ; cinq textes de la vue à balayer (A, 2 à 6, 8 à 10, Valet, Dame) ont été rédigés sur le même modèle. « Un tour » (maquette) dit « puis une deuxième » alors qu'on peut retourner jusqu'à trois cartes : à confirmer.
+13. Durée de Trio : « environ 15 minutes » d'après l'éditeur et les revendeurs, une source indique 15 à 20 minutes.
+14. Maquette de l'**accueil** (la liste des jeux) : elle n'a pas été fournie, l'accueil actuel est provisoire.
+15. Écran **« Qui joue ? »** (ajouté, sans maquette) : à valider ou à remplacer par la maquette.
+16. Les maquettes d'un **second jeu** (Love Letter) : le modèle suppose un `display`, une carte d'origine et un pouvoir par groupe.

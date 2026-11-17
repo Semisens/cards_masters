@@ -5,6 +5,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { rgba, shadowOf } from '../src/core/color.ts'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const charte = JSON.parse(readFileSync(resolve(root, 'charte/mastercards-charte.json'), 'utf8'))
@@ -52,35 +53,24 @@ add('card-face', charte.card.face)
 add('card-red', charte.card.red)
 add('card-black', charte.card.black)
 add('card-symbol-ratio', charte.card.symbol_width_ratio)
+add('card-symbol-ratio-list', charte.card.symbol_width_ratio_maquette)
+add('card-ratio-list', charte.card.ratio_liste)
+add('card-frame-list', `${charte.card.frame_px.liste}px`)
+add('card-frame-focus', `${charte.card.frame_px.focus}px`)
 
 // Jetons
 add('chip-inner-border', `${charte.chip_jeton.inner_border_px}px`)
 add('chip-stripe', `${charte.chip_jeton.stripe_deg}deg`)
 
-// Teintes dérivées. Calculées ici et non avec `color-mix()` en CSS, qui n'existe pas avant iOS 16.2
-// alors que l'app vise iOS 15 : sans cela, les ombres en relief disparaîtraient sur ces appareils.
-const SHADOW_MIX = 0.62 // part de la couleur d'origine ; le reste est du bleu nuit
+// Teintes dérivées, calculées ici et non avec `color-mix()` en CSS (absent d'iOS avant 16.2, alors que l'app vise iOS 15).
 const WHITE_STRIPE_ALPHA = 0.18 // motif en diagonale du dos de carte
 
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.replace('#', ''), 16)
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-}
-function mix(hex: string, withHex: string, share: number): string {
-  const a = hexToRgb(hex)
-  const b = hexToRgb(withHex)
-  const channels = a.map((v, i) => Math.round(v * share + b[i] * (1 - share)))
-  return `#${channels.map((c) => c.toString(16).padStart(2, '0')).join('')}`.toUpperCase()
-}
-function rgba(hex: string, alpha: number): string {
-  const [r, g, b] = hexToRgb(hex)
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
-}
-
-add('color-cerise-ombre', mix(charte.colors.cerise, charte.colors.nuit, SHADOW_MIX))
-for (const [k, v] of Object.entries<string>(charte.tapis_jeux)) {
-  add(`tapis-${kebab(k)}-ombre`, mix(v, charte.colors.nuit, SHADOW_MIX))
-}
+add('color-cerise-ombre', shadowOf(charte.colors.cerise))
+for (const [k, v] of Object.entries<string>(charte.tapis_ombres)) add(`tapis-${kebab(k)}-ombre`, v)
+add('ghost-bg', charte.fantome.fond)
+add('ghost-text', charte.fantome.texte)
+add('veil', charte.voile.fond)
+add('veil-shadow', charte.voile.ombre)
 add('chip-inner-color', rgba(charte.colors.blanc_carte, charte.chip_jeton.inner_border_alpha))
 add('card-back-stripe', rgba(charte.colors.blanc_carte, WHITE_STRIPE_ALPHA))
 
@@ -93,6 +83,7 @@ export const tokens = ${JSON.stringify(
     colors: charte.colors,
     tapis: charte.tapis_jeux,
     textOn: charte.text_on,
+    tapisOmbres: charte.tapis_ombres,
     card: { ratio: charte.card.ratio, red: charte.card.red, black: charte.card.black, face: charte.card.face },
   },
   null,

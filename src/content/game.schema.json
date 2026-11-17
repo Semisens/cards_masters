@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mastercards.local/game.schema.json",
+  "title": "Jeu MasterCards",
+  "description": "Un fichier game.json par jeu, dans src/content/games/<id>/. Validé par src/data/games.test.ts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "tagline",
+    "description",
+    "background_color",
+    "players",
+    "duration_min",
+    "card_groups",
+    "tutorial",
+    "full_rules"
+  ],
+  "properties": {
+    "id": {
+      "description": "Identifiant dans l'URL. Doit être égal au nom du dossier.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "font": {
+      "description": "Police du nom. Doit être embarquée dans l'app. Défaut : Fredoka.",
+      "enum": ["Fredoka", "Great Vibes"]
+    },
+    "background_color": {
+      "description": "Tapis de la charte, ou couleur libre. Le texte (blanc ou encre) est choisi automatiquement ; une couleur sans contraste suffisant est refusée.",
+      "oneOf": [
+        {
+          "enum": ["jaune", "vert", "rouge", "bleu"]
+        },
+        {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      ]
+    },
+    "logo": {
+      "description": "Fichier original ou redessiné, jamais le logo officiel. Absent : initiale dans un rond blanc.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+\\.(svg|png)$"
+    },
+    "players": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "max"],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        }
+      }
+    },
+    "duration_min": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 240
+    },
+    "classic_forbidden_terms": {
+      "description": "Optionnel. Vocabulaire du jeu d'origine interdit dans les textes du mode classique (vérifié par test). Vide pour un jeu dont le nom est lui-même le vocabulaire (Trio).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 2
+      }
+    },
+    "tagline": {
+      "description": "Phrase d'accroche en gras, sur la carte blanche de la page du jeu.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "description": {
+      "description": "Texte qui suit la phrase d'accroche, sur la page du jeu.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "card_groups": {
+      "description": "Cartes du paquet de 52 à garder, regroupées comme dans la vue liste. Un groupe = une ligne de la liste = une page de la vue à balayer.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/cardGroup"
+      }
+    },
+    "tutorial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["setup", "turn"],
+      "properties": {
+        "setup": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "hand", "center", "steps"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "hand": {
+              "type": "string",
+              "minLength": 1
+            },
+            "center": {
+              "type": "string",
+              "minLength": 1
+            },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "turn": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "steps", "win"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label", "text"],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "win": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["title", "text"],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "full_rules": {
+      "description": "Règles complètes : une section par titre.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "text"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "rank": {
+      "enum": ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    },
+    "suit": {
+      "enum": ["spades", "hearts", "diamonds", "clubs"]
+    },
+    "tapis": {
+      "enum": ["jaune", "vert", "rouge", "bleu"]
+    },
+    "cardGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "ranks", "count", "display", "short", "detail", "expert"],
+      "properties": {
+        "label": {
+          "description": "Titre de la ligne, ex. « 2 à 6 ».",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "ranks": {
+          "description": "Rangs du paquet réunis dans ce groupe.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/rank"
+          }
+        },
+        "count": {
+          "description": "Nombre de cartes gardées dans le groupe.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 52
+        },
+        "suits": {
+          "description": "Couleurs gardées. Absent : n'importe lesquelles. Si présent, count = rangs x couleurs.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/suit"
+          }
+        },
+        "display": {
+          "description": "La carte montrée dans la liste et la vue à balayer.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rank", "suit"],
+          "properties": {
+            "rank": {
+              "$ref": "#/$defs/rank"
+            },
+            "suit": {
+              "$ref": "#/$defs/suit"
+            }
+          }
+        },
+        "short": {
+          "description": "Sous le titre, après « ×3 · ».",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "badge": {
+          "description": "Pastille à côté du titre, ex. « Spécial ».",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "detail": {
+          "description": "Carte d'explication de la vue à balayer.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "text"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 60
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240
+            }
+          }
+        },
+        "expert": {
+          "description": "Mode connaisseur.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["original"],
+          "properties": {
+            "original": {
+              "description": "Carte(s) du jeu d'origine, ex. « 2–6 ».",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 12
+            },
+            "power": {
+              "description": "Pouvoir ou règle d'origine, en une proposition.",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,25 +1,38 @@
 import type { CSSProperties } from 'react'
-import { cardLabel, isRedSuit, type Rank, type Suit } from '../../core/cards.ts'
+import { cardLabel, isRedSuit, rankLetter, type Rank, type Suit } from '../../core/cards.ts'
 import type { TapisName } from '../../core/tokens.generated.ts'
 import { SUIT_PATHS, SYMBOL_VIEWBOX } from './symbols.ts'
 import styles from './PlayingCard.module.css'
+
+/**
+ * Variantes de carte :
+ * - `standard` : la carte de la charte, avec son relief ;
+ * - `list` : mini-carte des lignes de liste (maquettes Trio) : cadre bleu clair, sans relief, rang de 14 px ;
+ * - `focus` : grande carte de la vue à balayer : cadre soleil, rang de 28 px.
+ */
+export type CardVariant = 'standard' | 'list' | 'focus'
 
 interface FaceUp {
   rank: Rank
   suit: Suit
   faceDown?: false
+  variant?: CardVariant
 }
 
 interface FaceDown {
   faceDown: true
-  /** Couleur de la pioche (celle du tapis du jeu). */
+  /** Couleur de la pioche : un des tapis de la charte. */
   back?: TapisName
+  /** Couleur de pioche libre (CSS), pour un jeu à fond libre. Prime sur `back`. */
+  backColor?: string
 }
 
 export type PlayingCardProps = (FaceUp | FaceDown) & {
   /** Largeur de la carte : toute longueur CSS (par défaut, définie dans la feuille de style). */
   width?: string
   className?: string
+  /** Libellé pour lecteurs d'écran, à la place du libellé automatique (ex. « As, 3 cartes »). */
+  label?: string
 }
 
 /** Carte à jouer : rang seul en haut à gauche, un seul grand symbole centré, rouge ou noir uniquement. */
@@ -28,13 +41,13 @@ export function PlayingCard(props: PlayingCardProps) {
   const classes = [styles.card, props.className].filter(Boolean).join(' ')
 
   if (props.faceDown) {
-    const back = props.back ?? 'bleu'
+    const backColor = props.backColor ?? `var(--mc-tapis-${props.back ?? 'bleu'})`
     return (
       <div
         role="img"
         aria-label="Dos de carte"
         className={`${classes} ${styles.back}`}
-        style={{ ...style, '--back-color': `var(--mc-tapis-${back})` } as CSSProperties}
+        style={{ ...style, '--back-color': backColor } as CSSProperties}
       />
     )
   }
@@ -43,12 +56,12 @@ export function PlayingCard(props: PlayingCardProps) {
   return (
     <div
       role="img"
-      aria-label={cardLabel(rank, suit)}
-      className={`${classes} ${isRedSuit(suit) ? styles.red : styles.black}`}
+      aria-label={props.label ?? cardLabel(rank, suit)}
+      className={`${classes} ${isRedSuit(suit) ? styles.red : styles.black} ${props.variant === 'list' ? styles.list : ''} ${props.variant === 'focus' ? styles.focus : ''}`}
       style={style}
     >
       <span className={styles.rank} aria-hidden="true">
-        {rank}
+        {rankLetter(rank)}
       </span>
       <svg
         className={styles.symbol}

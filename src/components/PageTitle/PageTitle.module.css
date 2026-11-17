@@ -1,0 +1,7 @@
+.title {
+  margin: 0;
+  font-family: var(--mc-font-title);
+  font-weight: 600;
+  font-size: calc(var(--mc-text-min) * 2);
+  line-height: normal;
+}

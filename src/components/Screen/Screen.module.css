@@ -1,0 +1,39 @@
+.root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-image: linear-gradient(to bottom, var(--mc-color-ciel-from), var(--mc-color-ciel-to));
+}
+
+.solid {
+  background: var(--screen-solid);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mc-space-2);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--mc-text-min) * 32);
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  /* 48 en haut (sous la barre d'état), 24 sur les côtés et en bas : les marges des maquettes, zones sûres comprises. */
+  padding: max(var(--mc-space-5), env(safe-area-inset-top)) max(var(--mc-space-3), env(safe-area-inset-right))
+    max(var(--mc-space-3), env(safe-area-inset-bottom)) max(var(--mc-space-3), env(safe-area-inset-left));
+}
+
+.bare {
+  gap: 0;
+  padding: 0 0 max(var(--mc-space-3), env(safe-area-inset-bottom));
+}
+
+.fixed {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+}
+
+.tight {
+  gap: calc(var(--mc-space-1) * 1.5);
+}

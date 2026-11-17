@@ -36,6 +36,15 @@ describe('Button', () => {
     const cerise = screen.getByRole('button').className
     rerender(<Button variant="ciel">A</Button>)
     const ciel = screen.getByRole('button').className
-    expect(new Set([soleil, cerise, ciel]).size).toBe(3)
+    rerender(<Button variant="blanc">A</Button>)
+    const blanc = screen.getByRole('button').className
+    expect(new Set([soleil, cerise, ciel, blanc]).size).toBe(4)
+  })
+
+  it('peut occuper toute la largeur', () => {
+    const { rerender } = render(<Button>A</Button>)
+    const normal = screen.getByRole('button').className
+    rerender(<Button block>A</Button>)
+    expect(screen.getByRole('button').className).not.toBe(normal)
   })
 })

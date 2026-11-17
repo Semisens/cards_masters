@@ -1,0 +1,64 @@
+.zone {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--mc-space-2);
+  /* Le défilement vertical reste au navigateur ; le balayage horizontal est géré par la page. */
+  touch-action: pan-y;
+  outline: none;
+}
+
+.counter {
+  text-align: center;
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chevron {
+  min-width: var(--mc-touch-min);
+  min-height: var(--mc-touch-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  font-size: calc(var(--mc-text-min) * 2);
+  cursor: pointer;
+}
+
+.chevron:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.chevron:focus-visible {
+  outline: medium solid var(--mc-color-blanc-carte);
+  outline-offset: 2px;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--mc-space-1);
+}
+
+.dot,
+.dotActive {
+  width: calc(var(--mc-text-min) * 0.625);
+  height: calc(var(--mc-text-min) * 0.625);
+  border-radius: 50%;
+  background: var(--mc-color-nuit);
+}
+
+.dotActive {
+  background: var(--mc-color-soleil);
+}
+
+.note {
+  color: var(--mc-color-texte-secondaire);
+}

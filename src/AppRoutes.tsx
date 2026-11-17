@@ -1,0 +1,49 @@
+import { lazy, Suspense } from 'react'
+import { Route, Routes } from 'react-router'
+import { AboutPage } from './features/about/AboutPage.tsx'
+import { CardSwipePage } from './features/cards/CardSwipePage.tsx'
+import { CardsPage } from './features/cards/CardsPage.tsx'
+import { GameDetailPage } from './features/game-detail/GameDetailPage.tsx'
+import { HomePage } from './features/home/HomePage.tsx'
+import { NotFoundPage } from './features/not-found/NotFoundPage.tsx'
+import { PartyPage } from './features/party/PartyPage.tsx'
+import { ScorePage } from './features/party/ScorePage.tsx'
+import { PlayersPage } from './features/players/PlayersPage.tsx'
+import { RulesPage } from './features/rules/RulesPage.tsx'
+import { SetupPage } from './features/tutorial/SetupPage.tsx'
+import { TurnPage } from './features/tutorial/TurnPage.tsx'
+
+// La page de visite du design system n'existe qu'en développement : elle est absente du build de production.
+const DesignSystemPage = import.meta.env.DEV
+  ? lazy(() => import('./features/dev/DesignSystemPage.tsx').then((m) => ({ default: m.DesignSystemPage })))
+  : null
+
+/** Toutes les routes de l'app (adresses : voir `src/routes.ts`). Séparées de `App` pour être testées en mémoire. */
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/jeu/:gameId" element={<GameDetailPage />} />
+      <Route path="/jeu/:gameId/regles" element={<RulesPage />} />
+      <Route path="/jeu/:gameId/tutoriel/cartes" element={<CardsPage />} />
+      <Route path="/jeu/:gameId/tutoriel/cartes/:groupe" element={<CardSwipePage />} />
+      <Route path="/jeu/:gameId/tutoriel/mise-en-place" element={<SetupPage />} />
+      <Route path="/jeu/:gameId/tutoriel/tour" element={<TurnPage />} />
+      <Route path="/jeu/:gameId/joueurs" element={<PlayersPage />} />
+      <Route path="/jeu/:gameId/partie" element={<PartyPage />} />
+      <Route path="/jeu/:gameId/partie/scores" element={<ScorePage />} />
+      <Route path="/a-propos" element={<AboutPage />} />
+      {DesignSystemPage && (
+        <Route
+          path="/dev/design-system"
+          element={
+            <Suspense fallback={null}>
+              <DesignSystemPage />
+            </Suspense>
+          }
+        />
+      )}
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  )
+}

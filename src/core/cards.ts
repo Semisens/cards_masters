@@ -29,6 +29,24 @@ const SUIT_NAMES: Record<Suit, string> = {
   clubs: 'trèfle',
 }
 
+/** Nom d'un rang, ex. « Roi », « As », « 10 ». */
+export const rankName = (rank: Rank): string => RANK_NAMES[rank]
+
+/** Lettre du rang sur une carte française : V (Valet), D (Dame), R (Roi). Les autres rangs sont inchangés. */
+export const rankLetter = (rank: Rank): string => (rank === 'J' ? 'V' : rank === 'Q' ? 'D' : rank === 'K' ? 'R' : rank)
+
+/** Rang au pluriel, ex. « Rois », « Dames », « 7 ». */
+export const rankPlural = (rank: Rank): string =>
+  rank === 'A' ? 'As' : /^\d+$/.test(rank) ? rank : `${RANK_NAMES[rank]}s`
+
+const SUIT_PLURALS: Record<Suit, string> = { spades: 'piques', hearts: 'cœurs', diamonds: 'carreaux', clubs: 'trèfles' }
+
+/** Couleur au pluriel, ex. « trèfles ». */
+export const suitPlural = (suit: Suit): string => SUIT_PLURALS[suit]
+
+/** Nom d'une couleur, ex. « cœur ». */
+export const suitName = (suit: Suit): string => SUIT_NAMES[suit]
+
 /** Libellé lisible par un lecteur d'écran, ex. « Roi de cœur ». */
 export function cardLabel(rank: Rank, suit: Suit): string {
   return `${RANK_NAMES[rank]} de ${SUIT_NAMES[suit]}`

@@ -55,3 +55,39 @@
     var(--back-color);
   border: calc(var(--card-w) * 0.06) solid var(--mc-card-face);
 }
+
+/* Mini-carte des listes (maquettes Trio) : 44 px de large, cadre bleu clair, pas de relief. */
+.list {
+  --card-w: var(--mc-touch-min);
+  /* La maquette fixe 44 x 61 px (rapport 1,386), pas 1,4. */
+  aspect-ratio: 1 / var(--mc-card-ratio-list);
+  border: var(--mc-card-frame-list) solid var(--mc-color-bordure);
+  box-shadow: none;
+}
+
+/* Grande carte de la vue à balayer : cadre soleil. La largeur vient de la prop `width`. */
+.focus {
+  border: var(--mc-card-frame-focus) solid var(--mc-color-soleil);
+  box-shadow: none;
+}
+
+/* Rang des cartes de la maquette : taille fixe (14 px, 28 px) et décalage de 2 px / 6 px depuis le coin. */
+.list .rank,
+.focus .rank {
+  top: calc(var(--mc-space-1) / 4);
+  left: calc(var(--mc-space-1) * 0.75);
+}
+
+.list .rank {
+  font-size: calc(var(--mc-text-min) * 0.875);
+}
+
+.focus .rank {
+  font-size: calc(var(--mc-text-min) * 1.75);
+}
+
+/* Symbole des cartes de la maquette : le glyphe occupe environ la moitié de la largeur, un peu moins que la carte standard. */
+.list .symbol,
+.focus .symbol {
+  width: calc(var(--mc-card-symbol-ratio-list) * 100%);
+}

@@ -27,4 +27,36 @@ describe('PlayingCard', () => {
     expect(container.querySelector('svg')).toBeNull()
     expect(container).toHaveTextContent('')
   })
+
+  it('écrit les figures à la française : V, D, R', () => {
+    const { container, rerender } = render(<PlayingCard rank="J" suit="hearts" />)
+    expect(container).toHaveTextContent('V')
+    rerender(<PlayingCard rank="Q" suit="spades" />)
+    expect(container).toHaveTextContent('D')
+    rerender(<PlayingCard rank="K" suit="clubs" />)
+    expect(container).toHaveTextContent('R')
+  })
+
+  it('garde le libellé complet pour les lecteurs d’écran malgré la lettre', () => {
+    render(<PlayingCard rank="J" suit="hearts" />)
+    expect(screen.getByRole('img', { name: 'Valet de cœur' })).toBeInTheDocument()
+  })
+
+  it('accepte un libellé personnalisé', () => {
+    render(<PlayingCard rank="2" suit="spades" label="2 à 6" />)
+    expect(screen.getByRole('img', { name: '2 à 6' })).toBeInTheDocument()
+  })
+
+  it('a des variantes pour la liste et la vue à balayer', () => {
+    const { container: list } = render(<PlayingCard rank="2" suit="spades" variant="list" />)
+    const { container: focus } = render(<PlayingCard rank="2" suit="spades" variant="focus" />)
+    const { container: standard } = render(<PlayingCard rank="2" suit="spades" />)
+    const cls = (c: HTMLElement) => (c.firstChild as HTMLElement).className
+    expect(new Set([cls(list), cls(focus), cls(standard)]).size).toBe(3)
+  })
+
+  it('le dos de pioche accepte une couleur libre', () => {
+    render(<PlayingCard faceDown backColor="#187A33" />)
+    expect(screen.getByRole('img', { name: 'Dos de carte' }).style.getPropertyValue('--back-color')).toBe('#187A33')
+  })
 })

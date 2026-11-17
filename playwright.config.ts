@@ -19,10 +19,15 @@ export default defineConfig({
     toHaveScreenshot: { maxDiffPixelRatio: 0.005 },
   },
   projects: [
-    // Build de production servi par `vite preview` : PWA, service worker, hors ligne.
-    { name: 'pwa', testMatch: /pwa\.spec\.ts/, use: { baseURL: `http://localhost:${PREVIEW_PORT}` } },
+    // Build de production servi par `vite preview` : PWA, service worker, hors ligne, parcours de l'app.
+    { name: 'pwa', testMatch: /(pwa|app)\.spec\.ts/, use: { baseURL: `http://localhost:${PREVIEW_PORT}` } },
     // Serveur de dev : la page de visite du design system n'existe pas en production.
-    { name: 'visual', testMatch: /visual\.spec\.ts/, use: { baseURL: `http://localhost:${DEV_PORT}` } },
+    // Animations réduites (préférence système que l'app respecte) : les captures ne peuvent pas surprendre un fondu en cours.
+    {
+      name: 'visual',
+      testMatch: /(visual|maquettes)\.spec\.ts/,
+      use: { baseURL: `http://localhost:${DEV_PORT}`, reducedMotion: 'reduce' },
+    },
   ],
   webServer: [
     {

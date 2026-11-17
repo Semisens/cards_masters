@@ -1,0 +1,11 @@
+.step {
+  margin: 0;
+}
+
+.step + .step {
+  margin-top: calc(var(--mc-text-min) * 1.364);
+}
+
+.spacer {
+  flex: 1;
+}

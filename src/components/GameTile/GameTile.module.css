@@ -1,0 +1,58 @@
+.tile {
+  display: flex;
+  align-items: center;
+  gap: var(--mc-space-2);
+  min-height: calc(var(--mc-touch-min) * 2);
+  padding: var(--mc-space-2) var(--mc-space-3);
+  border-radius: var(--mc-radius-l);
+  background: var(--game-bg);
+  color: var(--game-fg);
+  text-decoration: none;
+  box-shadow: 0 var(--mc-elevation-l) 0 var(--game-shadow);
+  transition:
+    transform 80ms ease-out,
+    box-shadow 80ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tile:active {
+  transform: translateY(var(--mc-elevation-l));
+  box-shadow: 0 0 0 var(--game-shadow);
+}
+
+.tile:focus-visible {
+  outline: medium solid var(--mc-color-blanc-carte);
+  outline-offset: 2px;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--game-font);
+  font-weight: var(--game-font-weight);
+  font-size: calc(var(--mc-text-min) * 1.75);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  font-weight: 700;
+  font-size: var(--mc-text-min);
+}
+
+/* La pioche dépasse de la vignette, un peu penchée. */
+.pile {
+  flex: none;
+  transform: rotate(8deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+}

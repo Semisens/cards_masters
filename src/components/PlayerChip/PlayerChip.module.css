@@ -1,0 +1,25 @@
+.player {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+/* Jeton : bord blanc en pointillés, anneau de la couleur du joueur, relief sombre. */
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto calc(var(--mc-space-1) / 2);
+  border: calc(var(--mc-space-1) * 0.75) dashed var(--mc-color-blanc-carte);
+  border-radius: 50%;
+  background: var(--chip);
+  box-shadow: 0 var(--mc-elevation-s) 0 var(--mc-veil-shadow);
+  outline: medium solid var(--chip);
+  color: var(--chip-text);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--mc-text-min) * 1.375);
+}

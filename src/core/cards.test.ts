@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { cardLabel, isRedSuit, RANKS, SUITS } from './cards.ts'
+import { cardLabel, isRedSuit, rankLetter, RANKS, SUITS } from './cards.ts'
 
 describe('cardLabel', () => {
   it('donne un libellé français lisible', () => {
@@ -19,5 +19,19 @@ describe('cardLabel', () => {
 describe('isRedSuit', () => {
   it('cœur et carreau sont rouges, pique et trèfle noirs', () => {
     expect(SUITS.filter(isRedSuit)).toEqual(['hearts', 'diamonds'])
+  })
+})
+
+describe('rankLetter', () => {
+  it('écrit les figures à la française : V, D, R', () => {
+    expect(rankLetter('J')).toBe('V')
+    expect(rankLetter('Q')).toBe('D')
+    expect(rankLetter('K')).toBe('R')
+  })
+
+  it('laisse As et valeurs numériques inchangés', () => {
+    expect(rankLetter('A')).toBe('A')
+    expect(rankLetter('10')).toBe('10')
+    expect(rankLetter('7')).toBe('7')
   })
 })

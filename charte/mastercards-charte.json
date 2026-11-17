@@ -1,6 +1,6 @@
 {
  "app": "MasterCards",
- "version": 5,
+ "version": 6,
  "platform": "PWA + Capacitor (iOS/Android), base 390x844",
  "colors": {
   "ciel": "#1E5BD6",
@@ -25,6 +25,13 @@
   "rouge": "#B8312C",
   "bleu": "#2273C9"
  },
+ "tapis_ombres": {
+  "jaune": "#B98300",
+  "vert": "#0F4F20",
+  "rouge": "#78201D",
+  "bleu": "#164B83"
+ },
+ "tapis_ombres_note": "vert relevé dans la maquette Trio (GameDetail). jaune = soleil_ombre. rouge et bleu dérivés : couleur du tapis x 0,65.",
  "text_on": {
   "ciel": "#FFFFFF",
   "nuit": "#FFFFFF",
@@ -45,7 +52,8 @@
  "radius": {
   "s": 12,
   "m": 20,
-  "l": 28
+  "l": 28,
+  "ligne": 16
  },
  "elevation_px": {
   "s": 4,
@@ -72,7 +80,13 @@
   "red": "#D93A34",
   "black": "#14213D",
   "content": "rang en haut à gauche (Fredoka 700), symbole unique centré (62% de la largeur), pas de petit symbole",
-  "symbol_width_ratio": 0.62
+  "symbol_width_ratio": 0.62,
+  "frame_px": {
+   "liste": 3,
+   "focus": 4
+  },
+  "symbol_width_ratio_maquette": 0.54,
+  "ratio_liste": 1.3864
  },
  "chip_jeton": {
   "edge": "conic rayé blanc/couleur",
@@ -94,5 +108,15 @@
   },
   "font": "police du nom propre au jeu (Google Fonts, licence libre), ex. Love Letter : Great Vibes; défaut Fredoka 600"
  },
- "voice": "tutoiement, phrases courtes"
+ "voice": "tutoiement, phrases courtes",
+ "fantome": {
+  "fond": "#E9EFFB",
+  "texte": "#A9B7DA",
+  "note": "carte du jeu d'origine, en pointillés (maquette Trio, liste en mode connaisseur)"
+ },
+ "voile": {
+  "fond": "rgba(0, 0, 0, 0.2)",
+  "ombre": "rgba(0, 0, 0, 0.3)",
+  "note": "assombrit un tapis : panneau des joueurs et relief des jetons (maquette Trio, Partie en cours)"
+ }
 }

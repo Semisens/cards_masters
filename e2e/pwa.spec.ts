@@ -42,7 +42,7 @@ test.describe('PWA (build de production)', () => {
     await context.setOffline(true)
     await page.reload()
     await expect(page.getByRole('heading', { name: 'MasterCards' })).toBeVisible()
-    await expect(page.getByText('Les jeux arrivent bientôt.')).toBeVisible()
+    await expect(page.getByRole('link', { name: /Trio/ })).toBeVisible()
 
     // Les polices embarquées sont bien servies depuis le cache.
     const fontsReady = await page.evaluate(async () => {

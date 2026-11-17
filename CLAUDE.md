@@ -15,20 +15,39 @@
 | Commande | Rôle |
 |---|---|
 | `npm run dev` | Serveur de dev (régénère les tokens). Page de visite : `/dev/design-system` (dev uniquement). |
+| `npm run dev:phone` | Démarre le serveur de dev (s'il ne tourne pas) et ouvre la fenêtre au format téléphone, en une commande. `npm run phone` seul ouvre la fenêtre quand le serveur tourne déjà. |
 | `npm run lint` | oxlint + Prettier (vérification). `npm run format` pour corriger. |
 | `npm run typecheck` | `tsc -b` en mode strict. |
 | `npm test` | Vitest : unitaires, composants, garde-fou « aucune valeur en dur ». |
-| `npm run test:visual` | Playwright : PWA (hors ligne, manifeste) et captures du design system à 390x844. |
+| `npm run test:visual` | Playwright : PWA (hors ligne, manifeste), parcours de l’app sur le build de production, captures des écrans à 390x844. |
 | `npm run build` | Build de production dans `dist/` (service worker inclus). |
 | `npm run cap:sync` | Build puis copie dans les projets natifs `android/` et `ios/`. |
 | `npm run tokens` / `npm run icons` | Régénèrent les tokens et les icônes depuis la charte. |
+| `npm run maquettes` | Rend les maquettes HTML en images de référence (`maquettes/trio/*.png`). |
 
 **Avant chaque commit** : `npm run lint && npm run typecheck && npm test`. Après un changement visuel voulu : `npm run test:visual -- --update-snapshots`, puis regarde les images avant de les valider.
+
+## Parcours de l'app
+
+**Navigation identique partout** (cahier §7.9 bis) : « ‹ Retour » en haut à gauche, « Quitter le tutoriel » en haut à droite (tutoriel), le bouton principal (« Suivant ») toujours en bas. `StepHeader` ne prend que des adresses, pas de libellé.
+
+Accueil (choix du jeu) → le jeu (« Jouer » ou « Règles complètes ») → tutoriel : **Tes cartes** (liste, bandeau « Retire… » en bas ; **le mode Classique / Connaisseur se choisit ici**, jamais à l'accueil) → vue à balayer d'un groupe → mise en place → un tour → Qui joue ? → partie en cours ⇄ trios gagnés. Adresses dans `src/routes.ts`.
+
+**Les écrans sont ceux des maquettes de Trio** : `maquettes/trio/*.png` (rendues par `npm run maquettes` depuis `maquettes/trio/source/*.dc.html`). Le test `e2e/maquettes.spec.ts` compare **chaque écran à sa maquette, pixel par pixel**, et échoue au-delà de son seuil (images d'écart dans `test-results/maquettes/`). Avant de changer un écran, regarde sa maquette ; après, lance `npx playwright test --project=visual e2e/maquettes.spec.ts` et regarde les images d'écart. Les écarts voulus sont listés dans le test et dans le cahier des charges (7.10). Une nouvelle maquette : dépose le `.dc.html` dans `maquettes/trio/source/`, ajoute-le à l'export, relance `npm run maquettes`.
+
+**Chaque écran doit tenir sans défilement vertical** (test `aucun défilement vertical` dans `e2e/visual.spec.ts`, 390 x 844 et 393 x 852). Compacte avant d'ajouter du défilement.
+
+## Ajouter un jeu
+
+1. Crée le dossier `src/content/games/<id>/` avec un `game.json` (modèle : `src/content/game.schema.json`, exemple : `trio/game.json`). Ajoute un logo `svg` ou `png` seulement s'il est original ou redessiné.
+2. Les cartes sont regroupées en `card_groups` (une ligne de la liste = une page de la vue à balayer), avec `expert.original` pour le mode connaisseur ; ajoute `tutorial` et `full_rules`. Le bandeau « Retire… Garde… » est calculé, il ne s'écrit pas. Lance `npm test`. Les tests valident le schéma, les cartes, le contraste, les mots que le jeu interdit (`classic_forbidden_terms`, facultatif), le tutoiement et la longueur des phrases. Le jeu apparaît ensuite tout seul sur l'accueil.
+3. Aucune ligne de code à modifier. Seule exception : une nouvelle police de nom de jeu (paquet `@fontsource`, import dans `main.tsx`, ligne dans `src/core/fonts.ts`).
+4. Les textes de l'interface sont dans `src/i18n/fr.ts`, ceux des jeux dans leur `game.json`.
 
 ## Règles du dépôt
 
 - Fichiers `*.generated.*` : jamais édités à la main, régénérés par `npm run tokens`.
 - `.npmrc` active `legacy-peer-deps` (conflit de peer optionnel entre `@vitejs/plugin-react` et Workbox). Ne pas le retirer sans vérifier que `npm install` passe.
-- Les rangs de cartes et valeurs de jetons sont des éléments graphiques proportionnels à l'objet. Sous environ 3,9 rem de largeur de carte, le rang passe sous 16 px : ne pas descendre en dessous.
+- Les rangs de cartes et valeurs de jetons sont des éléments graphiques proportionnels à l'objet. Sous environ 3,9 rem de largeur de carte, le rang passe sous 16 px : pour les cartes d’illustration, utiliser `READABLE_CARD_WIDTH` (`components/PlayingCard/sizes.ts`).
 - `capacitor.config.ts` : l'identifiant `io.mastercards.app` est provisoire. Il ne peut plus changer une fois l'app publiée sur un store.
 - iOS ne se compile que sur Mac (Xcode). Android demande le SDK Android (Android Studio). Sans eux, on vérifie seulement `npx cap sync`.

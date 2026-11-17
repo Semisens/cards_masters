@@ -1,0 +1,26 @@
+.pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: var(--mc-touch-min);
+  padding: 0 var(--mc-space-2);
+  border-radius: calc(var(--mc-touch-min) / 2);
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nuit {
+  background: var(--mc-color-nuit);
+  color: var(--mc-text-on-nuit);
+}
+
+.soleil {
+  background: var(--mc-color-soleil);
+  color: var(--mc-text-on-soleil);
+}
+
+.pill:focus-visible {
+  outline: medium solid var(--mc-color-blanc-carte);
+  outline-offset: 2px;
+}

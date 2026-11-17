@@ -1,0 +1,8 @@
+.section + .section {
+  margin-top: calc(var(--mc-text-min) * 1.364);
+}
+
+.title {
+  font-family: var(--mc-font-title);
+  font-size: calc(var(--mc-text-min) * 1.25);
+}
