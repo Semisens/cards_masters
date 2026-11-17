@@ -1,0 +1,19 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mc-space-2);
+  padding: var(--mc-space-4) var(--mc-space-2);
+}
+
+.title {
+  font-size: calc(var(--mc-text-min) * 2.25);
+}
+
+.lead {
+  font-size: calc(var(--mc-text-min) * 1.125);
+}
+
+.soon {
+  color: var(--mc-color-soleil);
+  font-weight: 800;
+}

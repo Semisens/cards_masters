@@ -1,0 +1,68 @@
+.button {
+  /* Variables de variante, définies plus bas. */
+  position: relative;
+  box-sizing: border-box;
+  min-width: var(--mc-touch-min);
+  min-height: var(--mc-touch-min);
+  padding: var(--mc-space-2) var(--mc-space-4);
+  border: 0;
+  border-radius: var(--mc-radius-m);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--mc-text-min) * 1.125);
+  line-height: 1.2;
+  cursor: pointer;
+  /* Relief : une « tranche » pleine sous le bouton. */
+  box-shadow: 0 var(--mc-elevation-m) 0 var(--btn-shadow);
+  transform: translateY(0);
+  transition:
+    transform 80ms ease-out,
+    box-shadow 80ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Pressé : le bouton descend de toute la hauteur du relief. */
+.button:active:not(:disabled) {
+  transform: translateY(var(--mc-elevation-m));
+  box-shadow: 0 0 0 var(--btn-shadow);
+}
+
+.button:focus-visible {
+  outline: medium solid var(--mc-color-blanc-carte);
+  outline-offset: 2px;
+}
+
+/* Désactivé : à plat, terne, non cliquable. */
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: translateY(var(--mc-elevation-m));
+  box-shadow: 0 0 0 var(--btn-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
+
+.soleil {
+  --btn-bg: var(--mc-color-soleil);
+  --btn-fg: var(--mc-text-on-soleil);
+  --btn-shadow: var(--mc-color-soleil-ombre);
+}
+
+.cerise {
+  --btn-bg: var(--mc-color-cerise);
+  --btn-fg: var(--mc-text-on-cerise);
+  --btn-shadow: var(--mc-color-cerise-ombre);
+}
+
+.ciel {
+  --btn-bg: var(--mc-color-ciel);
+  --btn-fg: var(--mc-text-on-ciel);
+  --btn-shadow: var(--mc-color-nuit);
+}

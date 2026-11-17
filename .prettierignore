@@ -1,0 +1,16 @@
+node_modules
+dist
+android
+ios
+build_ressource
+package-lock.json
+*.generated.*
+public/icons
+playwright-report
+test-results
+e2e/**/*-snapshots
+# Documents rédactionnels et charte : pas de reformatage automatique.
+docs
+maquettes
+charte
+CLAUDE.md

@@ -1,0 +1,33 @@
+.chip {
+  --chip-size: 4rem;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--chip-size);
+  height: var(--chip-size);
+  border-radius: 50%;
+  /* Bord conique rayé blanc / couleur. */
+  background: repeating-conic-gradient(
+    var(--chip-color) 0 var(--mc-chip-stripe),
+    var(--mc-color-blanc-carte) var(--mc-chip-stripe) calc(var(--mc-chip-stripe) * 2)
+  );
+  box-shadow: 0 var(--mc-elevation-s) 0 var(--chip-shadow);
+}
+
+.face {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: var(--chip-color);
+  /* Liseré intérieur : blanc à 60 % d'opacité. */
+  border: var(--mc-chip-inner-border) solid var(--mc-chip-inner-color);
+  color: var(--chip-text);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--chip-size) * 0.3);
+  line-height: 1;
+}

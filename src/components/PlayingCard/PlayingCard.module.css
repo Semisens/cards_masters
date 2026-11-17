@@ -1,0 +1,57 @@
+/* Toutes les dimensions dérivent de --card-w. Les valeurs de la charte viennent des variables --mc-*. */
+.card {
+  --card-w: 5.5rem;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--card-w);
+  aspect-ratio: 1 / var(--mc-card-ratio);
+  border-radius: var(--mc-card-radius);
+  background: var(--mc-card-face);
+  box-shadow: 0 var(--mc-elevation-s) 0 var(--mc-color-bordure);
+  overflow: hidden;
+}
+
+.red {
+  color: var(--mc-card-red);
+}
+
+.black {
+  color: var(--mc-card-black);
+}
+
+/* Rang seul, en haut à gauche, Fredoka 700. */
+.rank {
+  position: absolute;
+  top: calc(var(--card-w) * 0.06);
+  left: calc(var(--card-w) * 0.1);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--card-w) * 0.26);
+  line-height: 1;
+}
+
+/* Un seul grand symbole centré : 62 % de la largeur. */
+.symbol {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--mc-card-symbol-ratio) * 100%);
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  stroke-width: 6;
+}
+
+/* Dos de pioche : couleur du jeu, liseré clair et motif en diagonale. */
+.back {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 calc(var(--card-w) * 0.08),
+      var(--mc-card-back-stripe) calc(var(--card-w) * 0.08) calc(var(--card-w) * 0.16)
+    ),
+    var(--back-color);
+  border: calc(var(--card-w) * 0.06) solid var(--mc-card-face);
+}

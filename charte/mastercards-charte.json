@@ -1,0 +1,98 @@
+{
+ "app": "MasterCards",
+ "version": 5,
+ "platform": "PWA + Capacitor (iOS/Android), base 390x844",
+ "colors": {
+  "ciel": "#1E5BD6",
+  "ciel_degrade": [
+   "#2A70E8",
+   "#1648B8"
+  ],
+  "nuit": "#0E2F86",
+  "soleil": "#FFC928",
+  "soleil_ombre": "#B98300",
+  "cerise": "#D93A34",
+  "prairie": "#2DB24E",
+  "azur": "#36A0F5",
+  "blanc_carte": "#FFFFFF",
+  "encre": "#14213D",
+  "texte_secondaire": "#4A5675",
+  "bordure": "#C9D6F2"
+ },
+ "tapis_jeux": {
+  "jaune": "#FFC928",
+  "vert": "#187A33",
+  "rouge": "#B8312C",
+  "bleu": "#2273C9"
+ },
+ "text_on": {
+  "ciel": "#FFFFFF",
+  "nuit": "#FFFFFF",
+  "cerise": "#FFFFFF",
+  "soleil": "#14213D",
+  "prairie": "#14213D",
+  "azur": "#14213D",
+  "tapis_vert": "#FFFFFF",
+  "tapis_rouge": "#FFFFFF",
+  "tapis_bleu": "#FFFFFF",
+  "tapis_jaune": "#14213D"
+ },
+ "fonts": {
+  "titres": "Fredoka 500/600/700",
+  "textes": "Nunito 600/700/800",
+  "texte_min_px": 16
+ },
+ "radius": {
+  "s": 12,
+  "m": 20,
+  "l": 28
+ },
+ "elevation_px": {
+  "s": 4,
+  "m": 6,
+  "l": 8
+ },
+ "spacing": [
+  8,
+  16,
+  24,
+  32,
+  48
+ ],
+ "touch_min_px": 44,
+ "icons": {
+  "stroke": 2.5,
+  "caps": "round",
+  "color": "#0E2F86"
+ },
+ "card": {
+  "ratio": 1.4,
+  "radius": 12,
+  "face": "#FFFFFF",
+  "red": "#D93A34",
+  "black": "#14213D",
+  "content": "rang en haut à gauche (Fredoka 700), symbole unique centré (62% de la largeur), pas de petit symbole",
+  "symbol_width_ratio": 0.62
+ },
+ "chip_jeton": {
+  "edge": "conic rayé blanc/couleur",
+  "inner_border": "3px blanc 60%",
+  "numbers_font": "Fredoka 700",
+  "inner_border_px": 3,
+  "inner_border_alpha": 0.6,
+  "stripe_deg": 15
+ },
+ "game_theme_schema": {
+  "name": "string",
+  "pile": "dos de cartes à la couleur du jeu",
+  "logo": "image originale ou redessinée, jamais le logo officiel; sinon initiale dans un rond blanc",
+  "background_color": "jaune|vert|rouge|bleu|libre (texte blanc ou encre auto, contraste>=4.5)",
+  "kept_cards": "liste des cartes à garder",
+  "rules": {
+   "classic": "règles sur la base des cartes choisies, sans vocabulaire d'origine",
+   "expert": "correspondance carte→personnage, pouvoir, règle d'origine"
+  },
+  "font": "police du nom propre au jeu (Google Fonts, licence libre), ex. Love Letter : Great Vibes; défaut Fredoka 600"
+ },
+ "voice": "tutoiement, phrases courtes"
+}

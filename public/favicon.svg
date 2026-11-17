@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A70E8"/>
+      <stop offset="1" stop-color="#1648B8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#ciel)"/>
+  <rect x="141" y="105.0" width="230" height="322" rx="24" fill="#0E2F86" opacity="0.55"/>
+  <rect x="141" y="95.0" width="230" height="322" rx="24" fill="#FFFFFF"/>
+  <g transform="translate(184.7 184.7) scale(1.4260)">
+    <path d="M50 90 C8 60 4 30 26 17 C39 10 50 18 50 30 C50 18 61 10 74 17 C96 30 92 60 50 90 Z" fill="#D93A34" stroke="#D93A34" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+</svg>
