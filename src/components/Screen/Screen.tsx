@@ -7,6 +7,8 @@ export interface ScreenProps {
   className?: string
   /** Couleur de fond unie (écran « Partie en cours ») au lieu du dégradé bleu. Toute couleur CSS. */
   solid?: string
+  /** Couleur du texte sur ce fond uni (celle du thème du jeu). Absent : celle de l'app. */
+  solidText?: string
   /** Sans marges : l'écran place lui-même ses blocs pleine largeur (bandeau du jeu). */
   bare?: boolean
   /** Hauteur de l'écran, pas plus : une zone interne défile (liste des cartes) au lieu de la page. */
@@ -25,12 +27,15 @@ export function Screen({
   children,
   className,
   solid,
+  solidText,
   bare = false,
   fixed = false,
   tight = false,
   tabs = false,
 }: ScreenProps) {
-  const style = solid ? ({ '--screen-solid': solid } as CSSProperties) : undefined
+  const style = solid
+    ? ({ '--screen-solid': solid, ...(solidText ? { '--screen-solid-fg': solidText } : {}) } as CSSProperties)
+    : undefined
   return (
     <div
       className={[styles.root, solid ? styles.solid : '', tabs ? styles.withTabs : ''].filter(Boolean).join(' ')}

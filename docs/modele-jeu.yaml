@@ -28,9 +28,22 @@ name: Mon jeu # 40 caractères au plus
 #   weight: 400
 #   band_size: 4 # taille du nom dans le bandeau, en multiples de 16 px (défaut 3,5)
 
-# Couleur du tapis : jaune, vert, rouge, bleu (charte), ou une couleur libre '#RRGGBB'.
-# Le texte (blanc ou encre) est choisi seul ; une couleur sans contraste suffisant est refusée.
-background_color: bleu
+# Couleurs. Seule main_color est obligatoire ; chaque autre champ remplace un calcul.
+#
+# main_color : la couleur du jeu (le « tapis ») : tuile de l'accueil, bandeau, écran de partie. Un nom de la charte
+#   (jaune, vert, rouge, bleu) ou une couleur libre '#RRGGBB'. Le texte dessus (blanc ou encre) est choisi seul ;
+#   une couleur sans contraste suffisant est refusée.
+main_color: bleu
+# shadow_color: '#0E2F86' # relief de main_color (défaut : main_color assombri)
+# text_color: '#FFFFFF' # texte sur main_color ; contraste d'au moins 4,5, sinon refusé
+
+# background_color : le fond de TOUS les écrans du jeu, à la place du bleu de l'app (un dégradé discret en est tiré).
+#   Avec lui, les pastilles et bascules prennent main_color. Sans lui, le jeu garde le bleu.
+# background_color: '#EEDDC8'
+# background_text_color: '#14213D' # texte sur ce fond (défaut : blanc ou encre, choisi seul ; contraste d'au moins 4,5)
+
+# Dos des cartes (pioche, cartes posées de dos) : un nom de la charte ou '#RRGGBB'. Défaut : main_color.
+# card_back_color: '#E57979'
 
 # logo: logo.svg # facultatif ; défaut : l'initiale du nom dans un rond blanc
 
@@ -57,6 +70,14 @@ duration_min: 15 # filtre « Rapide » de l'accueil : 15 minutes ou moins
 #         Le bandeau dit alors « Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet. ».
 # Le nombre de cartes et le bandeau « Retire… Garde… » sont calculés : rien à écrire.
 # expert : la correspondance avec le jeu d'origine, montrée en mode Connaisseur.
+#   expert.cards (facultatif) : les cartes d'origine, 1 à 5 par groupe : { value, name?, color, image? }.
+#     Sans `image`, la carte est DESSINÉE (valeur sur fond de couleur, sans portrait ni texte officiel) :
+#       cards: [{ value: '7', name: Roi, color: '#606D73' }]
+#     Avec `image: carte-07.webp` (fichier du dossier du jeu, svg, png ou webp), la carte EST l'image, chiffre compris :
+#       une image dont tu as les droits, jamais une illustration officielle. Pour découper une planche de cartes :
+#       `npm run planche -- planche.png src/content/games/<id> carte` (carte-01.webp, carte-02.webp… à fond transparent).
+#     Dans les deux cas, `color` doit porter `value` en blanc ou en encre (contraste d'au moins 4,5 : vérifié par `npm test`).
+#     Sans `cards`, une carte en pointillés.
 
 card_groups:
   - label: As # titre de la ligne
@@ -73,6 +94,7 @@ card_groups:
       original: '1' # carte(s) du jeu d'origine
       name: Dragon # nom d'origine ; facultatif
       power: rien n’arrête le dragon # pouvoir d'origine, en une proposition ; facultatif
+      cards: [{ value: '1', name: Dragon, color: '#C0392B' }] # facultatif : la carte d'origine, dessinée
 
   - label: 2 à 6
     cards:
@@ -105,8 +127,9 @@ scoring:
 tutorial:
   setup:
     title: Mise en place
-    diagram: # schéma : 1 à 4 tas de cartes, de dos ; ou une carte visible si `card` est donné
+    diagram: # schéma : 1 à 4 éléments, des cartes de dos ; ou une carte visible si `card` est donné
       - label: Pioche
+        layout: pile # single (une carte, défaut) | pile (la pioche) | spread (une main en éventail)
       - label: Défausse
         card: { rank: 5, suit: hearts }
     steps:
@@ -115,6 +138,10 @@ tutorial:
       - Le reste forme la pioche.
   turn:
     title: Un tour de jeu
+    diagram: # facultatif : même forme que le schéma de mise en place, 1 à 3 éléments, sous le titre
+      - { label: Pioche, layout: pile }
+      - { label: Ta main, layout: spread }
+      - { label: Posée devant toi, card: { rank: 5, suit: hearts } }
     steps:
       - label: Pioche.
         text: Prends la carte du dessus.

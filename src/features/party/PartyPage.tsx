@@ -34,7 +34,7 @@ export function PartyPage() {
   const aside = fill(scoring.party_label, { round: session.round })
 
   return (
-    <Screen solid={theme.background}>
+    <Screen solid={theme.main} solidText={theme.text}>
       <div className={styles.top}>
         <Link to={paths.game(game.id)} className={styles.quit}>
           <span aria-hidden="true">‹ </span>
@@ -55,20 +55,19 @@ export function PartyPage() {
       )}
 
       <div className={styles.tiles}>
-        <ResourceTile to={paths.rules(game.id, true)} icon="rules" accent={theme.background} shadow={theme.shadow}>
+        <ResourceTile to={paths.rules(game.id, true)} icon="rules" accent={theme.main} shadow={theme.shadow}>
           {fr.party.rules}
         </ResourceTile>
-        <ResourceTile to={paths.setup(game.id, true)} icon="setup" accent={theme.background} shadow={theme.shadow}>
+        <ResourceTile to={paths.setup(game.id, true)} icon="setup" accent={theme.main} shadow={theme.shadow}>
           {fr.party.setup}
         </ResourceTile>
-        <ResourceTile to={paths.cards(game.id, true)} icon="cards" accent={theme.background} shadow={theme.shadow}>
+        <ResourceTile to={paths.cards(game.id, true)} icon="cards" accent={theme.main} shadow={theme.shadow}>
           {fr.party.cards}
         </ResourceTile>
-        <ResourceTile to={paths.turn(game.id, true)} icon="turn" accent={theme.background} shadow={theme.shadow}>
+        <ResourceTile to={paths.turn(game.id, true)} icon="turn" accent={theme.main} shadow={theme.shadow}>
           {fr.party.turn}
         </ResourceTile>
       </div>
-
       <div className={styles.spacer} />
       <ButtonLink block to={paths.scores(game.id)}>
         {fr.party.enterScores}
@@ -76,7 +75,7 @@ export function PartyPage() {
       <Button
         block
         variant="blanc"
-        style={{ '--btn-fg': theme.background, '--btn-shadow': theme.shadow } as React.CSSProperties}
+        style={{ '--btn-fg': theme.main, '--btn-shadow': theme.shadow } as React.CSSProperties}
         onClick={() => void endGame(session, 'interrupted')}
       >
         {fr.party.end}

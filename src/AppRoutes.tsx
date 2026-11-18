@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router'
 import { AboutPage } from './features/about/AboutPage.tsx'
 import { CardSwipePage } from './features/cards/CardSwipePage.tsx'
 import { CardsPage } from './features/cards/CardsPage.tsx'
+import { GameScope } from './features/game-scope/GameScope.tsx'
 import { GameDetailPage } from './features/game-detail/GameDetailPage.tsx'
 import { HistoryPage } from './features/history/HistoryPage.tsx'
 import { HomePage } from './features/home/HomePage.tsx'
@@ -26,16 +27,19 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/jeu/:gameId" element={<GameDetailPage />} />
-      <Route path="/jeu/:gameId/regles" element={<RulesPage />} />
-      <Route path="/jeu/:gameId/tutoriel/cartes" element={<CardsPage />} />
-      <Route path="/jeu/:gameId/tutoriel/cartes/:groupe" element={<CardSwipePage />} />
-      <Route path="/jeu/:gameId/tutoriel/mise-en-place" element={<SetupPage />} />
-      <Route path="/jeu/:gameId/tutoriel/tour" element={<TurnPage />} />
-      <Route path="/jeu/:gameId/joueurs" element={<PlayersPage />} />
-      <Route path="/jeu/:gameId/partie" element={<PartyPage />} />
-      <Route path="/jeu/:gameId/partie/scores" element={<ScorePage />} />
-      <Route path="/jeu/:gameId/resultat/:partieId" element={<ResultsPage />} />
+      {/* Dans un jeu, l'app prend ses couleurs (fond, pastilles, dos de carte) : voir GameScope. */}
+      <Route path="/jeu/:gameId" element={<GameScope />}>
+        <Route index element={<GameDetailPage />} />
+        <Route path="regles" element={<RulesPage />} />
+        <Route path="tutoriel/cartes" element={<CardsPage />} />
+        <Route path="tutoriel/cartes/:groupe" element={<CardSwipePage />} />
+        <Route path="tutoriel/mise-en-place" element={<SetupPage />} />
+        <Route path="tutoriel/tour" element={<TurnPage />} />
+        <Route path="joueurs" element={<PlayersPage />} />
+        <Route path="partie" element={<PartyPage />} />
+        <Route path="partie/scores" element={<ScorePage />} />
+        <Route path="resultat/:partieId" element={<ResultsPage />} />
+      </Route>
       <Route path="/scores" element={<HistoryPage />} />
       <Route path="/reglages" element={<SettingsPage />} />
       <Route path="/a-propos" element={<AboutPage />} />

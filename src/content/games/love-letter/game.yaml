@@ -4,7 +4,13 @@
 id: love-letter
 name: Love Letter
 font: { file: great-vibes.woff2, family: Great Vibes, weight: 400, band_size: 4 }
-background_color: rouge
+# Palette : bordeaux (couleur du jeu), brun (son relief), crème (son texte, et le fond des écrans), corail (dos des cartes).
+main_color: '#812B2B'
+shadow_color: '#400E0E'
+text_color: '#EEDDC8'
+background_color: '#EEDDC8'
+card_back_color: '#E57979'
+logo: logo.svg # sceau de cire
 tagline: Une lettre. Une princesse. Un seul gagnant.
 description: >-
   Tu gardes une seule carte en main. Chaque tour, tu en piocheras une autre et tu joues l’une des deux. Devine,
@@ -29,6 +35,8 @@ card_groups:
     expert:
       original: '0'
       name: Espionne
+      cards:
+        - { value: '0', name: Espionne, color: '#6C767A' }
       power: marquer un point si l’on en a le plus devant soi
 
   - label: Valets et rois noirs
@@ -43,6 +51,8 @@ card_groups:
     expert:
       original: '1'
       name: Garde
+      cards:
+        - { value: '1', name: Garde, color: '#E0271D' }
       power: deviner la carte d’un joueur pour l’éliminer
 
   - label: '2'
@@ -56,6 +66,8 @@ card_groups:
     expert:
       original: '2'
       name: Prêtre
+      cards:
+        - { value: '2', name: Prêtre, color: '#65B049' }
       power: voir la main d’un joueur
 
   - label: '3'
@@ -71,6 +83,8 @@ card_groups:
     expert:
       original: '3'
       name: Baron
+      cards:
+        - { value: '3', name: Baron, color: '#069FD1' }
       power: comparer sa main avec celle d’un joueur
 
   - label: '4'
@@ -84,6 +98,8 @@ card_groups:
     expert:
       original: '4'
       name: Servante
+      cards:
+        - { value: '4', name: Servante, color: '#7A31A2' }
       power: être protégé jusqu’à son prochain tour
 
   - label: '5'
@@ -99,6 +115,8 @@ card_groups:
     expert:
       original: '5'
       name: Prince
+      cards:
+        - { value: '5', name: Prince, color: '#FC9913' }
       power: faire défausser la carte d’un joueur
 
   - label: '6'
@@ -112,6 +130,8 @@ card_groups:
     expert:
       original: '6'
       name: Chancelier
+      cards:
+        - { value: '6', name: Chancelier, color: '#00B6B3' }
       power: piocher deux cartes, en garder une
 
   - label: '7'
@@ -124,6 +144,8 @@ card_groups:
     expert:
       original: '7'
       name: Roi
+      cards:
+        - { value: '7', name: Roi, color: '#606D73' }
       power: échanger sa main avec celle d’un joueur
 
   - label: '8'
@@ -136,6 +158,8 @@ card_groups:
     expert:
       original: '8'
       name: Comtesse
+      cards:
+        - { value: '8', name: Comtesse, color: '#AF39A8' }
       power: devoir être jouée avec le Prince ou le Roi
 
   - label: Dame de cœur
@@ -149,6 +173,8 @@ card_groups:
     expert:
       original: '9'
       name: Princesse
+      cards:
+        - { value: '9', name: Princesse, color: '#D72865' }
       power: éliminer celui qui la joue ou la défausse
 
 # Partie en manches : le gagnant d'une manche marque 1 point (2 au plus, avec les jokers). Le premier à 6, 5, 4, 3
@@ -165,18 +191,19 @@ tutorial:
   setup:
     title: Mise en place
     diagram:
-      - label: Pioche
-      - label: Écartée, cachée
-      - label: Visibles (2 joueurs)
-        card: { rank: J, suit: hearts }
+      - { label: Pioche, layout: pile }
+      - { label: 'Écartée, cachée', layout: single }
     steps:
       - Mélange les {cards} cartes.
       - Écarte la première, face cachée.
-      - À 2 joueurs, pose 3 cartes face visible.
       - Donne 1 carte à chaque joueur.
       - Le reste forme la pioche.
   turn:
     title: Un tour de jeu
+    diagram:
+      - { label: Pioche, layout: pile }
+      - { label: Ta main, layout: single }
+      - { label: Posée devant toi, card: { rank: 5, suit: hearts } }
     steps:
       - label: Pioche.
         text: Prends la carte du dessus.
@@ -215,5 +242,3 @@ full_rules:
     text: >-
       Le joueur en jeu qui a le plus de jokers devant lui marque 1 point de plus. Il en faut au moins un. Égalité :
       personne ne marque. Une manche rapporte donc 2 points au plus.
-  - title: Cas particuliers
-    text: À 2 joueurs, pose aussi 3 cartes face visible au début de la manche.

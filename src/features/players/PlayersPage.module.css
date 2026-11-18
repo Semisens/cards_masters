@@ -46,7 +46,7 @@
 
 .field {
   padding: var(--mc-space-1) 0;
-  border-top: calc(var(--mc-space-1) / 4) solid var(--mc-color-bordure);
+  border-top: calc(var(--mc-space-1) / 4) solid var(--game-edge, var(--mc-color-bordure));
 }
 
 .input {
@@ -54,7 +54,7 @@
   width: 100%;
   min-height: var(--mc-touch-min);
   padding: 0 calc(var(--mc-space-1) * 1.5);
-  border: medium solid var(--mc-color-bordure);
+  border: medium solid var(--game-edge, var(--mc-color-bordure));
   border-radius: var(--mc-radius-s);
   background: var(--mc-card-face);
   color: var(--mc-color-encre);
@@ -69,6 +69,6 @@
 }
 
 .input:focus-visible {
-  outline: medium solid var(--mc-color-nuit);
+  outline: medium solid var(--game-pill-bg, var(--mc-color-nuit));
   outline-offset: 2px;
 }

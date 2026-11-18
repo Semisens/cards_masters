@@ -1,7 +1,15 @@
 import { fill } from '../core/format.ts'
 import { RANKS } from '../core/cards.ts'
 import { expandCards, toRank } from './deck.ts'
-import type { CardGroup, CardGroupConfig, DisplayCard, Game, GameConfig } from './types.ts'
+import type {
+  CardGroup,
+  CardGroupConfig,
+  DiagramItem,
+  DiagramItemConfig,
+  DisplayCard,
+  Game,
+  GameConfig,
+} from './types.ts'
 
 /** Remplace `{cards}` (nombre de cartes gardées) dans tous les textes. Les autres `{…}` (`{round}`) restent. */
 function fillTexts<T>(value: T, values: Record<string, number>): T {
@@ -12,8 +20,20 @@ function fillTexts<T>(value: T, values: Record<string, number>): T {
   return value
 }
 
+/** Un élément de schéma prêt à l'emploi : la carte visible (si elle est donnée) a un vrai rang. */
+function loadDiagramItem({ label, layout, card }: DiagramItemConfig): DiagramItem {
+  return {
+    label,
+    ...(layout ? { layout } : {}),
+    ...(card ? { card: { rank: toRank(card.rank), suit: card.suit } } : {}),
+  }
+}
+
 /** Un groupe de cartes prêt à l’emploi : cartes exactes, jokers, rangs, nombre de cartes, carte montrée. */
-export function loadCardGroup(group: CardGroupConfig): CardGroup {
+export function loadCardGroup(
+  group: CardGroupConfig,
+  assetUrl: (file: string) => string | undefined = () => undefined,
+): CardGroup {
   const cards = expandCards(group.cards ?? [])
   const jokers = group.jokers ?? 0
   const ranks = RANKS.filter((rank) => cards.some((card) => card.rank === rank))
@@ -22,7 +42,12 @@ export function loadCardGroup(group: CardGroupConfig): CardGroup {
     : 'joker' in group.display
       ? { joker: true }
       : { rank: toRank(group.display.rank), suit: group.display.suit }
-  return { ...group, cards, jokers, ranks, count: cards.length + jokers, display }
+  const originals = group.expert.cards?.map((card) => ({
+    ...card,
+    ...(card.image ? { imageUrl: assetUrl(card.image) } : {}),
+  }))
+  const expert = originals ? { ...group.expert, cards: originals } : group.expert
+  return { ...group, expert, cards, jokers, ranks, count: cards.length + jokers, display }
 }
 
 /**
@@ -32,21 +57,20 @@ export function loadCardGroup(group: CardGroupConfig): CardGroup {
  * @param assetUrl adresse d'un fichier du dossier du jeu (police), ou `undefined` s'il n'existe pas.
  */
 export function loadGame(config: GameConfig, assetUrl: (file: string) => string | undefined = () => undefined): Game {
-  const card_groups = config.card_groups.map(loadCardGroup)
+  const card_groups = config.card_groups.map((group) => loadCardGroup(group, assetUrl))
   const total = card_groups.reduce((sum, group) => sum + group.count, 0)
   const { font, ...rest } = fillTexts(config, { cards: total })
+  const { diagram: turnDiagram, ...turn } = rest.tutorial.turn
   return {
     ...rest,
     ...(font ? { font: { ...font, url: font.file ? assetUrl(font.file) : undefined } } : {}),
     card_groups: card_groups.map((group) => fillTexts(group, { cards: total })),
     tutorial: {
       ...rest.tutorial,
-      setup: {
-        ...rest.tutorial.setup,
-        diagram: rest.tutorial.setup.diagram.map(({ label, card }) => ({
-          label,
-          ...(card ? { card: { rank: toRank(card.rank), suit: card.suit } } : {}),
-        })),
+      setup: { ...rest.tutorial.setup, diagram: rest.tutorial.setup.diagram.map(loadDiagramItem) },
+      turn: {
+        ...turn,
+        ...(turnDiagram ? { diagram: turnDiagram.map(loadDiagramItem) } : {}),
       },
     },
   }

@@ -7,7 +7,7 @@
   background: var(--mc-card-face);
   color: var(--mc-color-encre);
   text-decoration: none;
-  box-shadow: 0 var(--mc-elevation-s) 0 var(--mc-color-bordure);
+  box-shadow: 0 var(--mc-elevation-s) 0 var(--game-edge, var(--mc-color-bordure));
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .row:focus-visible {
-  outline: medium solid var(--mc-color-blanc-carte);
+  outline: medium solid var(--game-screen-fg, var(--mc-color-blanc-carte));
   outline-offset: 2px;
 }
 

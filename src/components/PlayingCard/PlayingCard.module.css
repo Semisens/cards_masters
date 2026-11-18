@@ -9,7 +9,7 @@
   aspect-ratio: 1 / var(--mc-card-ratio);
   border-radius: var(--mc-card-radius);
   background: var(--mc-card-face);
-  box-shadow: 0 var(--mc-elevation-s) 0 var(--mc-color-bordure);
+  box-shadow: 0 var(--mc-elevation-s) 0 var(--game-edge, var(--mc-color-bordure));
   overflow: hidden;
 }
 

@@ -235,7 +235,7 @@ test.describe('parcours Love Letter', () => {
 
     // Le tutoriel jusqu'au bout.
     await page.getByRole('link', { name: 'Suivant' }).click()
-    await expect(page.getByText('Visibles (2 joueurs)')).toBeVisible()
+    await expect(page.getByText('Écartée, cachée')).toBeVisible()
     await page.getByRole('link', { name: 'Suivant' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Un tour de jeu' })).toBeVisible()
     await page.getByRole('link', { name: 'Jouer' }).click()

@@ -3,5 +3,5 @@
   border-radius: var(--mc-radius-m);
   background: var(--mc-card-face);
   color: var(--mc-color-encre);
-  box-shadow: 0 var(--mc-elevation-m) 0 var(--mc-color-bordure);
+  box-shadow: 0 var(--mc-elevation-m) 0 var(--game-edge, var(--mc-color-bordure));
 }

@@ -1,11 +1,16 @@
 .root {
   min-height: 100vh;
   min-height: 100dvh;
-  background-image: linear-gradient(to bottom, var(--mc-color-ciel-from), var(--mc-color-ciel-to));
+  background-image: linear-gradient(
+    to bottom,
+    var(--game-screen-from, var(--mc-color-ciel-from)),
+    var(--game-screen-to, var(--mc-color-ciel-to))
+  );
 }
 
 .solid {
   background: var(--screen-solid);
+  color: var(--screen-solid-fg, inherit);
 }
 
 .content {

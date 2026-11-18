@@ -25,6 +25,16 @@ export function rgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+/** Éclaircit une couleur : `keep` est la part conservée (0 à 1), le reste est du blanc. */
+export function tint(hex: string, keep: number): string {
+  return mix(hex, '#FFFFFF', keep)
+}
+
+/** Assombrit une couleur : `keep` est la part conservée (0 à 1), le reste est du noir. */
+export function shade(hex: string, keep: number): string {
+  return mix(hex, '#000000', keep)
+}
+
 /** Part de la couleur d'origine conservée dans son ombre en relief (le reste est du noir). */
 export const SHADOW_KEEP = 0.65
 
@@ -34,5 +44,5 @@ export const SHADOW_KEEP = 0.65
  * alors que l'app vise iOS 15.
  */
 export function shadowOf(hex: string): string {
-  return mix(hex, '#000000', SHADOW_KEEP)
+  return shade(hex, SHADOW_KEEP)
 }

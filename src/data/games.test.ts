@@ -2,10 +2,11 @@ import Ajv2020 from 'ajv/dist/2020.js'
 import { describe, expect, it } from 'vitest'
 import schema from '../content/game.schema.json'
 import { isRedSuit } from '../core/cards.ts'
-import { contrastRatio, MIN_CONTRAST } from '../core/contrast.ts'
+import { contrastRatio, MIN_CONTRAST, pickTextColor } from '../core/contrast.ts'
 import { FULL_DECK, deckPlan, removalList } from './deck.ts'
 import { gameConfigs, gameFiles, games, getGame, logoUrl } from './games.ts'
 import { loadGame } from './loadGame.ts'
+import { tokens } from '../core/tokens.generated.ts'
 import { resolveGameTheme } from './theme.ts'
 import type { CardGroup, Game, GameConfig } from './types.ts'
 
@@ -230,7 +231,48 @@ describe.each(games.map((game) => [game.id, game] as const))('jeu « %s »', (id
   describe('thème', () => {
     it('a un contraste texte / fond d’au moins 4,5', () => {
       const theme = resolveGameTheme(game)
-      expect(contrastRatio(theme.background, theme.text)).toBeGreaterThanOrEqual(MIN_CONTRAST)
+      expect(contrastRatio(theme.main, theme.text)).toBeGreaterThanOrEqual(MIN_CONTRAST)
+    })
+
+    it('a un texte lisible sur tout le fond des écrans, s’il en donne un', () => {
+      const { screen } = resolveGameTheme(game)
+      if (!screen) return
+      for (const end of [screen.base, screen.from, screen.to])
+        expect(contrastRatio(end, screen.text), end).toBeGreaterThanOrEqual(MIN_CONTRAST)
+    })
+
+    it('a un dos de carte visible sur le blanc des cartes et sur la couleur du jeu', () => {
+      const { cardBack } = resolveGameTheme(game)
+      expect(cardBack).toMatch(/^#[0-9A-F]{6}$/)
+    })
+  })
+
+  describe('cartes d’origine (mode connaisseur)', () => {
+    const originals = game.card_groups.flatMap((g) => g.expert.cards ?? [])
+
+    it('ont une couleur où la valeur se lit (blanc ou encre, contraste ≥ 4,5)', () => {
+      for (const card of originals) expect(pickTextColor(card.color), `${card.value} ${card.color}`).not.toBeNull()
+    })
+
+    it('ont une image qui existe, s’il y en a une', () => {
+      for (const card of originals) if (card.image) expect(card.imageUrl, `image ${card.image}`).toBeTruthy()
+    })
+
+    it('ne repètent aucune valeur d’un groupe à l’autre', () => {
+      const values = originals.map((c) => c.value)
+      expect(new Set(values).size).toBe(values.length)
+    })
+
+    it('sont toutes données, ou aucune : un jeu ne mélange pas dessin et pointillés', () => {
+      const withCards = game.card_groups.filter((g) => g.expert.cards).length
+      expect([0, game.card_groups.length]).toContain(withCards)
+    })
+  })
+
+  describe('schémas de cartes de dos', () => {
+    it('ne posent des cartes de dos que si le jeu n’y met pas une carte visible', () => {
+      const items = [...game.tutorial.setup.diagram, ...(game.tutorial.turn.diagram ?? [])]
+      for (const item of items) if (item.card) expect(item.layout, item.label).toBeUndefined()
     })
   })
 
@@ -286,6 +328,18 @@ describe('Trio', () => {
   it('alterne cartes rouges et noires dans la liste, comme la maquette', () => {
     const reds = trio.card_groups.map((g) => isRedGroup(g))
     expect(reds).toEqual([true, false, true, false, true, false])
+  })
+
+  it('dessine les 12 cartes d’origine, de 1 à 12, une couleur chacune', () => {
+    const originals = trio.card_groups.flatMap((g) => g.expert.cards ?? [])
+    expect(originals.map((c) => c.value)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
+    expect(trio.card_groups.map((g) => g.expert.cards?.length)).toEqual([1, 5, 1, 3, 1, 1])
+  })
+
+  it('garde le bleu de l’app (pas de fond propre) et pose une main en éventail, le centre en pile', () => {
+    expect(resolveGameTheme(trio).screen).toBeUndefined()
+    expect(trio.tutorial.setup.diagram.map((i) => i.layout)).toEqual(['spread', 'pile'])
+    expect(trio.tutorial.turn.diagram?.map((i) => i.layout)).toEqual(['pile', 'spread'])
   })
 
   it('se joue de 3 à 6 joueurs, en 15 minutes', () => {
@@ -421,11 +475,7 @@ describe('Love Letter', () => {
   it('reprend les textes de la maquette', () => {
     expect(ll.tagline).toBe('Une lettre. Une princesse. Un seul gagnant.')
     expect(ll.tutorial.turn.win.title).toBe('Gagner la manche')
-    expect(ll.tutorial.setup.diagram.map((item) => item.label)).toEqual([
-      'Pioche',
-      'Écartée, cachée',
-      'Visibles (2 joueurs)',
-    ])
+    expect(ll.tutorial.setup.diagram.map((item) => item.label)).toEqual(['Pioche', 'Écartée, cachée'])
     expect(ll.full_rules.map((s) => s.title)).toEqual([
       'But',
       'Valeurs des cartes',
@@ -433,7 +483,6 @@ describe('Love Letter', () => {
       'Un tour',
       'Fin de manche',
       'Jokers',
-      'Cas particuliers',
     ])
   })
 
@@ -442,6 +491,37 @@ describe('Love Letter', () => {
     expect(rules).toMatch(/6 points à 2 joueurs, 5 à 3 joueurs, 4 à 4 joueurs, 3 à 5 ou 6 joueurs/)
     expect(rules).toMatch(/2 points au plus/)
     expect(rules).not.toMatch(/additionn/)
+  })
+
+  it('n’a aucune mise en place particulière à 2 joueurs', () => {
+    const texts = [...ll.tutorial.setup.steps, ...ll.full_rules.map((s) => s.text)].join('\n')
+    expect(texts).not.toMatch(/face visible au début|À 2 joueurs, pose/)
+    expect(ll.tutorial.setup.diagram.every((item) => !item.card)).toBe(true)
+  })
+
+  it('prend la palette bordeaux : couleur du jeu, relief, texte et fond crème, dos corail, sceau de cire pour logo', () => {
+    const theme = resolveGameTheme(ll)
+    expect(theme.main).toBe('#812B2B')
+    expect(theme.shadow).toBe('#400E0E')
+    expect(theme.text).toBe('#EEDDC8')
+    expect(theme.screen?.base).toBe('#EEDDC8')
+    expect(theme.screen?.text).toBe(tokens.colors.encre)
+    expect(theme.cardBack).toBe('#E57979')
+    expect(ll.logo).toBe('logo.svg')
+    expect(logoUrl(ll)).toBeTruthy()
+  })
+
+  it('dessine les 10 cartes d’origine, de 0 à 9, avec leur nom', () => {
+    const originals = ll.card_groups.flatMap((g) => g.expert.cards ?? [])
+    expect(originals.map((c) => c.value)).toEqual(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    expect(originals.map((c) => c.name)).toEqual(ll.card_groups.map((g) => g.expert.name))
+  })
+
+  it('montre la pioche en pile, la carte écartée seule, et une carte visible posée dans « Un tour »', () => {
+    expect(ll.tutorial.setup.diagram.map((i) => i.layout)).toEqual(['pile', 'single'])
+    const turn = ll.tutorial.turn.diagram!
+    expect(turn.map((i) => i.label)).toEqual(['Pioche', 'Ta main', 'Posée devant toi'])
+    expect(turn[2].card).toEqual({ rank: '5', suit: 'hearts' })
   })
 
   it('annonce 21 cartes dans la mise en place, comme le paquet', () => {

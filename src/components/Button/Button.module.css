@@ -32,7 +32,7 @@
 }
 
 .button:focus-visible {
-  outline: medium solid var(--mc-color-blanc-carte);
+  outline: medium solid var(--game-screen-fg, var(--mc-color-blanc-carte));
   outline-offset: 2px;
 }
 
@@ -94,6 +94,6 @@
 /* Bouton blanc : action secondaire (« Règles complètes »). Texte et relief peuvent être repris par la page (--btn-fg, --btn-shadow). */
 .blanc {
   --btn-bg: var(--mc-card-face);
-  --btn-fg: var(--mc-color-nuit);
-  --btn-shadow: var(--mc-color-bordure);
+  --btn-fg: var(--game-pill-bg, var(--mc-color-nuit));
+  --btn-shadow: var(--game-edge, var(--mc-color-bordure));
 }

@@ -3,7 +3,7 @@
 
 id: trio
 name: Trio
-background_color: vert
+main_color: vert
 tagline: Trouve trois cartes identiques.
 description: >-
   Retourne des cartes au centre ou chez tes rivaux. Retiens ce que tu vois. Forme tes trios avant les autres.
@@ -23,6 +23,8 @@ card_groups:
       text: C’est la carte la plus basse. Dans ta main, elle passe toujours en premier.
     expert:
       original: '1'
+      cards:
+        - { value: '1', color: '#BC2EA8' }
 
   - label: 2 à 6
     cards:
@@ -34,6 +36,12 @@ card_groups:
       text: Chaque carte vaut son chiffre. Réunis trois cartes identiques pour gagner un trio.
     expert:
       original: 2–6
+      cards:
+        - { value: '2', color: '#FA7A06' }
+        - { value: '3', color: '#0096E8' }
+        - { value: '4', color: '#E42625' }
+        - { value: '5', color: '#FFD325' }
+        - { value: '6', color: '#44CE49' }
 
   - label: '7'
     cards:
@@ -46,6 +54,8 @@ card_groups:
       text: 'Réunis les trois 7 : tu gagnes tout de suite. Cache bien ton 7 !'
     expert:
       original: '7'
+      cards:
+        - { value: '7', color: '#F1CA26' }
       power: le trio de 7 donne la victoire immédiate.
 
   - label: 8 à 10
@@ -58,6 +68,10 @@ card_groups:
       text: Chaque carte vaut son chiffre. Réunis trois cartes identiques pour gagner un trio.
     expert:
       original: 8–10
+      cards:
+        - { value: '8', color: '#037BBF' }
+        - { value: '9', color: '#E91818' }
+        - { value: '10', color: '#FFD325' }
 
   - label: Valet
     cards:
@@ -69,6 +83,8 @@ card_groups:
       text: Il se range entre le 10 et la Dame. Réunis les trois Valets pour gagner un trio.
     expert:
       original: '11'
+      cards:
+        - { value: '11', color: '#44CD4C' }
 
   - label: Dame
     cards:
@@ -80,6 +96,8 @@ card_groups:
       text: C’est la carte la plus haute. Dans ta main, elle passe toujours en dernier.
     expert:
       original: '12'
+      cards:
+        - { value: '12', color: '#0092E7' }
 
 # Partie : on note les trios gagnés ; le premier à 3 trios gagne.
 scoring:
@@ -94,8 +112,8 @@ tutorial:
   setup:
     title: Mise en place
     diagram:
-      - label: Ta main, triée
-      - label: Au centre, cachées
+      - { label: 'Ta main, triée', layout: spread }
+      - { label: 'Au centre, cachées', layout: pile }
     steps:
       - Mélange les {cards} cartes.
       - Donne 9, 7, 6 ou 5 cartes par joueur (3, 4, 5 ou 6 joueurs).
@@ -103,6 +121,9 @@ tutorial:
       - Trie ta main du plus petit au plus grand. Ne la montre à personne.
   turn:
     title: Un tour de jeu
+    diagram:
+      - { label: Au centre, layout: pile }
+      - { label: Mains des joueurs, layout: spread }
     steps:
       - label: Retourne.
         text: Une carte au centre, ou la plus petite ou la plus grande d’une main.

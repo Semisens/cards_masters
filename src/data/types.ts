@@ -7,7 +7,7 @@ import type { TapisName } from '../core/tokens.generated.ts'
 // Les écrans ne lisent que le jeu prêt à l'emploi : ils sont les mêmes pour tous les jeux.
 
 /** Un des quatre tapis de la charte, ou une couleur libre `#RRGGBB`. */
-export type GameBackground = TapisName | `#${string}`
+export type GameColor = TapisName | `#${string}`
 
 /** Mode de lecture des cartes : Classique, ou Connaisseur (lien avec le jeu d'origine). */
 export type ReadingMode = 'classic' | 'expert'
@@ -61,6 +61,8 @@ interface CardGroupBase {
     name?: string
     /** Pouvoir ou règle d'origine, en une proposition. */
     power?: string
+    /** Les cartes d'origine, dessinées en mode Connaisseur. Absent : une carte en pointillés. */
+    cards?: OriginalCard[]
   }
 }
 
@@ -95,20 +97,35 @@ export interface TurnStep {
   text: string
 }
 
-/** Un élément du schéma de mise en place : un dos de carte, ou une carte visible si `card` est donné. */
+/** Comment on dessine des cartes de dos : une carte, une pile (la pioche), un éventail (une main). */
+export type CardLayout = 'single' | 'pile' | 'spread'
+
+/** Une carte du jeu d'origine : pastille de valeur sur fond de couleur. `image` : fichier du dossier du jeu. */
+export interface OriginalCard {
+  value: string
+  name?: string
+  color: string
+  image?: string
+  /** Adresse du fichier `image`, résolue au chargement du jeu. */
+  imageUrl?: string
+}
+
+/** Un élément d'un schéma (mise en place, un tour) : des cartes de dos (`layout`), ou une carte visible si `card` est donné. */
 export interface DiagramItem {
   label: string
+  layout?: CardLayout
   card?: DeckCard
 }
 
 export interface DiagramItemConfig {
   label: string
+  layout?: CardLayout
   card?: { rank: RankInput; suit: Suit }
 }
 
 export interface Tutorial<Item = DiagramItem> {
   setup: { title: string; diagram: Item[]; steps: string[] }
-  turn: { title: string; steps: TurnStep[]; win: { title: string; text: string } }
+  turn: { title: string; diagram?: Item[]; steps: TurnStep[]; win: { title: string; text: string } }
 }
 
 export interface RuleSection {
@@ -136,7 +153,18 @@ export interface Scoring {
 interface GameBase {
   id: string
   name: string
-  background_color: GameBackground
+  /** Couleur du jeu (le « tapis ») : tuile, bandeau, écran de partie, pastilles et boutons discrets. */
+  main_color: GameColor
+  /** Fond de tous les écrans du jeu, à la place du bleu de l'app. */
+  background_color?: GameColor
+  /** Texte sur `background_color` (contraste ≥ 4,5). Absent : blanc ou encre, choisi seul. */
+  background_text_color?: string
+  /** Couleur du dos des cartes. Absent : `main_color`. */
+  card_back_color?: GameColor
+  /** Couleur libre `#RRGGBB` du relief du tapis. Absent : le tapis assombri. */
+  shadow_color?: string
+  /** Couleur libre `#RRGGBB` du texte sur le tapis (contraste ≥ 4,5). Absent : blanc ou encre, choisi seul. */
+  text_color?: string
   /** Nom d'un fichier du dossier du jeu (svg ou png). Absent : initiale dans un rond blanc. */
   logo?: string
   /** Phrase d'accroche en gras, sur la page du jeu. */

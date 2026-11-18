@@ -66,7 +66,7 @@
   display: flex;
   justify-content: space-between;
   padding: calc(var(--mc-space-1) * 1.5) 0;
-  border-top: calc(var(--mc-space-1) / 4) solid var(--mc-color-bordure);
+  border-top: calc(var(--mc-space-1) / 4) solid var(--game-edge, var(--mc-color-bordure));
 }
 
 .spacer {

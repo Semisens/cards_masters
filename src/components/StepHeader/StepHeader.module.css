@@ -16,6 +16,6 @@
 }
 
 .back:focus-visible {
-  outline: medium solid var(--mc-color-blanc-carte);
+  outline: medium solid var(--game-screen-fg, var(--mc-color-blanc-carte));
   outline-offset: 2px;
 }

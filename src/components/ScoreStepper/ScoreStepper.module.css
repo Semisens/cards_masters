@@ -3,7 +3,7 @@
   align-items: center;
   gap: calc(var(--mc-space-1) * 1.5);
   padding: var(--mc-space-1) 0;
-  border-top: calc(var(--mc-space-1) / 4) solid var(--mc-color-bordure);
+  border-top: calc(var(--mc-space-1) / 4) solid var(--game-edge, var(--mc-color-bordure));
 }
 
 .name {
@@ -32,7 +32,7 @@
 }
 
 .button:focus-visible {
-  outline: medium solid var(--mc-color-nuit);
+  outline: medium solid var(--game-pill-bg, var(--mc-color-nuit));
   outline-offset: 2px;
 }
 

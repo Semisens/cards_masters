@@ -10,9 +10,9 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Couleur de repli : visible au rebond de défilement (iOS) et sous les barres système. */
+/* Couleur de repli : visible au rebond de défilement (iOS) et sous les barres système. Dans un jeu : son fond. */
 html {
-  background: var(--mc-color-ciel);
+  background: var(--game-screen-base, var(--mc-color-ciel));
 }
 
 body {
@@ -20,8 +20,12 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   /* Le dégradé couvre toute la hauteur de la page. (`background-attachment: fixed` est ignoré par iOS.) */
-  background-image: linear-gradient(to bottom, var(--mc-color-ciel-from), var(--mc-color-ciel-to));
-  color: var(--mc-text-on-ciel);
+  background-image: linear-gradient(
+    to bottom,
+    var(--game-screen-from, var(--mc-color-ciel-from)),
+    var(--game-screen-to, var(--mc-color-ciel-to))
+  );
+  color: var(--game-screen-fg, var(--mc-text-on-ciel));
   font-family: var(--mc-font-text);
   /* Réglages des maquettes : Nunito 700, interligne normal. */
   font-weight: 700;

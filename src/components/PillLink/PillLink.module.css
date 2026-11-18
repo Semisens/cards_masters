@@ -18,8 +18,8 @@
 }
 
 .nuit {
-  background: var(--mc-color-nuit);
-  color: var(--mc-text-on-nuit);
+  background: var(--game-pill-bg, var(--mc-color-nuit));
+  color: var(--game-pill-fg, var(--mc-text-on-nuit));
 }
 
 .soleil {
@@ -28,6 +28,6 @@
 }
 
 .pill:focus-visible {
-  outline: medium solid var(--mc-color-blanc-carte);
+  outline: medium solid var(--game-screen-fg, var(--mc-color-blanc-carte));
   outline-offset: 2px;
 }
