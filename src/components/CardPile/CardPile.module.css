@@ -1,0 +1,28 @@
+/* Un décalage par carte : la pile monte en biais, l'éventail s'étale. Tout dérive de --pile-card-w (largeur d'une carte). */
+.root {
+  --pile-card-w: 3.5rem;
+  --dx: 0px;
+  --dy: 0px;
+  position: relative;
+  display: block;
+  flex: none;
+  width: calc(var(--pile-card-w) + (var(--n) - 1) * var(--dx));
+  height: calc(var(--pile-card-w) * var(--mc-card-ratio) + (var(--n) - 1) * var(--dy));
+}
+
+.pile {
+  --dx: calc(var(--mc-space-1) / 2);
+  --dy: calc(var(--mc-space-1) / 2);
+}
+
+.spread {
+  --dx: calc(var(--mc-space-1) * 1.75);
+  --dy: 0px;
+}
+
+/* La dernière carte est dessus : elle est en haut de la pile, à droite de l'éventail. */
+.root .card {
+  position: absolute;
+  top: calc((var(--n) - 1 - var(--i)) * var(--dy));
+  left: calc(var(--i) * var(--dx));
+}

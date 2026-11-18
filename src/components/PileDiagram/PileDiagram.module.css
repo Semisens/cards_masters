@@ -3,8 +3,8 @@
   gap: var(--mc-space-1);
   padding: var(--mc-space-2) var(--mc-space-1);
   border-radius: var(--mc-radius-m);
-  background: var(--mc-color-nuit);
-  color: var(--mc-text-on-nuit);
+  background: var(--game-pill-bg, var(--mc-color-nuit));
+  color: var(--game-pill-fg, var(--mc-text-on-nuit));
 }
 
 .item {
@@ -12,18 +12,13 @@
   text-align: center;
 }
 
-.back {
-  box-sizing: border-box;
-  width: 3.5rem;
-  aspect-ratio: 1 / var(--mc-card-ratio);
-  margin: 0 auto;
-  border: var(--mc-card-frame-focus) solid var(--mc-color-blanc-carte);
-  border-radius: var(--mc-card-radius);
-  background: var(--mc-color-nuit);
-}
-
-/* La carte visible est centrée comme les dos de carte, sans la ligne vide que laisse un élément « en ligne ». */
-.face {
+/* Les cartes se posent sur la même ligne de base, quelle que soit leur disposition : les légendes restent alignées. */
+.visual {
   display: flex;
+  align-items: flex-end;
   justify-content: center;
+  /* Un peu d'air sous les cartes : le relief du dos ne touche pas la légende. */
+  padding-bottom: calc(var(--mc-space-1) / 2);
+  /* Une carte de 3,5 rem de large, plus les deux décalages de la pile. */
+  min-height: calc(3.5rem * var(--mc-card-ratio) + var(--mc-space-1) * 1.5);
 }

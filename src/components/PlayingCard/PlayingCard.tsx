@@ -41,6 +41,8 @@ export type PlayingCardProps = (FaceUp | Joker | FaceDown) & {
   /** Largeur de la carte : toute longueur CSS (par défaut, définie dans la feuille de style). */
   width?: string
   className?: string
+  /** Style en ligne (variables CSS de placement). */
+  style?: CSSProperties
   /** Libellé pour lecteurs d'écran, à la place du libellé automatique (ex. « As, 3 cartes »). */
   label?: string
 }
@@ -51,13 +53,14 @@ export function PlayingCard(props: PlayingCardProps) {
   const classes = [styles.card, props.className].filter(Boolean).join(' ')
 
   if (props.faceDown) {
-    const backColor = props.backColor ?? `var(--mc-tapis-${props.back ?? 'bleu'})`
+    const backColor =
+      props.backColor ?? (props.back ? `var(--mc-tapis-${props.back})` : 'var(--game-card-back, var(--mc-tapis-bleu))')
     return (
       <div
         role="img"
         aria-label="Dos de carte"
         className={`${classes} ${styles.back}`}
-        style={{ ...style, '--back-color': backColor } as CSSProperties}
+        style={{ ...style, ...props.style, '--back-color': backColor } as CSSProperties}
       />
     )
   }
@@ -69,7 +72,7 @@ export function PlayingCard(props: PlayingCardProps) {
       role="img"
       aria-label={label}
       className={`${classes} ${color} ${props.variant === 'list' ? styles.list : ''} ${props.variant === 'focus' ? styles.focus : ''} ${props.variant === 'diagram' ? styles.diagram : ''}`}
-      style={style}
+      style={{ ...style, ...props.style }}
     >
       {!props.joker && (
         <span className={styles.rank} aria-hidden="true">

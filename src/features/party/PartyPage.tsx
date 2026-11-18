@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router'
 import { Button } from '../../components/Button/Button.tsx'
 import { ButtonLink } from '../../components/Button/ButtonLink.tsx'
+import { CardPile } from '../../components/CardPile/CardPile.tsx'
 import { PageTitle } from '../../components/PageTitle/PageTitle.tsx'
 import { PlayerChip } from '../../components/PlayerChip/PlayerChip.tsx'
 import { ResourceTile } from '../../components/ResourceTile/ResourceTile.tsx'
@@ -68,7 +69,11 @@ export function PartyPage() {
           {fr.party.turn}
         </ResourceTile>
       </div>
-      <div className={styles.spacer} />
+
+      {/* La pioche, de dos, à la couleur du jeu : un décor qui rappelle de quoi on joue. */}
+      <div className={styles.spacer}>
+        <CardPile layout="pile" width="5.5rem" />
+      </div>
       <ButtonLink block to={paths.scores(game.id)}>
         {fr.party.enterScores}
       </ButtonLink>

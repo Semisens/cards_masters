@@ -2,6 +2,7 @@ import { useParams } from 'react-router'
 import { ButtonLink } from '../../components/Button/ButtonLink.tsx'
 import { PageTitle } from '../../components/PageTitle/PageTitle.tsx'
 import { Panel } from '../../components/Panel/Panel.tsx'
+import { PileDiagram } from '../../components/PileDiagram/PileDiagram.tsx'
 import { Screen } from '../../components/Screen/Screen.tsx'
 import { StepHeader } from '../../components/StepHeader/StepHeader.tsx'
 import { getGame } from '../../data/games.ts'
@@ -26,6 +27,7 @@ export function TurnPage() {
         quitTo={fromParty ? undefined : paths.game(game.id)}
       />
       <PageTitle>{turn.title}</PageTitle>
+      {turn.diagram && <PileDiagram items={turn.diagram} />}
       <Panel>
         {turn.steps.map((step, index) => (
           <p key={step.label} className={styles.step}>

@@ -122,6 +122,13 @@ describe('Love Letter : tutoriel', () => {
     expect(screen.getByRole('img', { name: 'Jokers' })).toBeInTheDocument()
   })
 
+  it('montre un « Un tour » avec sa pioche, sa main et la carte posée', async () => {
+    renderApp('/jeu/love-letter/tutoriel/tour')
+    expect(await screen.findByText('Posée devant toi')).toBeInTheDocument()
+    expect(screen.getByText('Ta main')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Posée devant toi' })).toBeInTheDocument()
+  })
+
   it('dessine les deux éléments de la mise en place, sans cartes visibles à 2 joueurs', async () => {
     renderApp('/jeu/love-letter/tutoriel/mise-en-place')
     expect(await screen.findByText('Pioche')).toBeInTheDocument()
