@@ -24,6 +24,7 @@
 | `npm run cap:sync` | Build puis copie dans les projets natifs `android/` et `ios/`. |
 | `npm run tokens` / `npm run icons` | Régénèrent les tokens et les icônes depuis la charte. |
 | `npm run maquettes` | Rend les maquettes HTML en images de référence (`maquettes/trio/*.png`). |
+| `npm run planche -- <planche.png> <dossier-du-jeu> <préfixe>` | Découpe une planche de cartes en `<préfixe>-01.webp`… (fond transparent) : cartes d'origine d'un jeu (`expert.cards[].image`). |
 
 **Avant chaque commit** : `npm run lint && npm run typecheck && npm test`. Après un changement visuel voulu : `npm run test:visual -- --update-snapshots`, puis regarde les images avant de les valider.
 
@@ -41,8 +42,8 @@ Accueil « Tes jeux » (recherche, filtres, onglets Jeux / Scores / Réglages) �
 
 Tous les jeux ont les mêmes écrans et le même fonctionnement. **Un jeu = une configuration, sans code.**
 
-1. Copie `docs/modele-jeu.yaml` (modèle commenté) dans `src/content/games/<id>/game.yaml` et remplis-le : identité, couleur du tapis, joueurs, durée, cartes à garder (`card_groups[].cards`, `suits: all` pour les quatre couleurs ; `jokers: 2` pour des jokers, pris dans la boîte, comptés dans « Garde ces N cartes »), correspondances (`expert`), mots du score (`scoring`, `target` pour une fin automatique), tutoriel, règles complètes. Exemples : `trio/game.yaml`, `love-letter/game.yaml`.
-2. Facultatif, dans le même dossier : un logo `svg` ou `png` (original ou redessiné) et la police du nom (`woff2` sous licence libre, avec sa licence), déclarée par `font: { file, family, weight, band_size }`.
+1. Copie `docs/modele-jeu.yaml` (modèle commenté) dans `src/content/games/<id>/game.yaml` et remplis-le : identité, couleurs (`main_color`), joueurs, durée, cartes à garder (`card_groups[].cards`, `suits: all` pour les quatre couleurs ; `jokers: 2` pour des jokers, pris dans la boîte, comptés dans « Garde ces N cartes »), correspondances (`expert`, avec `expert.cards` pour dessiner les cartes d'origine en mode Connaisseur), mots du score (`scoring`, `target` pour une fin automatique), tutoriel (schémas de cartes de dos : `layout: single | pile | spread`), règles complètes. Exemples : `trio/game.yaml`, `love-letter/game.yaml`.
+2. Facultatif, dans le même dossier : un logo `svg` ou `png` (original ou redessiné) et la police du nom (`woff2` sous licence libre, avec sa licence), déclarée par `font: { file, family, weight, band_size }`. Couleurs : `main_color` (la couleur du jeu : tuile, bandeau, écran de partie) ; `shadow_color` et `text_color` (relief et texte sur `main_color`) ; `background_color` (fond de **tous** les écrans du jeu, à la place du bleu : `GameScope` pose les variables `--game-*` sur la page, que les feuilles de style lisent avec le jeton de la charte en repli) et `background_text_color` ; `card_back_color` (dos des cartes, défaut `main_color`). Ce qui n'est pas donné est calculé.
 3. Lance `npm test`, puis `npx playwright test e2e/jeux.spec.ts e2e/visual.spec.ts`. Ils valident le schéma, les cartes, le contraste, les mots interdits, le ton, le parcours complet jusqu'au podium et l'absence de défilement, **pour chaque dossier de jeu**, sans les nommer. Le jeu apparaît seul sur l'accueil.
 4. Calculé, ne s'écrit pas : le nombre de cartes de chaque groupe, le bandeau « Retire… Garde… », `{cards}` dans les textes (nombre de cartes gardées).
 5. Pièges YAML : un texte avec « : » ou « # », ou qui commence par un chiffre, se met entre apostrophes droites (`'7'`). Pas d'accolades `{ }` autour d'un texte qui contient une virgule.

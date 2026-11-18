@@ -2,7 +2,7 @@
 
 Version 1.4 · Plateformes : PWA installable (web) + iOS et Android via Capacitor · Base écran : 390 × 844
 
-> Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor. Version 1.2 : écrans de Trio alignés sur les maquettes (charte v6). Version 1.3 : second jeu Love Letter, podium, historique, réglages, accueil « Tes jeux » à onglets ; moteur généralisé. Version 1.4 : un seul fonctionnement pour tous les jeux ; un jeu = une configuration YAML, sans code. Version 1.5 : Love Letter selon la règle de l'édition 2019 (10 personnages, 21 cartes dont 2 jokers, 2 à 6 joueurs) ; les jeux peuvent demander des jokers (`jokers`).
+> Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor. Version 1.2 : écrans de Trio alignés sur les maquettes (charte v6). Version 1.3 : second jeu Love Letter, podium, historique, réglages, accueil « Tes jeux » à onglets ; moteur généralisé. Version 1.4 : un seul fonctionnement pour tous les jeux ; un jeu = une configuration YAML, sans code. Version 1.7 : couleurs par jeu (`main_color`, `background_color` : le fond de tous les écrans du jeu, `card_back_color`), dos de carte (piles, éventails) dans la mise en place, un tour et la partie, cartes d'origine dessinées en mode Connaisseur (`expert.cards`). Version 1.6 : palette bordeaux et sceau de cire pour Love Letter (`shadow_color`, `text_color`), plus de mise en place à 2 joueurs. Version 1.5 : Love Letter selon la règle de l'édition 2019 (10 personnages, 21 cartes dont 2 jokers, 2 à 6 joueurs) ; les jeux peuvent demander des jokers (`jokers`).
 > Raisons : contenu statique et hors ligne, aucune API native nécessaire, partage par lien, référencement web, pas de review de store pour la v1. Voir `docs/contexte/mastercards-contexte.md`.
 
 ---
@@ -126,9 +126,12 @@ Chaque jeu possède son propre thème et son propre contenu (détail et règles 
 |---|---|
 | `name` | Nom du jeu |
 | `font` | Police du nom (licence libre, fichier woff2 dans le dossier du jeu). Défaut : Fredoka 700. Ex. Love Letter : Great Vibes |
-| pioche | Dos de cartes à la couleur du jeu (automatique) |
+| pioche | Dos de cartes à la couleur du jeu (`card_back_color`, défaut `main_color`) |
 | `logo` | Optionnel. Image **originale ou redessinée**. Sinon : initiale dans un rond blanc |
-| `background_color` | jaune, vert, rouge, bleu ou libre. Texte blanc ou encre choisi **automatiquement** (contraste ≥ 4,5) |
+| `main_color` | La couleur du jeu (le « tapis ») : jaune, vert, rouge, bleu ou libre. Texte blanc ou encre choisi **automatiquement** (contraste ≥ 4,5) |
+| `shadow_color`, `text_color` | Optionnels, `#RRGGBB` : relief et texte sur `main_color`. Un texte sous 4,5 de contraste est refusé |
+| `background_color`, `background_text_color` | Optionnels : le fond de **tous** les écrans du jeu, à la place du bleu de l'app (un dégradé discret en est tiré), et le texte dessus (choisi seul sinon, contraste ≥ 4,5) |
+| `card_back_color` | Optionnel : la couleur du dos des cartes (défaut : `main_color`) |
 | `card_groups` | Les cartes du paquet à garder, regroupées (une ligne de la liste, une page de la vue à balayer), avec leur correspondance d'origine |
 | `tutorial`, `full_rules` | Mise en place, un tour de jeu, règles complètes |
 
@@ -170,19 +173,19 @@ Bandeau plein cadre aux couleurs du jeu (« ‹ Retour », nom en grand, « 3–
 ### 7.3 Tes cartes : vue liste (maquettes *List classic* et *List expert*)
 En-tête (voir « Navigation » ci-dessous). Titre, **bascule Classique / Connaisseur**, puis une ligne par **groupe de cartes** (6 pour Trio : A, 2 à 6, 7, 8 à 10, Valet, Dame) : mini-carte, titre, « ×15 · Valent 2 à 6. », pastille éventuelle (« Spécial »). En bas, le bandeau jaune **dérivé des données** (« Retire les carreaux et les rois. Garde 36 cartes. »). La liste défile au doigt dans son cadre, **sans barre de défilement** (app mobile) ; le bandeau et le bouton « Suivant » restent fixes en dessous.
 - **Classique** : la liste.
-- **Connaisseur** : la même liste, sans légende, carte d'origine en pointillés → carte du paquet, titre « 2–6 → 2 à 6 ».
+- **Connaisseur** : la même liste, sans légende, **carte d'origine** (une **image** découpée d'une planche, ou dessinée : valeur sur sa couleur ; pour un groupe de plusieurs cartes, la première et la dernière qui se recouvrent) → carte du paquet, titre « 2–6 → 2 à 6 ». Un jeu sans `expert.cards` garde la carte en pointillés.
 
 ### 7.4 Vue à balayer (maquette *Swipe*)
-Un clic sur une ligne ouvre cette vue sur le groupe touché. « Groupe 3 / 6 », grande carte (200 × 280, cadre soleil), flèches ‹ ›, points de progression, carte d'explication (« ×3 · Le 7 est spécial. » + texte), bouton « Suivant ». On balaie, on touche les flèches ou le bouton, ou on utilise le clavier. Mode connaisseur : une ligne grise ajoute la carte d'origine et son pouvoir. Après le dernier groupe : « Terminer » ramène à la liste.
+Un clic sur une ligne ouvre cette vue sur le groupe touché. « Groupe 3 / 6 », grande carte (200 × 280, cadre soleil), flèches ‹ ›, points de progression, carte d'explication (« ×3 · Le 7 est spécial. » + texte), bouton « Suivant ». On balaie, on touche les flèches ou le bouton, ou on utilise le clavier. Mode connaisseur : la ou les cartes d'origine dessinées (3 rem de large, nom en légende) à côté (ou, si elles sont cinq, au-dessus) d'une ligne grise qui donne le pouvoir d'origine. Après le dernier groupe : « Terminer » ramène à la liste.
 
 ### 7.5 Mise en place et un tour de jeu (maquettes *Setup* et *TurnFlow*)
-Mise en place : schéma (2 à 4 éléments, chacun un dos de carte ou une carte visible : « Ta main, triée / Au centre, cachées » pour Trio ; « Pioche / Écartée, cachée / Visibles (2 joueurs) » pour Love Letter) et les étapes numérotées. Un tour de jeu : 4 étapes, la façon de gagner (« Gagner » ou « Gagner la manche »), bouton « Jouer ».
+Mise en place : schéma (1 à 4 éléments, chacun des **cartes de dos** à la couleur de dos du jeu, ou une carte visible : « Ta main, triée » en éventail / « Au centre, cachées » en pile pour Trio ; « Pioche » en pile / « Écartée, cachée » pour Love Letter) et les étapes numérotées. Un tour de jeu : un schéma facultatif sous le titre (Trio : « Au centre » en pile, « Mains des joueurs » en éventail ; Love Letter : « Pioche », « Ta main », « Posée devant toi » en carte visible), 4 étapes, la façon de gagner (« Gagner » ou « Gagner la manche »), bouton « Jouer ».
 
 ### 7.6 Règles complètes (maquette *FullRules*)
 Une carte blanche avec toutes les sections : But, Mise en place, Un tour, Trio, Cartes différentes, Mode piquant.
 
 ### 7.7 Partie en cours et saisie des scores (maquettes *Play* et *ScoreEntry*)
-Écrans et fonctionnement **identiques pour tous les jeux** ; seuls les mots viennent de la configuration (`scoring`). Fond du tapis du jeu ; en haut à droite, `party_label` (« Trios gagnés », « Manche 3 ») ; jetons des joueurs (cercle à bord pointillé, score, nom) ; tuiles Règles / Mise en place / Cartes / Un tour (elles ouvrent ces écrans, avec retour à la partie) ; « Noter les scores » ; « Terminer la partie » (archive la partie comme **interrompue**, l'efface, ouvre le podium).
+Écrans et fonctionnement **identiques pour tous les jeux** ; seuls les mots viennent de la configuration (`scoring`). Fond du tapis du jeu (`main_color`) ; en haut à droite, `party_label` (« Trios gagnés », « Manche 3 ») ; jetons des joueurs (cercle à bord pointillé, score, nom) ; tuiles Règles / Mise en place / Cartes / Un tour (elles ouvrent ces écrans, avec retour à la partie) ; une **pioche de dos** (couleur de dos du jeu) dans la zone libre, décorative, qui disparaît s'il n'y a pas la place (six joueurs) ; « Noter les scores » ; « Terminer la partie » (archive la partie comme **interrompue**, l'efface, ouvre le podium).
 - Saisie : un compteur − / + par joueur, qui **part de zéro** (points gagnés depuis la saisie précédente) ; « Valider » (`validate`) les ajoute aux scores et passe à la manche suivante. Titre et question viennent du jeu (« Trios gagnés » / « Qui a gagné un trio ? » ; « Fin de la manche 3 » / « Qui a gagné des points ? »).
 - Si un joueur atteint le score visé (`target` : 3 trios pour Trio ; 6, 5, 4, 3 ou 3 points à 2, 3, 4, 5 ou 6 joueurs pour Love Letter), la partie est **terminée** : podium. Trio : le trio de 7 (victoire immédiate) se note en ajoutant 3 au gagnant.
 - *Ajout (absent des maquettes)* : **Qui joue ?**, le nombre de joueurs (dans les limites du jeu) et leurs prénoms. « C'est parti » en bas ; « Passer cette étape » en haut à droite démarre sans prénoms. **Partie sans prénoms** (pastille, ou « C'est parti » avec tous les champs vides) : la partie en cours n'affiche **pas les jetons** des joueurs ; « Noter les scores » ouvre « Qui joue ? » (`?depuis=partie`, texte « Pour noter les scores, écris le prénom de chaque joueur. », champs vides, nombre de joueurs gardé, « Retour » vers la partie, pas de « Passer cette étape ») puis, dès qu'un prénom est donné, la saisie des scores. La saisie des scores ne s'ouvre jamais sur une partie sans prénoms.
@@ -214,6 +217,11 @@ Premier lancement, liste vide, jeu / groupe / page introuvable (avec retour), pa
 | **Love Letter** : 21 cartes, règle de l'édition 2019 (10 personnages de 0 à 9, 2 à 6 joueurs), au lieu des 16 de la galerie | Règles données par l'utilisateur (nos-jeux-de-societe.fr). Les jokers sont les Espionnes, la dame de cœur est la Princesse, les 6 Gardes sont 4 valets et 2 rois noirs, valeur = rang pour 2 à 8 ; « Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet. » |
 | **Love Letter** : lignes de liste au format de Trio (« Valets et rois noirs » / « ×6 · Devine… ») ; vue à balayer, mise en place sans la ligne vide, sources reconstruites d'après Trio | La galerie est une version antérieure : la mise en page validée de Trio prime. En mode connaisseur la ligne dit le nom d'origine (« Garde »). |
 | **Love Letter** : textes « Fin de manche » et « Cas particuliers » | La galerie contient des `[…]` : textes rédigés d'après la règle (1 point par manche, jokers, égalités, 6 / 5 / 4 / 3 / 3 points), à relire. Les textes de détail des groupes aussi. Les maquettes 02, 03, 04, 05, 06, 07, 08, 09 ont été refaites pour la nouvelle règle. |
+| **Love Letter** : tapis bordeaux #812B2B, ombre brun #400E0E, texte crème #EEDDC8 et logo en sceau de cire, au lieu du rouge de la charte et de la lettre « L » | Palette fournie par l'utilisateur. Le rose #DFB6B6 et le corail #E57979 ne servent qu'au logo (1,8 et 2,9 de contraste sur blanc). Maquettes 02, 03 et 10 refaites. |
+| **Love Letter** : mise en place sans les 3 cartes visibles à 2 joueurs | Le mode particulier à 2 joueurs est abandonné (demande de l'utilisateur) : schéma à deux éléments, quatre étapes, pas de « Cas particuliers ». Maquettes 04 et 08 refaites. |
+| **Love Letter** : fond **crème** sur tous les écrans du jeu (au lieu du bleu), pastilles et bascules bordeaux, texte encre, relief « tan » des surfaces blanches, dos corail | Nouveau principe `background_color` (demande de l'utilisateur) : l'écran du jeu prend la palette. Maquettes 03 à 09 et 11 à 13 refaites ; 02, 14 et 15 (hors du jeu) gardent le bleu. |
+| Dos de carte : pile, éventail ou carte seule à la couleur de dos du jeu, au lieu de la carte pleine bleu nuit | Nouveau principe « dos de carte » (`card_back_color`, `layout`). Maquettes de Trio 05 (mise en place) et Love Letter 08 refaites ; **Trio 06 et Love Letter 09** gagnent un schéma sous le titre ; **Trio 08 et Love Letter 10** une pioche de dos. Les maquettes de Trio, validées, ont été modifiées à la demande de l'utilisateur. |
+| Mode Connaisseur : cartes d'origine au lieu de la carte en pointillés ; vue à balayer : rangée des cartes d'origine | Demande de l'utilisateur. **Trio : 12 images découpées de la planche fournie** (`npm run planche`, `src/content/games/trio/carte-NN.webp`) ; l'utilisateur les dit être des dessins qui lui appartiennent (la règle du projet interdit les illustrations officielles : à lui d'en répondre). **Love Letter : dessinées en code** (valeur sur couleur relevée sur la planche, sans portrait ni texte officiel). Maquettes Trio 03 et 04, Love Letter 06 et 07 refaites. Trois couleurs de Trio (4, 8, 9) légèrement assombries pour la valeur blanche des cartes dessinées. |
 | Réglages : pas de bloc Compte ni « Se déconnecter » ; pas de bloc « Tutoriels passés » ; note « English et Español arrivent bientôt » ; « À propos » à la place | Pas de compte en v1. « Jouer » suit le même chemin pour tous les jeux, à chaque fois : il n'y a donc rien à réactiver. Les sources de la maquette 15 sont retouchées de même. |
 | Accueil : troisième vignette « [JEU 3] » non rendue | Gabarit de la maquette, masqué dans le test. |
 | Podium : l'écran n'a pas de « ‹ Retour » | Fidèle à la maquette : on en sort par « Voir l'historique » ou « Retour aux jeux ». |
@@ -233,9 +241,9 @@ Composants React dans `src/components/`, un dossier par composant (TSX + CSS Mod
 
 - **Structure** : `Screen` (fond, marges des maquettes, zones sûres ; options `solid`, `bare`, `fixed`, `tight`), `StepHeader` (« ‹ Retour » + pastille « Quitter le tutoriel » ou « Passer cette étape »), `PillLink`, `PillButton`, `PageTitle`, `Panel` (carte blanche), `Notice` (bandeau jaune), `EmptyState`.
 - **Boutons** : `Button` et `ButtonLink` (variantes soleil, cerise, ciel, **blanc** ; option `block` pleine largeur).
-- **Cartes et jetons** : `PlayingCard` (variantes `standard`, `list`, `focus` ; lettres V / D / R ; face « joker » : une étoile sans rang), `GhostCard` (carte d'origine en pointillés), `PokerChip`, `PlayerChip`.
+- **Cartes et jetons** : `PlayingCard` (variantes `standard`, `list`, `focus` ; lettres V / D / R ; face « joker » : une étoile sans rang), `GhostCard` (carte d'origine en pointillés, sans `expert.cards`), `PokerChip`, `PlayerChip`.
 - **Choix** : `Segmented` (bascule à segments : mode de lecture, langue), `ModeToggle` (bascule Classique / Connaisseur), `Chips` (pastilles de filtre), `TabBar` (onglets Jeux / Scores / Réglages), `CardGroupRow` (ligne de la liste).
-- **Jeu** : `GameBand` (bandeau), `GameTile` (vignette d'accueil, avec le logo ou l'initiale), `PileDiagram` (schéma de mise en place).
+- **Jeu** : `GameBand` (bandeau), `GameTile` (vignette d'accueil, avec le logo ou l'initiale), `PileDiagram` (schéma de cartes : mise en place, un tour), `CardPile` (cartes de dos : une carte, une pile, un éventail), `OriginalCard` / `OriginalCards` (carte du jeu d'origine : image, ou dessin), `GameScope` (`src/features/game-scope/` : couleurs du jeu sur toutes ses pages).
 - **Partie** : `ResourceTile` (tuiles de raccourci), `ScoreStepper` (compteur − / +).
 
 Hook `useSwipe` (`src/core/`) : balayage tactile et flèches du clavier. Les symboles ♠ ♥ ♦ ♣ sont dessinés en **vectoriel** (`PlayingCard/symbols.ts`), pas en texte.
@@ -257,7 +265,12 @@ Source de vérité : `src/content/game.schema.json` (VS Code complète les champ
 id: love-letter
 name: Love Letter
 font: { file: great-vibes.woff2, family: Great Vibes, weight: 400, band_size: 4 }
-background_color: rouge
+main_color: '#812B2B' # bordeaux
+shadow_color: '#400E0E' # brun
+text_color: '#EEDDC8' # crème
+background_color: '#EEDDC8' # fond des écrans du jeu
+card_back_color: '#E57979' # corail
+logo: logo.svg # sceau de cire
 tagline: Une lettre. Une princesse. Un seul gagnant.
 description: …
 players: { min: 2, max: 6 }
@@ -290,6 +303,7 @@ card_groups:
       original: '1'
       name: Garde
       power: deviner la carte d’un joueur pour l’éliminer
+      cards: [{ value: '1', name: Garde, color: '#E0271D' }] # la carte d'origine, dessinée
 scoring:
   unit: point
   party_label: Manche {round}
@@ -307,8 +321,13 @@ full_rules: [{ title: But, text: … }]
 |---|---|
 | `id` | Identifiant d'URL. Doit être égal au nom du dossier. |
 | `font` | Absent : Fredoka 700. Sinon `file` (woff2 du dossier du jeu), `family`, `weight` (défaut 400), `band_size` (taille du nom dans le bandeau, défaut 3,5 × 16 px). La police est déclarée au démarrage (`registerGameFonts`) et précachée. |
-| `background_color` | `jaune`, `vert`, `rouge`, `bleu` ou `#RRGGBB`. Le texte est **choisi automatiquement** ; une couleur sans contraste ≥ 4,5 est refusée. L'ombre vient de `tapis_ombres` (charte) ou, pour une couleur libre, de la couleur assombrie. |
+| `main_color` | `jaune`, `vert`, `rouge`, `bleu` ou `#RRGGBB`. Le texte est **choisi automatiquement** ; une couleur sans contraste ≥ 4,5 est refusée. L'ombre vient de `tapis_ombres` (charte) ou, pour une couleur libre, de la couleur assombrie. |
+| `shadow_color`, `text_color` | Facultatifs, `#RRGGBB`. Remplacent l'ombre calculée et le texte choisi seul. Un `text_color` sous 4,5 de contraste avec le tapis est refusé. Le texte colore le bandeau, la vignette (initiale), l'écran de partie. |
+| `background_color`, `background_text_color` | Facultatifs. Remplacent le bleu de l'app sur **tous les écrans du jeu** (`/jeu/:id/…`) : `GameScope` pose sur `<html>` les variables `--game-screen-*` (dégradé tiré du fond : un peu plus clair en haut, plus foncé en bas), `--game-edge` (relief des surfaces blanches) et, pour les pastilles, bascules et boutons discrets, `--game-pill-bg/fg` (= `main_color` et son texte). Les feuilles de style les lisent avec le jeton de la charte en repli : accueil, historique et réglages restent bleus. Sans `background_color`, le jeu garde le bleu et ses pastilles bleu nuit. Texte lisible (≥ 4,5) sur tout le dégradé, sinon refusé. |
+| `card_back_color` | Facultatif (défaut : `main_color`). Couleur du dos des cartes, posée en `--game-card-back` ; rayures de la charte. |
 | `card_groups` | Une ligne de la liste = une page de la vue à balayer. `cards` : les cartes à garder, une liste de `{ ranks, suits }` (`suits: all` = les quatre couleurs ; les rangs 2 à 10 s'écrivent sans guillemets). Le nombre de cartes est **calculé**. `display` : la carte montrée (défaut : la première) ; `short` : sous le titre, après « ×15 · » ; `badge` : pastille facultative ; `detail` : carte d'explication de la vue à balayer ; `expert` : la **correspondance** avec le jeu d'origine : `original` (« 2–6 », « 1 »), `name` (« Prêtre », remplace « 2–6 → 2 à 6 »), `power` (son pouvoir, en une proposition). |
+| `expert.cards` | Facultatif, 1 à 5 par groupe : les cartes du jeu d'origine en mode Connaisseur : `{ value, name?, color, image? }`. Avec `image` (svg, png ou webp du dossier du jeu, droits à la charge du jeu), la carte **est** l'image, chiffre compris ; `npm run planche` découpe une planche en images à fond transparent (`scripts/decouper-planche.ts`, qui repère les cartes seul). Sans `image`, elle est dessinée : valeur en blanc ou encre selon le contraste de `color` (≥ 4,5, vérifié par test), sans portrait ni texte officiel. Sans `cards`, la carte en pointillés. |
+| `tutorial.*.diagram[].layout` | `single` (une carte, défaut), `pile` (la pioche : trois dos décalés), `spread` (une main : trois dos en éventail), pour les cartes de dos ; `card` pour une carte visible. `turn.diagram` (facultatif, 1 à 3 éléments) est le même schéma sous le titre d'« Un tour ». |
 | `group_word` | « Groupe » (défaut) ou « Carte » : « Carte 2 / 8 » dans la vue à balayer. |
 | `scoring` | Les mots du jeu et la règle de fin (le fonctionnement est commun, voir §7) : `unit` (« trio », « point », pour les boutons − et +), `party_label` (en haut à droite de la partie : « Manche {round} », « Trios gagnés »), `title`, `question`, `validate`, `target` (score qui termine la partie : un nombre, ou un nombre par effectif ; absent : pas de fin automatique). |
 | `tutorial.setup.diagram` | 1 à 4 éléments `{label, card?}` : un dos de carte, ou une carte visible si `card` est donné. |
@@ -327,7 +346,7 @@ Un test automatisé (`src/data/games.test.ts`, Vitest + Ajv) vérifie **chaque j
 
 ### 9.3 Jeux livrés en v1
 1. **Trio** *(réalisé, d'après les maquettes)*. Fin automatique au 3e trio. 36 cartes d'origine (valeurs 1 à 12 en trois exemplaires) jouées avec le paquet de 52 : on garde pique, cœur et trèfle de l'As à la Dame, et on **retire les carreaux et les rois**. As = 1, Valet = 11, Dame = 12. Six groupes : A, 2 à 6, 7 (« Spécial »), 8 à 10, Valet, Dame. 3 à 6 joueurs, environ 15 minutes. Le mode « Piquant » n'est pas jouable : ses liens entre numéros sont imprimés sur les cartes d'origine.
-2. **Love Letter** *(réalisé, règle de l'édition 2019)*. 2 à 6 joueurs, 20 minutes, nom en Great Vibes, tapis rouge. **21 cartes**, valeur = rang : Espionne 0 = les 2 **jokers** ; Garde 1 = 4 valets et 2 rois noirs (×6) ; Prêtre 2, Baron 3, Servante 4, Prince 5, Chancelier 6 (×2 chacun, cœur et pique) ; Roi 7 = 7♥ ; Comtesse 8 = 8♠ ; Princesse 9 = la **dame de cœur**. Dix groupes. Tout le reste du paquet est retiré. Une manche rapporte 1 point (2 au plus avec les jokers) ; le premier à 6, 5, 4, 3 ou 3 points gagne à 2, 3, 4, 5 ou 6 joueurs.
+2. **Love Letter** *(réalisé, règle de l'édition 2019)*. 2 à 6 joueurs, 20 minutes, nom en Great Vibes, palette bordeaux (tapis #812B2B, ombre #400E0E, texte crème #EEDDC8) et un sceau de cire original (corail, rose, crème) en logo. **21 cartes**, valeur = rang : Espionne 0 = les 2 **jokers** ; Garde 1 = 4 valets et 2 rois noirs (×6) ; Prêtre 2, Baron 3, Servante 4, Prince 5, Chancelier 6 (×2 chacun, cœur et pique) ; Roi 7 = 7♥ ; Comtesse 8 = 8♠ ; Princesse 9 = la **dame de cœur**. Dix groupes. Tout le reste du paquet est retiré. Une manche rapporte 1 point (2 au plus avec les jokers) ; le premier à 6, 5, 4, 3 ou 3 points gagne à 2, 3, 4, 5 ou 6 joueurs.
 
 > Les textes viennent des **maquettes, mot pour mot**. Rédigés par nous, à relire : pour Trio, cinq textes de la vue à balayer ; pour Love Letter, les règles complètes, les détails de groupe et les noms de groupe (Jokers, Dame de cœur).
 
@@ -492,7 +511,7 @@ Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capa
 14. ~~Maquette de l'accueil~~ *Fournie avec la galerie Love Letter (« Tes jeux »), réalisée.* Reste à valider : les filtres « 2–4 joueurs » et « Rapide », que la maquette ne définit pas.
 15. Écran **« Qui joue ? »** (ajouté, sans maquette) : à valider ou à remplacer par la maquette.
 16. ~~Maquettes d'un second jeu~~ *Reçues et réalisées (Love Letter).*
-17. Love Letter : relire les textes rédigés par nous (règles complètes, détails de groupe) ; confirmer les exemplaires par carte (2 Espionnes, 6 Gardes, 2 Prêtres, 2 Barons, 2 Servantes, 2 Princes, 2 Chanceliers, 1 Roi, 1 Comtesse, 1 Princesse : la page de règles ne les donne pas) et les 3 cartes visibles à 2 joueurs ; Roi = 7♥ et Comtesse = 8♠ sont arbitraires. Le filtre « 2–4 joueurs » signifie désormais « se joue avec 2, 3 ou 4 joueurs » : Love Letter (2–6) et Trio (3–6) y répondent tous les deux.
+17. Love Letter : relire les textes rédigés par nous (règles complètes, détails de groupe) ; confirmer les exemplaires par carte (2 Espionnes, 6 Gardes, 2 Prêtres, 2 Barons, 2 Servantes, 2 Princes, 2 Chanceliers, 1 Roi, 1 Comtesse, 1 Princesse : la page de règles ne les donne pas) ; le mode particulier à 2 joueurs (3 cartes visibles) est abandonné ; Roi = 7♥ et Comtesse = 8♠ validés par l'utilisateur. Le filtre « 2–4 joueurs » signifie désormais « se joue avec 2, 3 ou 4 joueurs » : Love Letter (2–6) et Trio (3–6) y répondent tous les deux.
 18. Trio se termine seul au 3e trio (`target: 3`) et mène au podium et à l'historique. Le trio de 7 (victoire immédiate) se note en ajoutant 3 au gagnant : à confirmer, ou à traiter dans une version ultérieure.
 19. Langues English et Español : affichées grisées dans les Réglages, à traduire ou à retirer.
 20. **« Jouer » ouvre toujours « Tes cartes »**, pour tous les jeux (décision de l'utilisateur) : le raccourci « tutoriel passé » et ses Réglages ont été retirés.

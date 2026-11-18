@@ -21,6 +21,8 @@ Les 9 écrans de Trio, tels que le designer les a livrés.
 
 Les maquettes 01, 02, 03, 04, 07 et 08 ont été retouchées à la demande de l'utilisateur : navigation homogène (« ‹ Retour » en haut à gauche, « Quitter le tutoriel » en haut à droite, « Suivant » en bas), et sur « Tes cartes » le bandeau « Retire… » en bas et la légende du mode connaisseur retirée.
 
+Les maquettes 03, 04, 05, 06 et 08 ont encore été retouchées pour les nouveaux principes : cartes d'origine en mode Connaisseur : images découpées de la planche (`npm run planche`) pour Trio (03, 04), dessinées pour Love Letter (06, 07) ; le moteur de rendu sert les fichiers des jeux à `/__games/<id>/<fichier>`, dos de carte à la couleur du jeu en pile ou en éventail (05, 06) et pioche de la partie (08). Elles sont refaites à partir des mêmes pages par un script, et l'app doit les égaler.
+
 Pas de maquette pour : « Qui joue ? » (avec « Passer cette étape », la partie sans prénoms et la version « pour noter les scores »), À propos.
 
 **Saisie des scores (`09-scores`)** : la maquette montre « Léa 1 », mais l'app part de zéro pour tous les jeux (« Valider » ajoute). Le test de fidélité fait donc le geste « un point de plus pour Léa » avant de comparer.
@@ -50,6 +52,8 @@ La galerie est une version antérieure aux maquettes de Trio. Les sources ont é
 - **21 cartes**, règle de l'édition 2019 (10 personnages dont 2 jokers pour les Espionnes, la dame de cœur pour la Princesse ; 2 à 6 joueurs) : « Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet. », « Mélange les 21 cartes. », 10 lignes dans « Tes cartes », 7 sections de règles qui défilent dans leur carte ;
 - 05, 06 et 07 reconstruites d'après les maquettes de Trio (lignes de liste, vue à balayer), avec les données de Love Letter ;
 - 08 : la ligne vide sous les cartes du schéma et le décalage de la carte visible (défauts de la galerie) sont corrigés ;
+- **fond crème** sur tous les écrans du jeu (`background_color`), pastilles bordeaux, dos corail : 03 à 09, 11 à 13 ; **cartes d'origine dessinées** (mode Connaisseur) : 06 et 07 ; **dos de carte** : 08 (mise en place), 09 (un tour), 10 (pioche de la partie) ;
+- **palette bordeaux** (tapis #812B2B, ombre #400E0E, texte crème #EEDDC8) et logo en sceau de cire : 02, 03 et 10 ; **sans la mise en place à 2 joueurs** : 04 et 08 ;
 - 02, 03, 04, 05, 06, 07, 08 et 09 refaites pour cette règle (« 2–6 joueurs », règles de 2019, vue à balayer sur le Prêtre, texte « Gagner la manche ») ; 04 : les textes `[…]` sont remplacés par les textes rédigés ; 15 : blocs Compte et « Tutoriels passés » retirés (« Jouer » suit le même chemin pour tous les jeux, il n'y a rien à réactiver), note sur les langues et bouton « À propos » ajoutés ;
 - toutes les pages reçoivent `*{box-sizing:border-box}`, la règle globale de la galerie qui se perdait à l'extraction.
 
