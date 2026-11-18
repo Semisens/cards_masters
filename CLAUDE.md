@@ -26,12 +26,17 @@
 | `npm run maquettes` | Rend les maquettes HTML en images de référence (`maquettes/trio/*.png`). |
 | `npm run planche -- <planche.png> <dossier-du-jeu> <préfixe>` | Découpe une planche de cartes en `<préfixe>-01.webp`… (fond transparent) : cartes d'origine d'un jeu (`expert.cards[].image`). |
 
-## Façon de travailler (branches et tests)
+## Façon de travailler (hooks git)
 
-- **Une nouvelle branche à chaque demande**, créée depuis `main` à jour : `feat/<sujet>`, `fix/<sujet>` ou `docs/<sujet>` (sujet court, minuscules, tirets). Aucun développement directement sur `main`.
-- **Pendant le développement, ne lance pas les tests** : ni `npm test`, ni `npm run test:visual`, ni lint, ni typecheck, à aucune étape. Écris le code, puis laisse Jeremy le regarder en local (`npm run dev:phone`).
-- **Quand Jeremy juge le résultat convenable en local**, alors seulement : `npm run lint && npm run typecheck && npm test`, puis `npm run test:visual`. Après un changement visuel voulu : `npm run test:visual -- --update-snapshots`, puis regarde les images avant de les valider. Corrige, commite sur la branche, pousse, ouvre la PR vers `main` (`gh pr create --base main`). La CI rejoue les mêmes contrôles sur la PR (`.github/workflows/ci.yml`).
-- Pas de commit, de push ni de PR tant que Jeremy n'a pas validé le résultat en local.
+Le flux : Jeremy demande → tu développes vite → Jeremy valide avec `npm run dev` → commit → plusieurs commits → push. Les tests sont lancés **par les hooks git** (`.githooks/`, installés par `npm install` via `prepare`), jamais par toi.
+
+- On travaille **directement sur `main`** : pas de branche ni de PR par demande.
+- **Ne lance aucun test** : ni `npm test`, ni `npm run test:visual` / Playwright, ni lint, ni typecheck. Écris le code et laisse Jeremy le regarder.
+- **Commit** (seulement quand Jeremy le demande) : le hook `pre-commit` lance les tests unitaires (`npm test`).
+- **Push** (seulement quand Jeremy le demande, après plusieurs commits) : le hook `pre-push` vérifie que les tokens générés sont à jour, puis lance lint, typecheck et `npx playwright test` (PWA, parcours de chaque jeu, fidélité aux maquettes, captures). La CI GitHub (`.github/workflows/ci.yml`) rejoue la même chose en filet de sécurité.
+- **Un hook échoue** : lis son message, corrige, recommite ou repousse. Jamais `--no-verify`, sauf demande explicite de Jeremy.
+- **Une capture a changé volontairement** (le pre-push échoue sur un écran modifié) : montre l'écart à Jeremy et attends son accord. Ensuite seulement : `npx playwright test --update-snapshots`, regarde les images, commite la mise à jour, repousse.
+- Le tableau « Commandes » ci-dessus sert à Jeremy et aux hooks.
 
 ## Parcours de l'app
 

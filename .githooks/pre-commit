@@ -1,0 +1,7 @@
+#!/bin/sh
+# Avant chaque commit : les tests unitaires (vitest : unitaires, composants, garde-fou « aucune valeur en dur »).
+echo "pre-commit : tests unitaires (npm test)"
+npm test || {
+  echo "Commit refusé : un test unitaire échoue. Corrige, puis recommence." >&2
+  exit 1
+}

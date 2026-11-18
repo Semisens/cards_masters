@@ -1,0 +1,21 @@
+#!/bin/sh
+# Avant chaque push : tout le reste, comme la CI (.github/workflows/ci.yml).
+# Chaque version qui arrive sur GitHub est donc passée par la suite complète.
+fail() {
+  echo "Push refusé : $1" >&2
+  exit 1
+}
+
+echo "pre-push 1/4 : tokens à jour"
+npm run tokens >/dev/null || fail "la génération des tokens échoue."
+git diff --exit-code -- src/styles/tokens.generated.css src/core/tokens.generated.ts ||
+  fail "les tokens générés ne sont pas à jour : commite le résultat de « npm run tokens »."
+
+echo "pre-push 2/4 : lint"
+npm run lint || fail "lint."
+
+echo "pre-push 3/4 : typecheck"
+npm run typecheck || fail "typecheck."
+
+echo "pre-push 4/4 : Playwright (PWA, parcours des jeux, maquettes, captures)"
+npx playwright test || fail "Playwright. Si une capture a changé volontairement, régénère-la (--update-snapshots) après avoir regardé l'écart."
