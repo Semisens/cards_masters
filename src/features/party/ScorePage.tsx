@@ -33,6 +33,8 @@ export function ScorePage() {
   if (!game) return <NotFoundPage message={fr.errors.gameNotFound} />
   if (status === 'loading') return null
   if (!session) return <Navigate to={paths.players(game.id)} replace />
+  // Partie sans prénoms : on les demande avant de noter les scores, puis on revient ici.
+  if (session.unnamed) return <Navigate to={paths.players(game.id, true)} replace />
 
   const { scoring } = game
   const values = edited ?? session.players.map(() => 0)

@@ -10,6 +10,11 @@ export interface Session {
   players: Player[]
   /** Manche en cours, à partir de 1. Sert aux jeux à manches ; vaut 1 pour les autres. */
   round: number
+  /**
+   * Vrai quand personne n'a donné de prénom (« Passer cette étape ») : les joueurs ont des noms par défaut
+   * (« Joueur 1 »…). La partie n'affiche pas les jetons et demande les prénoms avant de noter les scores.
+   */
+  unnamed?: true
 }
 
 export const MAX_SCORE = 99
@@ -31,7 +36,7 @@ export function parseSession(raw: string | null): Session | null {
     const data: unknown = JSON.parse(raw)
     if (typeof data !== 'object' || data === null || !Array.isArray((data as { players?: unknown }).players))
       return null
-    const { players, round } = data as { players: unknown[]; round?: unknown }
+    const { players, round, unnamed } = data as { players: unknown[]; round?: unknown; unnamed?: unknown }
     if (players.length === 0) return null
     const valid: Player[] = []
     for (const item of players) {
@@ -43,15 +48,23 @@ export function parseSession(raw: string | null): Session | null {
       valid.push({ name, score: value })
     }
     if (round !== undefined && (!isCount(round, MAX_ROUND) || round < 1)) return null
-    return { players: valid, round: round ?? 1 }
+    return { players: valid, round: round ?? 1, ...(unnamed === true ? { unnamed: true as const } : {}) }
   } catch {
     return null
   }
 }
 
-/** Nouvelle partie : tous les joueurs à zéro, première manche. Les noms vides reçoivent un nom par défaut. */
+/**
+ * Nouvelle partie : tous les joueurs à zéro, première manche. Les noms vides reçoivent un nom par défaut ;
+ * si tous sont vides, la partie est « sans prénoms » (`unnamed`).
+ */
 export function newSession(names: string[], defaultName: (n: number) => string): Session {
-  return { players: names.map((name, i) => ({ name: name.trim() || defaultName(i + 1), score: 0 })), round: 1 }
+  const unnamed = names.every((name) => name.trim() === '')
+  return {
+    players: names.map((name, i) => ({ name: name.trim() || defaultName(i + 1), score: 0 })),
+    round: 1,
+    ...(unnamed ? { unnamed: true as const } : {}),
+  }
 }
 
 /** Points à atteindre pour gagner avec ce nombre de joueurs, ou `undefined` si le jeu n'a pas de fin automatique. */
@@ -69,6 +82,7 @@ export function hasWinner(session: Session, scoring: Scoring): boolean {
 /** Fin de manche : ajoute les points gagnés à chacun (sans dépasser le maximum) et passe à la manche suivante. */
 export function endRound(session: Session, gains: number[]): Session {
   return {
+    ...session,
     players: session.players.map((player, i) => ({
       ...player,
       score: Math.min(MAX_SCORE, player.score + (gains[i] ?? 0)),

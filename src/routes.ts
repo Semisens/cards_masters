@@ -8,7 +8,7 @@
  *   /jeu/:id/tutoriel/cartes/:groupe    vue à balayer d'un groupe de cartes (à partir de 1)
  *   /jeu/:id/tutoriel/mise-en-place     mise en place
  *   /jeu/:id/tutoriel/tour              un tour de jeu
- *   /jeu/:id/joueurs                    qui joue ?
+ *   /jeu/:id/joueurs                    qui joue ? (avec `?depuis=partie` : pour noter les scores, retour à la partie)
  *   /jeu/:id/partie                     partie en cours
  *   /jeu/:id/partie/scores              saisie des scores (trios gagnés, fin de manche)
  *   /jeu/:id/resultat/:partieId         podium d'une partie terminée ou interrompue
@@ -32,7 +32,7 @@ export const paths = {
   group: (id: string, group: number, party = false) => fromParty(`/jeu/${id}/tutoriel/cartes/${group}`, party),
   setup: (id: string, party = false) => fromParty(`/jeu/${id}/tutoriel/mise-en-place`, party),
   turn: (id: string, party = false) => fromParty(`/jeu/${id}/tutoriel/tour`, party),
-  players: (id: string) => `/jeu/${id}/joueurs`,
+  players: (id: string, party = false) => fromParty(`/jeu/${id}/joueurs`, party),
   party: (id: string) => `/jeu/${id}/partie`,
   scores: (id: string) => `/jeu/${id}/partie/scores`,
   results: (id: string, partyId: string) => `/jeu/${id}/resultat/${partyId}`,

@@ -44,12 +44,15 @@ export function PartyPage() {
       </div>
       <PageTitle>{fr.party.title}</PageTitle>
 
-      <div className={styles.players} role="group" aria-label={fr.party.players}>
-        {session.players.map((player, index) => {
-          const { color, text } = playerColor(index)
-          return <PlayerChip key={index} name={player.name} score={player.score} color={color} textColor={text} />
-        })}
-      </div>
+      {/* Sans prénoms, pas de jetons : « Joueur 1 » ne dit rien. Ils apparaissent quand on les renseigne. */}
+      {!session.unnamed && (
+        <div className={styles.players} role="group" aria-label={fr.party.players}>
+          {session.players.map((player, index) => {
+            const { color, text } = playerColor(index)
+            return <PlayerChip key={index} name={player.name} score={player.score} color={color} textColor={text} />
+          })}
+        </div>
+      )}
 
       <div className={styles.tiles}>
         <ResourceTile to={paths.rules(game.id, true)} icon="rules" accent={theme.background} shadow={theme.shadow}>

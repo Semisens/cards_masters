@@ -11,6 +11,7 @@ import { paths } from '../../routes.ts'
 import { newSession } from '../../state/session.ts'
 import { useSession } from '../../state/useSession.ts'
 import { NotFoundPage } from '../not-found/NotFoundPage.tsx'
+import { useFromParty } from '../tutorial/useFlow.ts'
 import styles from './PlayersPage.module.css'
 
 /**
@@ -21,12 +22,14 @@ export function PlayersPage() {
   const { gameId } = useParams()
   const navigate = useNavigate()
   const game = getGame(gameId)
+  const fromParty = useFromParty()
   const { status, session, save } = useSession(gameId ?? '')
   // Les prénoms modifiés par l'utilisateur ; tant qu'il n'a rien changé, on part de la dernière partie
   // ou, à défaut, du minimum de joueurs du jeu avec des champs vides.
   const [edited, setEdited] = useState<string[] | null>(null)
+  // Une partie sans prénoms garde son nombre de joueurs, mais les champs restent vides (« Joueur 1 » n'est qu'un repli).
   const initial = session
-    ? session.players.map((p) => p.name)
+    ? session.players.map((p) => (session.unnamed ? '' : p.name))
     : Array.from({ length: game?.players.min ?? 0 }, () => '')
   const names = edited ?? initial
   const setNames = (update: (current: string[]) => string[]) => setEdited(update(names))
@@ -39,15 +42,20 @@ export function PlayersPage() {
 
   // Les noms vides reçoivent « Joueur n » : passer l'étape, c'est démarrer sans aucun prénom.
   const start = async (players: string[]) => {
-    await save(newSession(players, fr.players.defaultName))
-    navigate(paths.party(game.id))
+    const next = newSession(players, fr.players.defaultName)
+    await save(next)
+    // Venu de la partie pour noter les scores : on y va droit une fois un prénom donné ; sinon, la partie.
+    navigate(fromParty && !next.unnamed ? paths.scores(game.id) : paths.party(game.id))
   }
 
   return (
     <Screen>
-      <StepHeader backTo={paths.turn(game.id)} onSkip={() => void start(names.map(() => ''))} />
+      <StepHeader
+        backTo={fromParty ? paths.party(game.id) : paths.turn(game.id)}
+        onSkip={fromParty ? undefined : () => void start(names.map(() => ''))}
+      />
       <PageTitle>{fr.players.title}</PageTitle>
-      <p className={styles.intro}>{fr.players.intro}</p>
+      <p className={styles.intro}>{fromParty ? fr.players.introForScores : fr.players.intro}</p>
       <Panel>
         <div className={styles.count}>
           <span className={styles.label}>{fr.players.count}</span>

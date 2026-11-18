@@ -85,6 +85,27 @@ describe('newSession', () => {
   it('donne un nom par défaut aux champs vides et nettoie les espaces', () => {
     const session = newSession(['  Léa  ', '', '   '], (n) => `Joueur ${n}`)
     expect(session.players.map((p) => p.name)).toEqual(['Léa', 'Joueur 2', 'Joueur 3'])
+    expect(session.unnamed).toBeUndefined()
+  })
+
+  it('marque la partie « sans prénoms » quand tous les champs sont vides', () => {
+    expect(newSession(['', '  '], (n) => `Joueur ${n}`)).toEqual({
+      players: [
+        { name: 'Joueur 1', score: 0 },
+        { name: 'Joueur 2', score: 0 },
+      ],
+      round: 1,
+      unnamed: true,
+    })
+  })
+
+  it('relit et garde ce marquage', () => {
+    const raw = JSON.stringify(newSession(['', ''], (n) => `Joueur ${n}`))
+    expect(parseSession(raw)?.unnamed).toBe(true)
+    expect(
+      parseSession(JSON.stringify({ players: [{ name: 'Léa', score: 0 }], unnamed: 'oui' }))?.unnamed,
+    ).toBeUndefined()
+    expect(endRound(parseSession(raw)!, [1, 0]).unnamed).toBe(true)
   })
 })
 

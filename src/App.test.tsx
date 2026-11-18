@@ -368,6 +368,7 @@ describe('qui joue ?', () => {
         { name: 'Joueur 3', score: 0 },
       ],
       round: 1,
+      unnamed: true,
     })
   })
 
@@ -377,6 +378,35 @@ describe('qui joue ?', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Passer cette étape' }))
     await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
     expect(savedParty().players).toHaveLength(4)
+  })
+
+  it('sans prénoms : la partie n’a pas de jetons, et « Noter les scores » demande les prénoms', async () => {
+    const app = renderApp('/jeu/trio/joueurs')
+    await userEvent.click(await screen.findByRole('button', { name: 'Passer cette étape' }))
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
+    expect(screen.queryByRole('group', { name: 'Joueurs de la partie' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /Joueur 1/ })).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('link', { name: 'Noter les scores' }))
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/joueurs?depuis=partie'))
+    expect(screen.getByText('Pour noter les scores, écris le prénom de chaque joueur.')).toBeInTheDocument()
+    // Les champs sont vides (« Joueur 1 » n'est qu'un repli), le nombre de joueurs est gardé, pas de pastille « Passer ».
+    expect(screen.getByRole('textbox', { name: 'Prénom du joueur 1' })).toHaveValue('')
+    expect(screen.getAllByRole('textbox')).toHaveLength(3)
+    expect(screen.queryByRole('button', { name: 'Passer cette étape' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Retour/ })).toHaveAttribute('href', '/jeu/trio/partie')
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Prénom du joueur 1' }), 'Léa')
+    await userEvent.click(screen.getByRole('button', { name: 'C’est parti' }))
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie/scores'))
+    expect(savedParty().players[0].name).toBe('Léa')
+    expect(savedParty().unnamed).toBeUndefined()
+  })
+
+  it('sans prénoms, valider « C’est parti » à vide ramène à la partie, sans boucle', async () => {
+    const app = renderApp('/jeu/trio/joueurs?depuis=partie')
+    await userEvent.click(await screen.findByRole('button', { name: 'C’est parti' }))
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
   })
 
   it('reprend les prénoms de la dernière partie', async () => {
@@ -392,6 +422,15 @@ describe('qui joue ?', () => {
 })
 
 describe('partie en cours', () => {
+  it('une partie sans prénoms ne s’ouvre pas sur la saisie des scores : elle demande les prénoms', async () => {
+    window.localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({ players: [{ name: 'Joueur 1', score: 0 }], round: 1, unnamed: true }),
+    )
+    const app = renderApp('/jeu/trio/partie/scores')
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/joueurs?depuis=partie'))
+  })
+
   it('sans partie, on commence par dire qui joue', async () => {
     const app = renderApp('/jeu/trio/partie')
     await waitFor(() => expect(app.location()).toBe('/jeu/trio/joueurs'))

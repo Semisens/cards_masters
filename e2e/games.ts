@@ -18,11 +18,22 @@ const NAMES = ['Léa', 'Tom', 'Inès', 'Sam', 'Maé', 'Noé', 'Lou', 'Max', 'Zo�
 export interface Party {
   players: Array<{ name: string; score: number }>
   round: number
+  /** Partie lancée avec « Passer cette étape » : sans prénoms, sans jetons. */
+  unnamed?: true
 }
 
 /** Une partie en cours de `count` joueurs, en manche 3, avec des scores sous le score visé. */
 export function party(count: number): Party {
   return { players: NAMES.slice(0, count).map((name, i) => ({ name, score: i === 0 ? 1 : 0 })), round: 3 }
+}
+
+/** Une partie lancée sans prénoms (noms par défaut), de `count` joueurs. */
+export function unnamedParty(count: number): Party {
+  return {
+    players: Array.from({ length: count }, (_, i) => ({ name: `Joueur ${i + 1}`, score: 0 })),
+    round: 1,
+    unnamed: true,
+  }
 }
 
 /** Les `count` premiers prénoms de test. */

@@ -115,6 +115,7 @@ export const fr = {
   players: {
     title: 'Qui joue ?',
     intro: 'Écris le prénom de chaque joueur.',
+    introForScores: 'Pour noter les scores, écris le prénom de chaque joueur.',
     count: 'Joueurs',
     fewer: 'Un joueur de moins',
     more: 'Un joueur de plus',

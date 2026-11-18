@@ -94,12 +94,26 @@ test.describe('parcours de chaque jeu', () => {
   }
 
   for (const game of GAMES) {
-    test(`${game.name} : « Passer cette étape » démarre la partie sans prénoms`, async ({ page }) => {
+    test(`${game.name} : « Passer cette étape » démarre sans jetons, les prénoms se demandent pour noter les scores`, async ({
+      page,
+    }) => {
       await page.goto(`/jeu/${game.id}/joueurs`)
       await page.getByRole('button', { name: 'Passer cette étape' }).click()
       await expect(page.getByRole('heading', { level: 1, name: 'Partie en cours' })).toBeVisible()
-      for (let i = 1; i <= game.players.min; i++)
-        await expect(page.getByRole('img', { name: `Joueur ${i} : 0` })).toBeVisible()
+      // Pas de jetons sans prénoms.
+      await expect(page.getByRole('img', { name: /: 0$/ })).toHaveCount(0)
+
+      // « Noter les scores » propose de remplir les joueurs ; le nombre de joueurs est gardé.
+      await page.getByRole('link', { name: 'Noter les scores' }).click()
+      await expect(page.getByText('Pour noter les scores, écris le prénom de chaque joueur.')).toBeVisible()
+      await expect(page.getByRole('textbox')).toHaveCount(game.players.min)
+      await page.getByRole('textbox', { name: 'Prénom du joueur 1' }).fill('Léa')
+      await page.getByRole('button', { name: 'C’est parti' }).click()
+      await expect(page.getByRole('heading', { level: 1, name: fill(game.scoring.title, { round: 1 }) })).toBeVisible()
+
+      // Les jetons apparaissent une fois les prénoms donnés.
+      await page.getByRole('link', { name: /Retour/ }).click()
+      await expect(page.getByRole('img', { name: 'Léa : 0' })).toBeVisible()
     })
   }
 })

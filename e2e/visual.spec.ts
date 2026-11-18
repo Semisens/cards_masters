@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import type { Game } from '../src/data/types.ts'
-import { GAMES, party, type Party } from './games.ts'
+import { GAMES, party, unnamedParty, type Party } from './games.ts'
 
 // Remplace les « golden tests » : captures de la page de visite du design system à 390 × 844.
 // Première exécution ou changement voulu : `npm run test:visual -- --update-snapshots`, puis relire les images.
@@ -177,6 +177,13 @@ const gameScreens = (game: Game): Screen[] => {
     { name: 'mise en place', url: `${url}/tutoriel/mise-en-place` },
     { name: 'un tour', url: `${url}/tutoriel/tour` },
     { name: 'qui joue ?', url: `${url}/joueurs` },
+    { name: `partie sans prénoms, ${max} joueurs`, url: `${url}/partie`, game: game.id, party: unnamedParty(max) },
+    {
+      name: 'qui joue ? pour noter les scores',
+      url: `${url}/joueurs?depuis=partie`,
+      game: game.id,
+      party: unnamedParty(max),
+    },
     ...[...new Set([min, max])].flatMap((n): Screen[] => [
       { name: `partie, ${n} joueurs`, url: `${url}/partie`, game: game.id, party: party(n) },
       { name: `scores, ${n} joueurs`, url: `${url}/partie/scores`, game: game.id, party: party(n) },
