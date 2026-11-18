@@ -19,7 +19,8 @@
     "icons": "node scripts/gen-icons.ts",
     "phone": "sh scripts/phone.sh",
     "dev:phone": "sh scripts/dev-phone.sh",
-    "maquettes": "node scripts/render-maquettes.ts"
+    "maquettes": "node scripts/render-maquettes.ts",
+    "planche": "node scripts/decouper-planche.ts"
   },
   "dependencies": {
     "@capacitor/core": "^8.6.2",

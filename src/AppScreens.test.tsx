@@ -130,6 +130,22 @@ describe('Love Letter : tutoriel', () => {
     expect(list).toHaveTextContent('Prêtre')
   })
 
+  it('Trio : une image par carte d’origine en mode connaisseur, cinq pour « 2 à 6 »', async () => {
+    window.localStorage.setItem('mastercards:mode', 'expert')
+    renderApp('/jeu/trio/tutoriel/cartes/2')
+    const list = await screen.findByRole('list', { name: 'Dans le jeu d’origine' })
+    expect(list.querySelectorAll('img')).toHaveLength(5)
+  })
+
+  it('Trio : la liste montre la première et la dernière carte d’un groupe en image', async () => {
+    window.localStorage.setItem('mastercards:mode', 'expert')
+    renderApp('/jeu/trio/tutoriel/cartes')
+    await screen.findByText('Retire les carreaux et les rois. Garde 36 cartes.')
+    const rows = screen.getAllByRole('link').filter((link) => link.getAttribute('href')?.includes('/tutoriel/cartes/'))
+    expect(rows[0].querySelectorAll('img')).toHaveLength(1)
+    expect(rows[1].querySelectorAll('img')).toHaveLength(2)
+  })
+
   it('montre le joker sur la vue à balayer du premier groupe', async () => {
     renderApp('/jeu/love-letter/tutoriel/cartes/1')
     expect(await screen.findByText('Carte 1 / 10')).toBeInTheDocument()

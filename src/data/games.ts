@@ -5,7 +5,7 @@ import type { Game, GameConfig } from './types.ts'
 // Ajouter un jeu = ajouter ce dossier. Aucun code à modifier. Les fichiers sont embarqués dans le build
 // (donc précachés pour le hors ligne) et validés par src/data/games.test.ts.
 const configModules = import.meta.glob<GameConfig>('../content/games/*/game.yaml', { eager: true, import: 'default' })
-const assetModules = import.meta.glob<string>('../content/games/*/*.{svg,png,woff2}', {
+const assetModules = import.meta.glob<string>('../content/games/*/*.{svg,png,webp,woff2}', {
   eager: true,
   query: '?url',
   import: 'default',

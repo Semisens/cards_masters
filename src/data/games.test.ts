@@ -336,6 +336,14 @@ describe('Trio', () => {
     expect(trio.card_groups.map((g) => g.expert.cards?.length)).toEqual([1, 5, 1, 3, 1, 1])
   })
 
+  it('montre ses cartes d’origine en images découpées de la planche, une par carte, fichiers présents', () => {
+    const originals = trio.card_groups.flatMap((g) => g.expert.cards ?? [])
+    expect(originals.map((c) => c.image)).toEqual(
+      Array.from({ length: 12 }, (_, i) => `carte-${String(i + 1).padStart(2, '0')}.webp`),
+    )
+    for (const card of originals) expect(card.imageUrl, card.image).toBeTruthy()
+  })
+
   it('garde le bleu de l’app (pas de fond propre) et pose une main en éventail, le centre en pile', () => {
     expect(resolveGameTheme(trio).screen).toBeUndefined()
     expect(trio.tutorial.setup.diagram.map((i) => i.layout)).toEqual(['spread', 'pile'])

@@ -2,6 +2,7 @@
 // Ces images sont la référence du test de fidélité (e2e/maquettes.spec.ts).
 // Les polices sont celles de l'app (paquets @fontsource, et police du nom fournie par chaque jeu dans son dossier),
 // pas celles de Google Fonts : le rendu est identique à celui de l'app et ne dépend pas du réseau.
+// Les fichiers du dossier d'un jeu (images des cartes d'origine) sont servis à /__games/<id>/<fichier>.
 // Usage : npm run maquettes
 import { createServer } from 'node:http'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
@@ -44,6 +45,9 @@ const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.woff2': 'font/woff2',
+  '.webp': 'image/webp',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
 }
 
 const server = createServer((req, res) => {
@@ -51,6 +55,10 @@ const server = createServer((req, res) => {
   let file: string
   if (url.pathname.startsWith('/__fonts/')) {
     file = FONTS[Number(url.pathname.slice('/__fonts/'.length).replace('.woff2', ''))]?.[2] ?? ''
+  } else if (url.pathname.startsWith('/__games/')) {
+    // Les fichiers du dossier d'un jeu (images des cartes d'origine) : /__games/<id>/<fichier>.
+    file = join(contentDir, decodeURIComponent(url.pathname.slice('/__games/'.length)))
+    if (!file.startsWith(contentDir)) file = ''
   } else {
     file = join(gamesDir, decodeURIComponent(url.pathname))
     if (!file.startsWith(gamesDir)) file = ''

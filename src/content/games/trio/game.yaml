@@ -24,7 +24,7 @@ card_groups:
     expert:
       original: '1'
       cards:
-        - { value: '1', color: '#BC2EA8' }
+        - { value: '1', color: '#BC2EA8', image: carte-01.webp }
 
   - label: 2 à 6
     cards:
@@ -37,11 +37,11 @@ card_groups:
     expert:
       original: 2–6
       cards:
-        - { value: '2', color: '#FA7A06' }
-        - { value: '3', color: '#0096E8' }
-        - { value: '4', color: '#E42625' }
-        - { value: '5', color: '#FFD325' }
-        - { value: '6', color: '#44CE49' }
+        - { value: '2', color: '#FA7A06', image: carte-02.webp }
+        - { value: '3', color: '#0096E8', image: carte-03.webp }
+        - { value: '4', color: '#E42625', image: carte-04.webp }
+        - { value: '5', color: '#FFD325', image: carte-05.webp }
+        - { value: '6', color: '#44CE49', image: carte-06.webp }
 
   - label: '7'
     cards:
@@ -55,7 +55,7 @@ card_groups:
     expert:
       original: '7'
       cards:
-        - { value: '7', color: '#F1CA26' }
+        - { value: '7', color: '#F1CA26', image: carte-07.webp }
       power: le trio de 7 donne la victoire immédiate.
 
   - label: 8 à 10
@@ -69,9 +69,9 @@ card_groups:
     expert:
       original: 8–10
       cards:
-        - { value: '8', color: '#037BBF' }
-        - { value: '9', color: '#E91818' }
-        - { value: '10', color: '#FFD325' }
+        - { value: '8', color: '#037BBF', image: carte-08.webp }
+        - { value: '9', color: '#E91818', image: carte-09.webp }
+        - { value: '10', color: '#FFD325', image: carte-10.webp }
 
   - label: Valet
     cards:
@@ -84,7 +84,7 @@ card_groups:
     expert:
       original: '11'
       cards:
-        - { value: '11', color: '#44CD4C' }
+        - { value: '11', color: '#44CD4C', image: carte-11.webp }
 
   - label: Dame
     cards:
@@ -97,7 +97,7 @@ card_groups:
     expert:
       original: '12'
       cards:
-        - { value: '12', color: '#0092E7' }
+        - { value: '12', color: '#0092E7', image: carte-12.webp }
 
 # Partie : on note les trios gagnés ; le premier à 3 trios gagne.
 scoring:
