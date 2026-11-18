@@ -352,6 +352,33 @@ describe('qui joue ?', () => {
     })
   })
 
+  it('« Passer cette étape » (en haut, après « Retour ») démarre tout de suite, noms par défaut', async () => {
+    const app = renderApp('/jeu/trio/joueurs')
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Prénom du joueur 1' }), 'Léa')
+    expect(screen.queryByRole('link', { name: 'Quitter le tutoriel' })).not.toBeInTheDocument()
+    const header = screen.getByRole('link', { name: /Retour/ }).parentElement!
+    expect(header.lastElementChild).toBe(screen.getByRole('button', { name: 'Passer cette étape' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Passer cette étape' }))
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
+    // Le prénom tapé est laissé de côté ; le nombre de joueurs reste celui de l'écran.
+    expect(savedParty()).toEqual({
+      players: [
+        { name: 'Joueur 1', score: 0 },
+        { name: 'Joueur 2', score: 0 },
+        { name: 'Joueur 3', score: 0 },
+      ],
+      round: 1,
+    })
+  })
+
+  it('« Passer cette étape » garde le nombre de joueurs réglé', async () => {
+    const app = renderApp('/jeu/trio/joueurs')
+    await userEvent.click(await screen.findByRole('button', { name: 'Un joueur de plus' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Passer cette étape' }))
+    await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
+    expect(savedParty().players).toHaveLength(4)
+  })
+
   it('reprend les prénoms de la dernière partie', async () => {
     seedParty()
     renderApp('/jeu/trio/joueurs')

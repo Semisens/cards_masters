@@ -29,7 +29,7 @@
 
 ## Parcours de l'app
 
-**Navigation identique partout** (cahier §7.9 bis) : « ‹ Retour » en haut à gauche, « Quitter le tutoriel » en haut à droite (tutoriel), le bouton principal (« Suivant ») toujours en bas. `StepHeader` ne prend que des adresses, pas de libellé.
+**Navigation identique partout** (cahier §7.9 bis) : « ‹ Retour » en haut à gauche, « Quitter le tutoriel » en haut à droite (tutoriel) ou « Passer cette étape » (« Qui joue ? »), le bouton principal (« Suivant ») toujours en bas. `StepHeader` ne prend que des adresses (ou `onSkip`), pas de libellé.
 
 Accueil « Tes jeux » (recherche, filtres, onglets Jeux / Scores / Réglages) → le jeu (« Jouer » ou « Règles complètes ») → tutoriel : **Tes cartes** (liste, bandeau « Retire… » en bas ; **le mode Classique / Connaisseur se choisit ici**, jamais à l'accueil) → vue à balayer d'un groupe → mise en place → un tour → Qui joue ? → partie en cours ⇄ saisie des scores → podium → historique (`/scores`). Réglages : `/reglages` (langue, À propos). « Jouer » ouvre toujours « Tes cartes » : pas de raccourci qui dépende de l'historique. Adresses dans `src/routes.ts`.
 

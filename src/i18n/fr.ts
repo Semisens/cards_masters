@@ -9,6 +9,7 @@ export const fr = {
     back: 'Retour',
     backToParty: 'Retour à la partie',
     quitTutorial: 'Quitter le tutoriel',
+    skip: 'Passer cette étape',
     next: 'Suivant',
     play: 'Jouer',
     finish: 'Terminer',

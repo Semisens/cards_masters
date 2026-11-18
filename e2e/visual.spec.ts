@@ -102,6 +102,10 @@ test.describe('écrans sans maquette', () => {
     await page.goto('/jeu/trio/joueurs')
     await expect(page.getByRole('heading', { name: 'Qui joue ?' })).toBeVisible()
     await ready(page)
+    // La pastille est un <button> : elle doit respecter texte ≥ 16 px et zone tactile ≥ 44 px, comme un lien.
+    const skip = page.getByRole('button', { name: 'Passer cette étape' })
+    expect((await skip.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+    expect(await skip.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16)
     await expect(page).toHaveScreenshot('qui-joue.png')
   })
 

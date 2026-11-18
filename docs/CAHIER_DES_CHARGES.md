@@ -185,7 +185,7 @@ Une carte blanche avec toutes les sections : But, Mise en place, Un tour, Trio, 
 Écrans et fonctionnement **identiques pour tous les jeux** ; seuls les mots viennent de la configuration (`scoring`). Fond du tapis du jeu ; en haut à droite, `party_label` (« Trios gagnés », « Manche 3 ») ; jetons des joueurs (cercle à bord pointillé, score, nom) ; tuiles Règles / Mise en place / Cartes / Un tour (elles ouvrent ces écrans, avec retour à la partie) ; « Noter les scores » ; « Terminer la partie » (archive la partie comme **interrompue**, l'efface, ouvre le podium).
 - Saisie : un compteur − / + par joueur, qui **part de zéro** (points gagnés depuis la saisie précédente) ; « Valider » (`validate`) les ajoute aux scores et passe à la manche suivante. Titre et question viennent du jeu (« Trios gagnés » / « Qui a gagné un trio ? » ; « Fin de la manche 3 » / « Qui a gagné des points ? »).
 - Si un joueur atteint le score visé (`target` : 3 trios pour Trio ; 7, 5 ou 4 jetons à 2, 3 ou 4 joueurs pour Love Letter), la partie est **terminée** : podium. Trio : le trio de 7 (victoire immédiate) se note en ajoutant 3 au gagnant.
-- *Ajout (absent des maquettes)* : **Qui joue ?**, le nombre de joueurs (dans les limites du jeu) et leurs prénoms.
+- *Ajout (absent des maquettes)* : **Qui joue ?**, le nombre de joueurs (dans les limites du jeu) et leurs prénoms. « C'est parti » en bas ; « Passer cette étape » en haut à droite démarre sans prénoms.
 
 ### 7.7 bis Podium, historique, réglages (maquettes *Results*, *History*, *Settings* de Love Letter)
 - **Podium** : pastille « Partie terminée » (verte) ou « Partie interrompue » (jaune), les trois premiers sur des marches (2e à gauche, 1er au centre, 3e à droite), les suivants en liste (« 4e Sam 0 »), « Voir l'historique », « Retour aux jeux ». Les égalités partagent le même rang. La partie est lue dans l'historique.
@@ -202,9 +202,9 @@ Premier lancement, liste vide, jeu / groupe / page introuvable (avec retour), pa
 
 - **En haut à gauche** : « ‹ Retour », toujours ce libellé, jamais le nom d'un écran (composant `StepHeader`, ou le bandeau du jeu).
 - **Écrans racines** (Jeux, Scores, Réglages) : la barre d'onglets du bas tient lieu de navigation ; pas de « Retour ».
-- **En haut à droite** : pastille « Quitter le tutoriel », sur les écrans du tutoriel (Tes cartes, vue à balayer, Mise en place, Un tour). Absente quand l'écran est ouvert depuis la partie.
+- **En haut à droite** : une seule pastille, au même endroit. « Quitter le tutoriel » sur les écrans du tutoriel (Tes cartes, vue à balayer, Mise en place, Un tour), absente quand l'écran est ouvert depuis la partie. « Passer cette étape » sur « Qui joue ? » : elle démarre la partie tout de suite, avec les noms par défaut (« Joueur 1 »…) et le nombre de joueurs affiché ; les prénoms tapés sont ignorés.
 - **En bas de page** : le bouton principal de l'étape, toujours à la même place : « Suivant » (Tes cartes, vue à balayer, Mise en place), « Jouer » à la dernière étape du tutoriel. Depuis la partie : « Retour à la partie ».
-- Le libellé du retour n'est pas personnalisable : `StepHeader` n'accepte que l'adresse.
+- Les libellés de l'en-tête ne sont pas personnalisables : `StepHeader` n'accepte que des adresses (`backTo`, `quitTo`) ou l'action de « Passer cette étape » (`onSkip`).
 
 ### 7.10 Écarts assumés avec les maquettes
 | Écart | Raison |

@@ -37,14 +37,15 @@ export function PlayersPage() {
   const { min, max } = game.players
   const setCount = (count: number) => setNames((current) => Array.from({ length: count }, (_, i) => current?.[i] ?? ''))
 
-  const start = async () => {
-    await save(newSession(names, fr.players.defaultName))
+  // Les noms vides reçoivent « Joueur n » : passer l'étape, c'est démarrer sans aucun prénom.
+  const start = async (players: string[]) => {
+    await save(newSession(players, fr.players.defaultName))
     navigate(paths.party(game.id))
   }
 
   return (
     <Screen>
-      <StepHeader backTo={paths.turn(game.id)} />
+      <StepHeader backTo={paths.turn(game.id)} onSkip={() => void start(names.map(() => ''))} />
       <PageTitle>{fr.players.title}</PageTitle>
       <p className={styles.intro}>{fr.players.intro}</p>
       <Panel>
@@ -90,7 +91,7 @@ export function PlayersPage() {
         ))}
       </Panel>
       <div className={styles.spacer} />
-      <Button block onClick={() => void start()}>
+      <Button block onClick={() => void start(names)}>
         {fr.players.start}
       </Button>
     </Screen>

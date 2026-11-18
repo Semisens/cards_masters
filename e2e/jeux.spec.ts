@@ -92,4 +92,14 @@ test.describe('parcours de chaque jeu', () => {
       await expect(page.getByRole('link', { name: 'Jouer' })).toHaveAttribute('href', `/jeu/${game.id}/tutoriel/cartes`)
     })
   }
+
+  for (const game of GAMES) {
+    test(`${game.name} : « Passer cette étape » démarre la partie sans prénoms`, async ({ page }) => {
+      await page.goto(`/jeu/${game.id}/joueurs`)
+      await page.getByRole('button', { name: 'Passer cette étape' }).click()
+      await expect(page.getByRole('heading', { level: 1, name: 'Partie en cours' })).toBeVisible()
+      for (let i = 1; i <= game.players.min; i++)
+        await expect(page.getByRole('img', { name: `Joueur ${i} : 0` })).toBeVisible()
+    })
+  }
 })

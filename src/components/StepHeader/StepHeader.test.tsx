@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import { StepHeader } from './StepHeader.tsx'
 
 const renderHeader = (props: Parameters<typeof StepHeader>[0]) =>
@@ -24,5 +25,18 @@ describe('StepHeader', () => {
   it('n’affiche pas la pastille sans adresse', () => {
     renderHeader({ backTo: '/ici' })
     expect(screen.queryByRole('link', { name: 'Quitter le tutoriel' })).not.toBeInTheDocument()
+  })
+
+  it('affiche la pastille « Passer cette étape » et appelle l’action au clic', async () => {
+    const onSkip = vi.fn()
+    renderHeader({ backTo: '/ici', onSkip })
+    await userEvent.click(screen.getByRole('button', { name: 'Passer cette étape' }))
+    expect(onSkip).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('link', { name: 'Quitter le tutoriel' })).not.toBeInTheDocument()
+  })
+
+  it('n’affiche pas « Passer cette étape » sans action', () => {
+    renderHeader({ backTo: '/ici' })
+    expect(screen.queryByRole('button', { name: 'Passer cette étape' })).not.toBeInTheDocument()
   })
 })
