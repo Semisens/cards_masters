@@ -63,11 +63,38 @@ const MINUS_AT_ZERO: Rect[] = [
   { x: 204, y: 350, w: 48, h: 48 },
 ]
 
+/**
+ * La main (2 ou 3 cartes en éventail, cahier §7.3 et §7.4) remplace la carte seule des groupes de plusieurs rangs
+ * (« 2 à 6 », « 8 à 10 »). Les lignes grandissent (la main est plus large, le titre passe parfois à la ligne) :
+ * on ignore le cadre de la liste. La vue à balayer des maquettes montre le 7, une carte seule : elle n'a pas d'écart.
+ */
+const HAND_LIST: Rect[] = [{ x: 0, y: 215, w: 390, h: 465 }]
+const HAND_WHY = 'La main de cartes remplace la carte seule : écart voulu (cahier des charges §7.10).'
+
 const TRIO_SCREENS: Screen[] = [
   { name: '01-game-detail', url: '/jeu/trio', max: 0.005 },
-  { name: '02-cartes-classique', url: '/jeu/trio/tutoriel/cartes', mode: 'classic', max: 0.005 },
-  { name: '03-cartes-connaisseur', url: '/jeu/trio/tutoriel/cartes', mode: 'expert', max: 0.005 },
-  { name: '04-carte-swipe', url: '/jeu/trio/tutoriel/cartes/3', mode: 'expert', max: 0.01 },
+  {
+    name: '02-cartes-classique',
+    url: '/jeu/trio/tutoriel/cartes',
+    mode: 'classic',
+    masks: HAND_LIST,
+    why: HAND_WHY,
+    max: 0.005,
+  },
+  {
+    name: '03-cartes-connaisseur',
+    url: '/jeu/trio/tutoriel/cartes',
+    mode: 'expert',
+    masks: HAND_LIST,
+    why: HAND_WHY,
+    max: 0.005,
+  },
+  {
+    name: '04-carte-swipe',
+    url: '/jeu/trio/tutoriel/cartes/3',
+    mode: 'expert',
+    max: 0.01,
+  },
   { name: '05-mise-en-place', url: '/jeu/trio/tutoriel/mise-en-place', max: 0.005 },
   { name: '06-un-tour', url: '/jeu/trio/tutoriel/tour', max: 0.01 },
   { name: '07-regles-completes', url: '/jeu/trio/regles', masks: [PIQUANT_TEXT], max: 0.01 },
@@ -86,9 +113,31 @@ const LL = '/jeu/love-letter'
 const LOVE_LETTER_SCREENS: Screen[] = [
   { game: 'love-letter', name: '03-game-detail', url: LL, max: 0.01 },
   { game: 'love-letter', name: '04-regles-completes', url: `${LL}/regles`, max: 0.01 },
-  { game: 'love-letter', name: '05-cartes-classique', url: `${LL}/tutoriel/cartes`, mode: 'classic', max: 0.01 },
-  { game: 'love-letter', name: '06-cartes-connaisseur', url: `${LL}/tutoriel/cartes`, mode: 'expert', max: 0.01 },
-  { game: 'love-letter', name: '07-carte-swipe', url: `${LL}/tutoriel/cartes/3`, mode: 'expert', max: 0.01 },
+  {
+    game: 'love-letter',
+    name: '05-cartes-classique',
+    url: `${LL}/tutoriel/cartes`,
+    mode: 'classic',
+    masks: HAND_LIST,
+    why: HAND_WHY,
+    max: 0.01,
+  },
+  {
+    game: 'love-letter',
+    name: '06-cartes-connaisseur',
+    url: `${LL}/tutoriel/cartes`,
+    mode: 'expert',
+    masks: HAND_LIST,
+    why: HAND_WHY,
+    max: 0.01,
+  },
+  {
+    game: 'love-letter',
+    name: '07-carte-swipe',
+    url: `${LL}/tutoriel/cartes/3`,
+    mode: 'expert',
+    max: 0.01,
+  },
   { game: 'love-letter', name: '08-mise-en-place', url: `${LL}/tutoriel/mise-en-place`, max: 0.01 },
   { game: 'love-letter', name: '09-un-tour', url: `${LL}/tutoriel/tour`, max: 0.01 },
   { game: 'love-letter', name: '10-partie', url: `${LL}/partie`, party: PARTY, max: 0.01 },

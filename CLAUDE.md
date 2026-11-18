@@ -26,13 +26,20 @@
 | `npm run maquettes` | Rend les maquettes HTML en images de référence (`maquettes/trio/*.png`). |
 | `npm run planche -- <planche.png> <dossier-du-jeu> <préfixe>` | Découpe une planche de cartes en `<préfixe>-01.webp`… (fond transparent) : cartes d'origine d'un jeu (`expert.cards[].image`). |
 
-**Avant chaque commit** : `npm run lint && npm run typecheck && npm test`. Après un changement visuel voulu : `npm run test:visual -- --update-snapshots`, puis regarde les images avant de les valider.
+## Façon de travailler (branches et tests)
+
+- **Une nouvelle branche à chaque demande**, créée depuis `main` à jour : `feat/<sujet>`, `fix/<sujet>` ou `docs/<sujet>` (sujet court, minuscules, tirets). Aucun développement directement sur `main`.
+- **Pendant le développement, ne lance pas les tests** : ni `npm test`, ni `npm run test:visual`, ni lint, ni typecheck, à aucune étape. Écris le code, puis laisse Jeremy le regarder en local (`npm run dev:phone`).
+- **Quand Jeremy juge le résultat convenable en local**, alors seulement : `npm run lint && npm run typecheck && npm test`, puis `npm run test:visual`. Après un changement visuel voulu : `npm run test:visual -- --update-snapshots`, puis regarde les images avant de les valider. Corrige, commite sur la branche, pousse, ouvre la PR vers `main` (`gh pr create --base main`). La CI rejoue les mêmes contrôles sur la PR (`.github/workflows/ci.yml`).
+- Pas de commit, de push ni de PR tant que Jeremy n'a pas validé le résultat en local.
 
 ## Parcours de l'app
 
 **Navigation identique partout** (cahier §7.9 bis) : « ‹ Retour » en haut à gauche, « Quitter le tutoriel » en haut à droite (tutoriel) ou « Passer cette étape » (« Qui joue ? »), le bouton principal (« Suivant ») toujours en bas. `StepHeader` ne prend que des adresses (ou `onSkip`), pas de libellé.
 
 Accueil « Tes jeux » (recherche, filtres, onglets Jeux / Scores / Réglages) → le jeu (« Jouer » ou « Règles complètes ») → tutoriel : **Tes cartes** (liste, bandeau « Retire… » en bas ; **le mode Classique / Connaisseur se choisit ici**, jamais à l'accueil) → vue à balayer d'un groupe → mise en place → un tour → Qui joue ? → partie en cours ⇄ saisie des scores → podium → historique (`/scores`). Réglages : `/reglages` (langue, À propos). « Jouer » ouvre toujours « Tes cartes » : pas de raccourci qui dépende de l'historique. Adresses dans `src/routes.ts`.
+
+**La main** : un groupe de plusieurs rangs se montre en éventail de 2 ou 3 cartes (`CardHand`, règle dans `src/data/hand.ts`) ; un groupe d'un seul rang (A, 7, Valet, Dame) ou de jokers reste une carte seule. Aucun champ YAML : elle se déduit des cartes.
 
 **Les écrans sont ceux des maquettes** : `maquettes/<jeu>/*.png` (rendues par `npm run maquettes` depuis `maquettes/<jeu>/source/*.html`). Trio : 9 écrans. Love Letter : 14 écrans extraits de la galerie. Quand une maquette de Love Letter diverge de Trio sur une mise en page commune, celle de Trio prime. Le test `e2e/maquettes.spec.ts` compare **chaque écran à sa maquette, pixel par pixel**, et échoue au-delà de son seuil (images d'écart dans `test-results/maquettes/`). Avant de changer un écran, regarde sa maquette ; après, lance `npx playwright test --project=visual e2e/maquettes.spec.ts` et regarde les images d'écart. Les écarts voulus sont listés dans le test et dans le cahier des charges (7.10). Une nouvelle maquette : dépose la page HTML dans `maquettes/<jeu>/source/` (ajoute `*{box-sizing:border-box}` si elle vient d'une galerie), ajoute l'écran à `e2e/maquettes.spec.ts`, relance `npm run maquettes -- <jeu>`.
 

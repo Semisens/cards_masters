@@ -1,0 +1,39 @@
+/* Une main : chaque carte est décalée d'une part de sa largeur (--hand-step) et inclinée autour de la carte du milieu.
+   Tout dérive de --hand-card-w. */
+.root {
+  --hand-card-w: var(--mc-touch-min);
+  --hand-ratio: var(--mc-card-ratio-list);
+  --hand-step: var(--mc-hand-step-list);
+  position: relative;
+  display: block;
+  flex: none;
+  width: calc(var(--hand-card-w) * (1 + (var(--n) - 1) * var(--hand-step)));
+  height: calc(var(--hand-card-w) * var(--hand-ratio));
+}
+
+.list {
+  --hand-card-w: var(--mc-touch-min);
+}
+
+.focus {
+  --hand-card-w: 7rem;
+  --hand-ratio: var(--mc-card-ratio);
+  --hand-step: var(--mc-hand-step);
+}
+
+/* La dernière carte est dessus ; l'inclinaison part du bas, au centre de chaque carte. */
+.item {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--i) * var(--hand-card-w) * var(--hand-step));
+  display: flex;
+  width: var(--hand-card-w);
+  transform: rotate(calc((var(--i) - (var(--n) - 1) / 2) * var(--mc-hand-angle)));
+  transform-origin: 50% 100%;
+}
+
+/* Les cartes qu'on place dans la main prennent la largeur de la main. */
+.root .item > * {
+  --card-w: var(--hand-card-w);
+  width: var(--hand-card-w);
+}

@@ -84,7 +84,7 @@ card_groups:
     cards:
       - ranks: [A]
         suits: all
-    display: { rank: A, suit: hearts } # carte montrée ; facultatif (défaut : la première carte du groupe)
+    display: { rank: A, suit: hearts } # carte montrée d'un groupe d'un seul rang ; facultatif (défaut : la première carte). Un groupe de plusieurs rangs montre une « main » de 2 ou 3 cartes, calculée (8-9-10, 2-4-6)
     short: Vaut 1. # sous le titre, après « ×4 · »
     badge: Spécial # pastille à côté du titre ; facultatif
     detail: # explication de la vue à balayer

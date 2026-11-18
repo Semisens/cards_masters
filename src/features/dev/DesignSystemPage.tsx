@@ -1,4 +1,5 @@
 import { Button } from '../../components/Button/Button.tsx'
+import { CardHand } from '../../components/CardHand/CardHand.tsx'
 import { PlayingCard } from '../../components/PlayingCard/PlayingCard.tsx'
 import { PokerChip } from '../../components/PokerChip/PokerChip.tsx'
 import type { TapisName } from '../../core/tokens.generated.ts'
@@ -40,6 +41,18 @@ export function DesignSystemPage() {
           {TAPIS.map((color) => (
             <PlayingCard key={color} faceDown back={color} width={CARD_WIDTH} />
           ))}
+        </div>
+        {/* La main : 2 ou 3 cartes en éventail (groupes de plusieurs rangs : « 8 à 10 », « Valets et rois noirs »). */}
+        <div className={`${styles.row} ${styles.hands}`}>
+          <CardHand size="focus" width={CARD_WIDTH}>
+            <PlayingCard rank="8" suit="hearts" />
+            <PlayingCard rank="9" suit="hearts" />
+            <PlayingCard rank="10" suit="hearts" />
+          </CardHand>
+          <CardHand size="focus" width={CARD_WIDTH}>
+            <PlayingCard rank="J" suit="spades" />
+            <PlayingCard rank="K" suit="clubs" />
+          </CardHand>
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router'
 import { Button } from '../../components/Button/Button.tsx'
+import { CardHand } from '../../components/CardHand/CardHand.tsx'
 import { OriginalCard } from '../../components/OriginalCard/OriginalCard.tsx'
 import { Panel } from '../../components/Panel/Panel.tsx'
 import { PlayingCard } from '../../components/PlayingCard/PlayingCard.tsx'
@@ -7,6 +8,7 @@ import { Screen } from '../../components/Screen/Screen.tsx'
 import { StepHeader } from '../../components/StepHeader/StepHeader.tsx'
 import { useSwipe } from '../../core/useSwipe.ts'
 import { deckPlan } from '../../data/deck.ts'
+import { handOf } from '../../data/hand.ts'
 import { getGame } from '../../data/games.ts'
 import { fr } from '../../i18n/fr.ts'
 import { paths } from '../../routes.ts'
@@ -41,6 +43,7 @@ export function CardSwipePage() {
   if (!valid) return <NotFoundPage message={fr.errors.groupNotFound} />
 
   const group = groups[index]
+  const hand = handOf(group)
   const isLast = index === groups.length - 1
   const listPath = paths.cards(game.id, fromParty)
 
@@ -63,7 +66,17 @@ export function CardSwipePage() {
           >
             ‹
           </button>
-          <PlayingCard {...group.display} variant="focus" width="12.5rem" label={group.label} />
+          {hand.length === 1 ? (
+            <PlayingCard {...hand[0]} variant="focus" width="12.5rem" label={group.label} />
+          ) : (
+            <span role="img" aria-label={group.label} className={styles.hand}>
+              <CardHand size="focus">
+                {hand.map((card, i) => (
+                  <PlayingCard key={i} {...card} variant="focus" />
+                ))}
+              </CardHand>
+            </span>
+          )}
           <button
             type="button"
             className={styles.chevron}

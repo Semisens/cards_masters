@@ -55,6 +55,9 @@
   --mc-card-ratio-list: 1.3864;
   --mc-card-frame-list: 3px;
   --mc-card-frame-focus: 4px;
+  --mc-hand-angle: 7deg;
+  --mc-hand-step: 0.45;
+  --mc-hand-step-list: 0.4;
   --mc-chip-inner-border: 3px;
   --mc-chip-stripe: 15deg;
   --mc-color-cerise-ombre: #8D2622;

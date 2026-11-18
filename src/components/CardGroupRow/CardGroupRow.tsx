@@ -1,6 +1,8 @@
 import { Link } from 'react-router'
 import type { CardGroup, ReadingMode } from '../../data/types.ts'
+import { handOf } from '../../data/hand.ts'
 import { fr } from '../../i18n/fr.ts'
+import { CardHand } from '../CardHand/CardHand.tsx'
 import { GhostCard } from '../GhostCard/GhostCard.tsx'
 import { OriginalCards } from '../OriginalCard/OriginalCard.tsx'
 import { PlayingCard } from '../PlayingCard/PlayingCard.tsx'
@@ -13,10 +15,23 @@ export interface CardGroupRowProps {
   to: string
 }
 
+/** La main du groupe (2 ou 3 cartes), ou la carte seule d'un groupe d'une seule carte. */
+function HandOfGroup({ group }: { group: CardGroup }) {
+  const cards = handOf(group)
+  if (cards.length === 1) return <PlayingCard {...cards[0]} variant="list" />
+  return (
+    <CardHand>
+      {cards.map((card, index) => (
+        <PlayingCard key={index} {...card} variant="list" />
+      ))}
+    </CardHand>
+  )
+}
+
 /**
  * Une ligne de la vue liste : le groupe de cartes à garder.
- * Mode classique : la carte, son titre, « ×3 · Vaut 1. ».
- * Mode connaisseur : la carte d'origine (dessinée, ou en pointillés sans `expert.cards`), une flèche, puis la carte du paquet (« 2–6 → 2 à 6 »).
+ * Mode classique : la main (2 ou 3 cartes), son titre, « ×3 · Vaut 1. ».
+ * Mode connaisseur : la main d'origine (dessinée, ou une carte en pointillés sans `expert.cards`), une flèche, puis la main du paquet (« 2–6 → 2 à 6 »).
  */
 export function CardGroupRow({ group, mode, to }: CardGroupRowProps) {
   const expert = mode === 'expert'
@@ -37,7 +52,7 @@ export function CardGroupRow({ group, mode, to }: CardGroupRowProps) {
       )}
       {/* La carte est décorative : le titre et le sous-titre portent l'information. */}
       <span aria-hidden="true" className={styles.card}>
-        <PlayingCard {...group.display} variant="list" />
+        <HandOfGroup group={group} />
       </span>
       <span className={styles.text}>
         <span className={styles.titleLine}>

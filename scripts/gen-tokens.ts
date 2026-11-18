@@ -56,6 +56,9 @@ add('card-symbol-ratio-list', charte.card.symbol_width_ratio_maquette)
 add('card-ratio-list', charte.card.ratio_liste)
 add('card-frame-list', `${charte.card.frame_px.liste}px`)
 add('card-frame-focus', `${charte.card.frame_px.focus}px`)
+add('hand-angle', `${charte.card.hand.angle_deg}deg`)
+add('hand-step', charte.card.hand.step_focus)
+add('hand-step-list', charte.card.hand.step_liste)
 
 // Jetons
 add('chip-inner-border', `${charte.chip_jeton.inner_border_px}px`)

@@ -15,7 +15,13 @@
 .stage {
   display: flex;
   align-items: center;
+  /* La hauteur d'une grande carte seule (12,5 rem) : la main, plus basse, est centrée et le texte dessous ne bouge pas. */
+  min-height: calc(12.5rem * var(--mc-card-ratio));
   justify-content: space-between;
+}
+
+.hand {
+  display: flex;
 }
 
 .chevron {

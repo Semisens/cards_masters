@@ -240,7 +240,7 @@ describe('vue à balayer', () => {
   it('compte autant de points que de groupes', async () => {
     const { container } = renderApp('/jeu/trio/tutoriel/cartes/3')
     await screen.findByText('Groupe 3 / 6')
-    expect(container.querySelectorAll('[aria-hidden="true"] > span')).toHaveLength(6)
+    expect(container.querySelectorAll('[aria-hidden="true"] > span:not([style])')).toHaveLength(6)
   })
 
   it.each(['0', '7', 'abc', '-1', '2.5'])('refuse le groupe « %s »', async (groupe) => {

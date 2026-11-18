@@ -17,6 +17,11 @@
   gap: var(--mc-space-2);
 }
 
+.hands {
+  /* L'inclinaison de la première carte dépasse un peu à gauche. */
+  padding-left: var(--mc-space-1);
+}
+
 .column {
   display: flex;
   flex-direction: column;

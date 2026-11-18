@@ -54,23 +54,29 @@ describe('OriginalCard', () => {
 })
 
 describe('OriginalCards', () => {
+  it('deux cartes : une main de deux', () => {
+    const { container } = render(<OriginalCards cards={[card('1', '#BC2EA8'), card('2', '#FA7A06')]} />)
+    expect(container.textContent).toBe('12')
+  })
+
   it('une carte seule : elle seule', () => {
     const { container } = render(<OriginalCards cards={[card('1', '#BC2EA8')]} />)
     expect(container.textContent).toBe('1')
   })
 
-  it('plusieurs cartes en image : la première et la dernière aussi', () => {
+  it('plusieurs cartes en image : une main de trois, la première, celle du milieu et la dernière', () => {
     const cards = ['2', '3', '4', '5', '6'].map((v) => ({ ...card(v, '#FA7A06'), imageUrl: `/carte-${v}.webp` }))
     const { container } = render(<OriginalCards cards={cards} />)
     expect([...container.querySelectorAll('img')].map((img) => img.getAttribute('src'))).toEqual([
       '/carte-2.webp',
+      '/carte-4.webp',
       '/carte-6.webp',
     ])
   })
 
-  it('plusieurs cartes : la première et la dernière, qui se recouvrent', () => {
+  it('plusieurs cartes : une main de trois, qui se recouvrent', () => {
     const cards = ['2', '3', '4', '5', '6'].map((v) => card(v, '#FA7A06'))
     const { container } = render(<OriginalCards cards={cards} />)
-    expect(container.textContent).toBe('26')
+    expect(container.textContent).toBe('246')
   })
 })

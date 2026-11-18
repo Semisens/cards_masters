@@ -86,7 +86,13 @@
    "focus": 4
   },
   "symbol_width_ratio_maquette": 0.54,
-  "ratio_liste": 1.3864
+  "ratio_liste": 1.3864,
+  "hand": {
+   "content": "la main : 2 ou 3 cartes en éventail ; chevauchement = part de la largeur d'une carte qui reste visible entre deux cartes",
+   "angle_deg": 7,
+   "step_focus": 0.45,
+   "step_liste": 0.4
+  }
  },
  "chip_jeton": {
   "edge": "conic rayé blanc/couleur",

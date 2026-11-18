@@ -48,18 +48,3 @@
 .value {
   position: relative;
 }
-
-/* Deux cartes qui se recouvrent : la seconde passe devant, la première reste lisible sur ses 28 px de gauche. */
-.pair {
-  display: inline-flex;
-  flex: none;
-}
-
-.pair > * + * {
-  margin-left: calc((var(--mc-touch-min) - var(--mc-space-3) - var(--mc-space-1) / 2) * -1);
-}
-
-.pair > :first-child:not(:last-child):not(.picture) {
-  justify-content: flex-start;
-  padding-left: var(--mc-space-1);
-}

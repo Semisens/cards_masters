@@ -1,7 +1,9 @@
 import type { CSSProperties } from 'react'
 import { pickTextColor } from '../../core/contrast.ts'
 import { tokens } from '../../core/tokens.generated.ts'
+import { pickHand } from '../../data/hand.ts'
 import type { OriginalCard as OriginalCardData } from '../../data/types.ts'
+import { CardHand } from '../CardHand/CardHand.tsx'
 import styles from './OriginalCard.module.css'
 
 /** `list` : mini-carte des lignes (44 px) ; `strip` : carte de la rangée de la vue à balayer (3,5 rem). */
@@ -41,16 +43,17 @@ export interface OriginalCardsProps {
 }
 
 /**
- * Les cartes d'origine d'une ligne de la liste : une carte, ou la première et la dernière qui se recouvrent
- * (« 2–6 » : le 2 et le 6) pour dire qu'il y en a plusieurs sans prendre de place.
+ * Les cartes d'origine d'une ligne de la liste : une carte, ou une main de 2 ou 3 cartes en éventail
+ * (« 2–6 » : le 2, le 4 et le 6) pour dire qu'il y en a plusieurs sans prendre de place.
  */
 export function OriginalCards({ cards }: OriginalCardsProps) {
-  const shown = cards.length > 1 ? [cards[0], cards[cards.length - 1]] : cards
+  const shown = pickHand(cards)
+  if (shown.length === 1) return <OriginalCard card={shown[0]} />
   return (
-    <span className={styles.pair} aria-hidden="true">
+    <CardHand>
       {shown.map((card, index) => (
         <OriginalCard key={`${card.value}-${index}`} card={card} />
       ))}
-    </span>
+    </CardHand>
   )
 }
