@@ -231,11 +231,11 @@ Premier lancement, liste vide, jeu / groupe / page introuvable (avec retour), pa
 
 Composants React dans `src/components/`, un dossier par composant (TSX + CSS Module + test).
 
-- **Structure** : `Screen` (fond, marges des maquettes, zones sûres ; options `solid`, `bare`, `fixed`, `tight`), `StepHeader` (« ‹ Retour » + pastille), `PillLink`, `PageTitle`, `Panel` (carte blanche), `Notice` (bandeau jaune), `EmptyState`.
+- **Structure** : `Screen` (fond, marges des maquettes, zones sûres ; options `solid`, `bare`, `fixed`, `tight`), `StepHeader` (« ‹ Retour » + pastille « Quitter le tutoriel » ou « Passer cette étape »), `PillLink`, `PillButton`, `PageTitle`, `Panel` (carte blanche), `Notice` (bandeau jaune), `EmptyState`.
 - **Boutons** : `Button` et `ButtonLink` (variantes soleil, cerise, ciel, **blanc** ; option `block` pleine largeur).
-- **Cartes et jetons** : `PlayingCard` (variantes `standard`, `list`, `focus` ; lettres V / D / R), `GhostCard` (carte d'origine en pointillés), `PokerChip`, `PlayerChip`, `SuitIcon`, `CardRow`.
-- **Choix des cartes** : `ModeToggle` (bascule Classique / Connaisseur), `CardGroupRow` (ligne de la liste).
-- **Jeu** : `GameBand` (bandeau), `GameTile` (vignette d'accueil), `GameLogo`, `PileDiagram` (schéma de mise en place).
+- **Cartes et jetons** : `PlayingCard` (variantes `standard`, `list`, `focus` ; lettres V / D / R), `GhostCard` (carte d'origine en pointillés), `PokerChip`, `PlayerChip`.
+- **Choix** : `Segmented` (bascule à segments : mode de lecture, langue), `ModeToggle` (bascule Classique / Connaisseur), `Chips` (pastilles de filtre), `TabBar` (onglets Jeux / Scores / Réglages), `CardGroupRow` (ligne de la liste).
+- **Jeu** : `GameBand` (bandeau), `GameTile` (vignette d'accueil, avec le logo ou l'initiale), `PileDiagram` (schéma de mise en place).
 - **Partie** : `ResourceTile` (tuiles de raccourci), `ScoreStepper` (compteur − / +).
 
 Hook `useSwipe` (`src/core/`) : balayage tactile et flèches du clavier. Les symboles ♠ ♥ ♦ ♣ sont dessinés en **vectoriel** (`PlayingCard/symbols.ts`), pas en texte.
@@ -348,18 +348,23 @@ Organisation par fonctionnalités :
 
 ```
 src/
-  core/          # tokens générés, contraste, storage, cartes, init native
-  content/games/ # <id>/game.yaml + logo et police du jeu
+  core/          # tokens générés, contraste, couleurs, cartes, polices, storage, init native, balayage
+  content/games/ # <id>/game.yaml + logo et police du jeu ; game.schema.json
+  data/          # types, chargement des jeux (loadGame), plan du paquet (deck), thème, filtres
+  state/         # partie en cours (session), historique, mode de lecture, drapeaux mémorisés
+  i18n/          # textes de l'interface (fr)
   features/
-    home/
-    game-detail/
-    rules/
-    about/
+    home/ game-detail/ rules/ about/
+    cards/       # Tes cartes (liste) et vue à balayer
+    tutorial/    # mise en place, un tour
+    players/     # Qui joue ?
+    party/       # partie en cours, saisie des scores
+    results/ history/ settings/   # podium, Tes scores, Réglages
     dev/         # page de visite du design system (dev uniquement)
   components/    # design system partagé
   styles/        # tokens générés + styles globaux
-scripts/         # gen-tokens, gen-icons, garde-fous
-e2e/             # tests Playwright
+scripts/         # gen-tokens, gen-icons, render-maquettes, garde-fous
+e2e/             # tests Playwright (parcours, hors ligne, aucun défilement, fidélité aux maquettes)
 charte/  docs/  maquettes/
 android/  ios/   # projets natifs Capacitor
 ```
@@ -419,15 +424,15 @@ Aucune collecte en v1, aucun compte, pas de tracking. Si des statistiques sont a
 - [x] Chaque écran de Trio et de Love Letter est **conforme à sa maquette, mesuré** : moins de 1 % de pixels différents (`e2e/maquettes.spec.ts`), écarts assumés listés en 7.10.
 - [x] Chaque écran tient sans défilement vertical à 390 × 844 et 393 × 852 (test automatisé).
 - [x] Le mode de lecture se choisit après le jeu, jamais à l'accueil.
-- [ ] Aucune couleur / rayon / espacement / taille de texte en dur (test automatisé vert).
-- [ ] Un nouveau jeu s'ajoute avec un seul JSON + assets, sans modification de code.
-- [ ] Les termes d'origine interdits par un jeu n'apparaissent pas dans ses textes (test, champ `classic_forbidden_terms`).
-- [ ] Contraste ≥ 4,5 pour tous les couples texte/fond, y compris fond « libre ».
+- [x] Aucune couleur / rayon / espacement / taille de texte en dur (`scripts/no-hardcoded-values.test.ts`).
+- [x] Un nouveau jeu s'ajoute avec un seul `game.yaml` (logo et police facultatifs), sans modification de code : prouvé en déposant `docs/modele-jeu.yaml` comme troisième jeu, qui passe les tests de chaque jeu (`src/data/games.test.ts`, `e2e/jeux.spec.ts`, « aucun défilement »).
+- [x] Les termes d'origine interdits par un jeu n'apparaissent pas dans ses textes (test, champ `classic_forbidden_terms`).
+- [x] Contraste ≥ 4,5 pour tous les couples texte/fond, y compris fond « libre » (`src/data/theme.test.ts`, `src/data/games.test.ts`).
 - [ ] Aucun logo ou lettrage officiel dans le dépôt.
-- [ ] App 100 % fonctionnelle hors ligne (test Playwright : rechargement sans réseau).
-- [ ] App installable : manifeste valide, icônes 192, 512 et maskable.
-- [ ] `npm run lint`, `npm run typecheck`, `npm test` sans erreur.
-- [ ] `npx cap sync` sans erreur.
+- [x] App 100 % fonctionnelle hors ligne (`e2e/pwa.spec.ts`, `e2e/app.spec.ts` : rechargement sans réseau).
+- [x] App installable : manifeste valide, icônes 192, 512 et maskable (`e2e/pwa.spec.ts`).
+- [x] `npm run lint`, `npm run typecheck`, `npm test` sans erreur.
+- [x] `npx cap sync` sans erreur.
 - [ ] Testé sur au moins un petit et un grand écran, sur iOS (Safari) et Android (Chrome).
 - [ ] Si publication sur les stores : build natif Android et iOS testé sur appareil réel.
 
@@ -442,20 +447,20 @@ Projet Vite + React + TypeScript strict, structure de dossiers, lint (oxlint + P
 Tokens générés depuis le JSON (variables CSS + TypeScript), garde-fou « aucune valeur en dur », contraste WCAG, polices embarquées, `Button`, `PlayingCard`, `PokerChip`, page de visite `/dev/design-system`, tests de composants et captures Playwright.
 
 **Jalon 2 : données** *(réalisé, avec Trio)*
-Types, schéma JSON, chargement des jeux (`import.meta.glob`), plan du paquet (`deckPlan`, `removalList`), thème par jeu, tests de validation éditoriale. Trio en contenu de référence.
+Types, schéma JSON (`game.schema.json`), configuration YAML par jeu (`game.yaml`, lue au build, `loadGame`), plan du paquet carte par carte (`deckPlan`, `removalList`), thème et police par jeu, tests de validation éditoriale. Trio en contenu de référence.
 
 **Jalons 3 et 4 : écrans de Trio d'après les maquettes** *(réalisés)*
 Page du jeu, tutoriel (Tes cartes en deux modes, vue à balayer, mise en place, un tour), règles complètes, partie en cours, trios gagnés, plus « Qui joue ? ». Charte v6 (ombres de tapis, carte fantôme, voile, rayon 16). **Test de fidélité pixel à pixel** aux maquettes.
 
 **Jalon 5 : second jeu et finitions** *(en partie)*
-Fait : page À propos et mentions légales, états vides, erreur et premier lancement ; **second jeu, Love Letter** (manches, podium, historique, réglages, accueil « Tes jeux » avec onglets, recherche et filtres), **moteur généralisé** (liste exacte de cartes, retrait « tout le reste », schéma de mise en place libre, scoring par jeu). Reste : accessibilité à auditer sur appareil, performances (Lighthouse).
+Fait : page À propos et mentions légales, états vides, erreur et premier lancement ; **second jeu, Love Letter** (manches, podium, historique, réglages, accueil « Tes jeux » avec onglets, recherche et filtres), **refonte « un jeu = une configuration »** (mêmes écrans et même fonctionnement pour tous, scores identiques et score visé par jeu, police et logo dans le dossier du jeu, `docs/modele-jeu.yaml`, tests qui parcourent chaque jeu sans le nommer), « Passer cette étape » et parties sans prénoms. Reste : accessibilité à auditer sur appareil, performances (Lighthouse).
 
 **Jalon 6 : publication**
 Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capacitor/assets`), vérification des droits (voir section 6), puis, si décidé : builds Android et iOS, fiches et captures de stores, plugin d'écran maintenu allumé.
 
 ### Prompt de démarrage conseillé pour Claude Code
 
-> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (finitions) ou ajoute un troisième jeu. Utilise `charte/mastercards-charte.json` comme seule source des tokens et les images de `maquettes/<jeu>/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
+> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (finitions) ou ajoute un troisième jeu (copie `docs/modele-jeu.yaml` dans `src/content/games/<id>/game.yaml`, sans toucher au code). Utilise `charte/mastercards-charte.json` comme seule source des tokens et les images de `maquettes/<jeu>/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
 
 ---
 
@@ -478,5 +483,7 @@ Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capa
 15. Écran **« Qui joue ? »** (ajouté, sans maquette) : à valider ou à remplacer par la maquette.
 16. ~~Maquettes d'un second jeu~~ *Reçues et réalisées (Love Letter).*
 17. Love Letter : relire les textes rédigés par nous (« Fin de manche », « Cas particuliers », sept détails de groupe), et confirmer le jeu à **6 Gardes** (17 cartes) plutôt que 5 (16 cartes).
-18. « Terminer la partie » de Trio mène au podium et à l'historique ; un trio de 7 ou trois trios ne terminent pas la partie tout seuls (pas de `target` pour Trio).
+18. Trio se termine seul au 3e trio (`target: 3`) et mène au podium et à l'historique. Le trio de 7 (victoire immédiate) se note en ajoutant 3 au gagnant : à confirmer, ou à traiter dans une version ultérieure.
 19. Langues English et Español : affichées grisées dans les Réglages, à traduire ou à retirer.
+20. **« Jouer » ouvre toujours « Tes cartes »**, pour tous les jeux (décision de l'utilisateur) : le raccourci « tutoriel passé » et ses Réglages ont été retirés.
+21. « Passer cette étape » sur « Qui joue ? » démarre une partie sans prénoms (pas de jetons, prénoms demandés pour noter les scores) : à valider à l'usage.

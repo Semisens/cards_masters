@@ -11,8 +11,10 @@ Il ne s'agit pas d'enseigner les règles de jeux de cartes classiques (belote…
 - Mode connaisseur : correspondance carte → personnage, pouvoir, règle d'origine.
 
 ## Personnalisation par jeu
-Nom, police du nom, pioche (dos de cartes), logo (optionnel), couleur de fond
-(jaune, vert, rouge, bleu ou libre), règles (classique + connaisseur).
+Tout est dans une configuration, `src/content/games/<id>/game.yaml` (modèle commenté : `docs/modele-jeu.yaml`) :
+nom, police du nom, pioche (dos de cartes), logo (optionnel), couleur de fond (jaune, vert, rouge, bleu ou libre),
+joueurs, durée, cartes à garder, correspondances avec le jeu d'origine, règles (classique + connaisseur), score.
+Tous les jeux ont les mêmes écrans et le même fonctionnement : ajouter un jeu ne demande aucun code.
 
 ## Direction artistique
 - Ambiance jeu de société : fond bleu, formes épaisses et arrondies, boutons en relief (réf. Ludo).
@@ -31,5 +33,7 @@ PWA en Vite + React + TypeScript, empaquetée avec Capacitor pour les stores. Ra
 aucune API native requise, partage par simple lien, référencement web, pas de review de store pour la v1.
 Capacitor est intégré dès le départ pour publier sur les stores sans réécriture si la monétisation ou la visibilité l'exigent.
 
-## Prochaines étapes
-Écrans complets : accueil, fiche jeu avec choix des cartes à garder, règle pas à pas en mode classique et connaisseur.
+## Où on en est
+Deux jeux livrés, Trio et Love Letter, avec tous les écrans : accueil, page du jeu, tutoriel (Tes cartes en deux modes,
+mise en place, un tour), partie en cours et scores, podium, historique, réglages.
+Reste : accessibilité à auditer sur appareil, performances, puis la publication (cahier des charges, jalon 6).

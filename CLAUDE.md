@@ -3,7 +3,7 @@
 - Spécification complète : `docs/CAHIER_DES_CHARGES.md`. Lis-le en premier.
 - Tokens de design : `charte/mastercards-charte.json`. Ne jamais écrire une couleur, un rayon, un espacement ou une taille de texte en dur : tout passe par les variables `--mc-*` générées (`npm run tokens`). Le test `scripts/no-hardcoded-values.test.ts` fait échouer le build sinon.
 - Contexte produit : `docs/contexte/mastercards-contexte.md`.
-- Maquettes : `maquettes/` (images exportées du canvas).
+- Maquettes : `maquettes/<jeu>/*.png`, rendues par `npm run maquettes` depuis `maquettes/<jeu>/source/*.html` (voir `maquettes/LISEZ-MOI.md`).
 - Stack : **PWA** en Vite + React + TypeScript strict, empaquetée pour iOS et Android avec **Capacitor**. Base 390x844, portrait uniquement.
 - Textes de l'app : tutoiement, phrases courtes, français.
 - Ne jamais reproduire de logo, lettrage ou illustration officiels d'un jeu.
@@ -19,7 +19,7 @@
 | `npm run lint` | oxlint + Prettier (vérification). `npm run format` pour corriger. |
 | `npm run typecheck` | `tsc -b` en mode strict. |
 | `npm test` | Vitest : unitaires, composants, garde-fou « aucune valeur en dur ». |
-| `npm run test:visual` | Playwright : PWA (hors ligne, manifeste), parcours de l’app sur le build de production, captures des écrans à 390x844. |
+| `npm run test:visual` | Playwright : PWA (hors ligne, manifeste), parcours de l’app sur le build de production (dont `e2e/jeux.spec.ts` : le même parcours pour chaque jeu), captures des écrans à 390x844. |
 | `npm run build` | Build de production dans `dist/` (service worker inclus). |
 | `npm run cap:sync` | Build puis copie dans les projets natifs `android/` et `ios/`. |
 | `npm run tokens` / `npm run icons` | Régénèrent les tokens et les icônes depuis la charte. |

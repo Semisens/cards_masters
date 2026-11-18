@@ -106,7 +106,7 @@
    "classic": "règles sur la base des cartes choisies, sans vocabulaire d'origine",
    "expert": "correspondance carte→personnage, pouvoir, règle d'origine"
   },
-  "font": "police du nom propre au jeu (Google Fonts, licence libre), ex. Love Letter : Great Vibes; défaut Fredoka 600"
+  "font": "police du nom propre au jeu (fichier woff2 dans le dossier du jeu, licence libre), ex. Love Letter : Great Vibes; défaut Fredoka 600"
  },
  "voice": "tutoiement, phrases courtes",
  "fantome": {

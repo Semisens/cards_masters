@@ -146,7 +146,6 @@ interface Screen {
   /** Jeu de la partie mémorisée. */
   game?: string
   history?: unknown[]
-  storage?: Record<string, string>
 }
 
 const entry = (id: number, gameId: string, status: string, players = party(4).players) => ({
@@ -216,21 +215,18 @@ test.describe('aucun défilement vertical', () => {
       for (const screen of SCREENS) {
         test(screen.name, async ({ page }) => {
           await page.addInitScript(
-            ({ mode, party, game, history, storage }) => {
+            ({ mode, party, game, history }) => {
               window.localStorage.clear()
               window.localStorage.setItem('mastercards:welcomed', '1')
               if (mode) window.localStorage.setItem('mastercards:mode', mode)
               if (party) window.localStorage.setItem(`mastercards:session:${game}`, JSON.stringify(party))
               if (history) window.localStorage.setItem('mastercards:history', JSON.stringify(history))
-              for (const [key, value] of Object.entries(storage ?? {}))
-                window.localStorage.setItem(`mastercards:${key}`, value)
             },
             {
               mode: screen.mode,
               party: screen.party,
               game: screen.game,
               history: screen.history,
-              storage: screen.storage,
             },
           )
           await page.goto(screen.url)

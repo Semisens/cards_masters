@@ -44,7 +44,6 @@ export const fr = {
     interrupted: 'Interrompue',
     emptyTitle: 'Aucune partie pour le moment',
     emptyText: 'Tes parties apparaîtront ici quand tu les auras terminées.',
-    open: (name: string) => `Voir les parties de ${name}`,
   },
   settings: {
     title: 'Réglages',
@@ -60,13 +59,11 @@ export const fr = {
   game: {
     /** « 3 à 6 joueurs » pour les vignettes. */
     players: (min: number, max: number) => (min === max ? plural(min, 'joueur', 'joueurs') : `${min} à ${max} joueurs`),
-    duration: (minutes: number) => `${minutes} min`,
     /** « 3–6 joueurs · 15 min » pour le bandeau du jeu. */
     facts: (min: number, max: number, minutes: number) =>
       `${min === max ? min : `${min}–${max}`} joueur${max > 1 ? 's' : ''} · ${minutes} min`,
     play: 'Jouer',
     fullRules: 'Règles complètes',
-    pileOf: (name: string) => `Pioche de ${name}`,
   },
   cards: {
     title: 'Tes cartes',

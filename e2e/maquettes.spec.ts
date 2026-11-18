@@ -31,8 +31,6 @@ interface Screen {
   party?: Party
   /** Parties passées à charger dans l'historique. */
   history?: unknown[]
-  /** Autres valeurs à mémoriser (clés sans le préfixe `mastercards:`). */
-  storage?: Record<string, string>
   /** Gestes à faire avant la capture (la maquette montre un état qu'on n'a pas au chargement). */
   act?: (page: Page) => Promise<void>
 }
@@ -190,16 +188,14 @@ test.describe('fidélité aux maquettes', () => {
     const label = `${game}/${screen.name}`
     test(label, async ({ page }, testInfo) => {
       await page.addInitScript(
-        ({ mode, party, history, game, storage }) => {
+        ({ mode, party, history, game }) => {
           window.localStorage.clear()
           window.localStorage.setItem('mastercards:welcomed', '1')
           if (mode) window.localStorage.setItem('mastercards:mode', mode)
           if (party) window.localStorage.setItem(`mastercards:session:${game}`, JSON.stringify(party))
           if (history) window.localStorage.setItem('mastercards:history', JSON.stringify(history))
-          for (const [key, value] of Object.entries(storage ?? {}))
-            window.localStorage.setItem(`mastercards:${key}`, value)
         },
-        { mode: screen.mode, party: screen.party, history: screen.history, storage: screen.storage, game },
+        { mode: screen.mode, party: screen.party, history: screen.history, game },
       )
       await page.goto(screen.url)
       await ready(page)
