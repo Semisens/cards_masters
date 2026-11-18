@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mastercards.local/game.schema.json",
   "title": "Jeu MasterCards",
-  "description": "Un fichier game.json par jeu, dans src/content/games/<id>/. Validé par src/data/games.test.ts.",
+  "description": "Un fichier game.yaml par jeu, dans src/content/games/<id>/. Ajouter un jeu = ajouter ce dossier, sans toucher au code. Validé par src/data/games.test.ts. Modèle commenté : docs/modele-jeu.yaml.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -30,8 +30,34 @@
       "maxLength": 40
     },
     "font": {
-      "description": "Police du nom. Doit être embarquée dans l'app. Défaut : Fredoka.",
-      "enum": ["Fredoka", "Great Vibes"]
+      "description": "Police du nom du jeu. Absent : Fredoka (police de titre de l'app). Donne `file` : un fichier woff2 déposé dans le dossier du jeu, sous licence libre.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+\\.woff2$"
+        },
+        "family": {
+          "description": "Nom de la famille, ex. « Great Vibes ».",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "weight": {
+          "description": "Graisse du fichier. Défaut : 400.",
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 900
+        },
+        "band_size": {
+          "description": "Taille du nom dans le bandeau, en multiples de 16 px. Défaut : 3,5. Une calligraphie demande plus (4).",
+          "type": "number",
+          "minimum": 2,
+          "maximum": 5
+        }
+      }
     },
     "background_color": {
       "description": "Tapis de la charte, ou couleur libre. Le texte (blanc ou encre) est choisi automatiquement ; une couleur sans contraste suffisant est refusée.",
@@ -107,23 +133,25 @@
       "maxLength": 12
     },
     "scoring": {
-      "description": "Comment la partie se marque : mots du jeu, manches, points à atteindre.",
+      "description": "Comment la partie se marque. Tous les jeux fonctionnent pareil : à chaque saisie on note les points gagnés, « Valider » les ajoute et passe à la manche suivante. {round} = numéro de manche.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["rounds", "unit", "title", "question", "validate"],
+      "required": ["unit", "party_label", "title", "question", "validate"],
       "properties": {
-        "rounds": {
-          "description": "Vrai : la partie se joue en manches ; on note les points gagnés à chaque manche.",
-          "type": "boolean"
-        },
         "unit": {
-          "description": "Ce qu'on compte, au singulier : « trio », « point ». Sert aux libellés des boutons − et +.",
+          "description": "Ce qu'on compte, au singulier : « trio », « point ». Sert aux libellés des boutons − et + pour lecteurs d'écran.",
           "type": "string",
           "minLength": 1,
           "maxLength": 20
         },
+        "party_label": {
+          "description": "En haut à droite de la partie en cours, ex. « Manche {round} » ou « Trios gagnés ».",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
         "title": {
-          "description": "Titre de l'écran de saisie. {round} est remplacé par le numéro de manche.",
+          "description": "Titre de l'écran de saisie, ex. « Fin de la manche {round} ».",
           "type": "string",
           "minLength": 1,
           "maxLength": 40
@@ -138,23 +166,26 @@
           "minLength": 1,
           "maxLength": 30
         },
-        "round_label": {
-          "description": "Ex. « Manche {round} ». Obligatoire pour un jeu à manches.",
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 30
-        },
         "target": {
-          "description": "Points à atteindre pour gagner, selon le nombre de joueurs. Absent : pas de fin automatique.",
-          "type": "object",
-          "propertyNames": {
-            "pattern": "^[0-9]{1,2}$"
-          },
-          "additionalProperties": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 99
-          }
+          "description": "Points à atteindre pour gagner : un nombre, ou un nombre par effectif (clé = nombre de joueurs). La partie se termine seule. Absent : pas de fin automatique.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 99
+            },
+            {
+              "type": "object",
+              "propertyNames": {
+                "pattern": "^[0-9]{1,2}$"
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 99
+              }
+            }
+          ]
         }
       }
     },
@@ -188,17 +219,7 @@
                     "maxLength": 30
                   },
                   "card": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": ["rank", "suit"],
-                    "properties": {
-                      "rank": {
-                        "$ref": "#/$defs/rank"
-                      },
-                      "suit": {
-                        "$ref": "#/$defs/suit"
-                      }
-                    }
+                    "$ref": "#/$defs/cardRef"
                   }
                 }
               }
@@ -283,7 +304,17 @@
   },
   "$defs": {
     "rank": {
-      "enum": ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+      "description": "Rang : A, 2 à 10, J (valet), Q (dame), K (roi). Les nombres peuvent s'écrire sans guillemets.",
+      "oneOf": [
+        {
+          "enum": ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+        },
+        {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10
+        }
+      ]
     },
     "suit": {
       "enum": ["spades", "hearts", "diamonds", "clubs"]
@@ -294,7 +325,7 @@
     "cardGroup": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["label", "ranks", "count", "display", "short", "detail", "expert"],
+      "required": ["label", "cards", "short", "detail", "expert"],
       "properties": {
         "label": {
           "description": "Titre de la ligne, ex. « 2 à 6 ».",
@@ -302,66 +333,44 @@
           "minLength": 1,
           "maxLength": 20
         },
-        "ranks": {
-          "description": "Rangs du paquet réunis dans ce groupe.",
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/rank"
-          }
-        },
-        "count": {
-          "description": "Nombre de cartes gardées dans le groupe.",
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 52
-        },
         "cards": {
-          "description": "Liste exacte quand les rangs n'ont pas les mêmes couleurs (ex. 4 valets et 2 rois noirs). Alors `ranks` en est la liste des rangs, `count` le total, et `suits` est absent.",
+          "description": "Les cartes du paquet de 52 à garder dans ce groupe. Ex. 2 à 6 en trois couleurs : `- { ranks: [2, 3, 4, 5, 6], suits: [spades, hearts, clubs] }`. Le nombre de cartes est calculé.",
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["rank", "suits"],
+            "required": ["ranks", "suits"],
             "properties": {
-              "rank": {
-                "$ref": "#/$defs/rank"
-              },
-              "suits": {
+              "ranks": {
                 "type": "array",
                 "minItems": 1,
-                "uniqueItems": true,
                 "items": {
-                  "$ref": "#/$defs/suit"
+                  "$ref": "#/$defs/rank"
                 }
+              },
+              "suits": {
+                "description": "Couleurs : spades (pique), hearts (cœur), diamonds (carreau), clubs (trèfle), ou `all` pour les quatre.",
+                "oneOf": [
+                  {
+                    "const": "all"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "$ref": "#/$defs/suit"
+                    }
+                  }
+                ]
               }
             }
           }
         },
-        "suits": {
-          "description": "Couleurs gardées. Absent : n'importe lesquelles. Si présent, count = rangs x couleurs.",
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/suit"
-          }
-        },
         "display": {
-          "description": "La carte montrée dans la liste et la vue à balayer.",
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["rank", "suit"],
-          "properties": {
-            "rank": {
-              "$ref": "#/$defs/rank"
-            },
-            "suit": {
-              "$ref": "#/$defs/suit"
-            }
-          }
+          "description": "La carte montrée dans la liste et la vue à balayer. Absent : la première carte du groupe.",
+          "$ref": "#/$defs/cardRef"
         },
         "short": {
           "description": "Sous le titre, après « ×3 · ».",
@@ -418,6 +427,19 @@
               "maxLength": 160
             }
           }
+        }
+      }
+    },
+    "cardRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rank", "suit"],
+      "properties": {
+        "rank": {
+          "$ref": "#/$defs/rank"
+        },
+        "suit": {
+          "$ref": "#/$defs/suit"
         }
       }
     }

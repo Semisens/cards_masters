@@ -1,4 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
+import type { Game } from '../src/data/types.ts'
+import { GAMES, party, type Party } from './games.ts'
 
 // Remplace les « golden tests » : captures de la page de visite du design system à 390 × 844.
 // Première exécution ou changement voulu : `npm run test:visual -- --update-snapshots`, puis relire les images.
@@ -79,8 +81,6 @@ const ready = async (page: Page) => {
 }
 
 const player = (name: string, score = 0) => ({ name, score })
-const PARTY_3 = { players: [player('Léa', 2), player('Tom', 1), player('Inès')], round: 3 }
-const PARTY_4 = { players: [player('Léa', 2), player('Tom', 1), player('Inès'), player('Sam')], round: 3 }
 const PARTY_6 = {
   players: [player('Léa', 2), player('Tom', 1), player('Inès'), player('Sacha'), player('Maé'), player('Noé', 3)],
   round: 1,
@@ -131,21 +131,21 @@ test.describe('écrans sans maquette', () => {
   })
 })
 
-// « Chaque écran doit tenir sans défilement vertical » : vérifié sur tous les écrans, à la base du cahier des charges
-// (390 x 844) et au Pixel 8a (393 x 852).
+// « Chaque écran doit tenir sans défilement vertical » : vérifié sur tous les écrans de tous les jeux, à la base
+// du cahier des charges (390 x 844) et au Pixel 8a (393 x 852). Les jeux sont lus dans src/content/games/ :
+// un nouveau jeu est contrôlé sans modifier ce fichier.
 interface Screen {
   name: string
   url: string
   mode?: 'classic' | 'expert'
-  party?: typeof PARTY_3
-  /** Jeu de la partie mémorisée (Trio par défaut). */
+  party?: Party
+  /** Jeu de la partie mémorisée. */
   game?: string
   history?: unknown[]
   storage?: Record<string, string>
 }
 
-const LL = '/jeu/love-letter'
-const entry = (id: number, gameId: string, status: string, players = PARTY_4.players) => ({
+const entry = (id: number, gameId: string, status: string, players = party(4).players) => ({
   id: String(id),
   gameId,
   date: `2026-10-${String(10 + (id % 18)).padStart(2, '0')}T12:00:00.000Z`,
@@ -154,53 +154,45 @@ const entry = (id: number, gameId: string, status: string, players = PARTY_4.pla
 })
 /** Beaucoup de parties : la liste doit défiler dans son cadre, pas la page. */
 const MANY_PARTIES = Array.from({ length: 30 }, (_, i) =>
-  entry(i + 1, i % 3 === 0 ? 'trio' : 'love-letter', i % 2 ? 'finished' : 'interrupted'),
+  entry(i + 1, GAMES[i % GAMES.length].id, i % 2 ? 'finished' : 'interrupted'),
 )
+
+/** Tous les écrans d'un jeu, avec le plus petit et le plus grand nombre de joueurs. */
+const gameScreens = (game: Game): Screen[] => {
+  const url = `/jeu/${game.id}`
+  const { min, max } = game.players
+  const screens: Screen[] = [
+    { name: 'le jeu', url },
+    { name: 'règles complètes', url: `${url}/regles` },
+    { name: 'cartes, classique', url: `${url}/tutoriel/cartes`, mode: 'classic' },
+    { name: 'cartes, connaisseur', url: `${url}/tutoriel/cartes`, mode: 'expert' },
+    ...game.card_groups.flatMap((_, i): Screen[] => [
+      { name: `groupe ${i + 1}, classique`, url: `${url}/tutoriel/cartes/${i + 1}`, mode: 'classic' },
+      { name: `groupe ${i + 1}, connaisseur`, url: `${url}/tutoriel/cartes/${i + 1}`, mode: 'expert' },
+    ]),
+    { name: 'mise en place', url: `${url}/tutoriel/mise-en-place` },
+    { name: 'un tour', url: `${url}/tutoriel/tour` },
+    { name: 'qui joue ?', url: `${url}/joueurs` },
+    ...[...new Set([min, max])].flatMap((n): Screen[] => [
+      { name: `partie, ${n} joueurs`, url: `${url}/partie`, game: game.id, party: party(n) },
+      { name: `scores, ${n} joueurs`, url: `${url}/partie/scores`, game: game.id, party: party(n) },
+    ]),
+    {
+      name: `podium, ${max} joueurs`,
+      url: `${url}/resultat/1`,
+      history: [entry(1, game.id, 'finished', party(max).players)],
+    },
+  ]
+  return screens.map((screen) => ({ ...screen, name: `${game.name} : ${screen.name}` }))
+}
 
 const SCREENS: Screen[] = [
   { name: 'accueil', url: '/' },
-  { name: 'le jeu', url: '/jeu/trio' },
-  { name: 'règles complètes', url: '/jeu/trio/regles' },
-  { name: 'cartes, classique', url: '/jeu/trio/tutoriel/cartes', mode: 'classic' },
-  { name: 'cartes, connaisseur', url: '/jeu/trio/tutoriel/cartes', mode: 'expert' },
-  ...[1, 2, 3, 4, 5, 6].flatMap((n): Screen[] => [
-    { name: `groupe ${n}, classique`, url: `/jeu/trio/tutoriel/cartes/${n}`, mode: 'classic' },
-    { name: `groupe ${n}, connaisseur`, url: `/jeu/trio/tutoriel/cartes/${n}`, mode: 'expert' },
-  ]),
-  { name: 'mise en place', url: '/jeu/trio/tutoriel/mise-en-place' },
-  { name: 'un tour', url: '/jeu/trio/tutoriel/tour' },
-  { name: 'qui joue ?', url: '/jeu/trio/joueurs' },
-  { name: 'partie, 3 joueurs', url: '/jeu/trio/partie', party: PARTY_3 },
-  { name: 'partie, 6 joueurs', url: '/jeu/trio/partie', party: PARTY_6 },
-  { name: 'scores, 3 joueurs', url: '/jeu/trio/partie/scores', party: PARTY_3 },
-  { name: 'scores, 6 joueurs', url: '/jeu/trio/partie/scores', party: PARTY_6 },
   { name: 'à propos', url: '/a-propos' },
   { name: 'scores, historique vide', url: '/scores' },
   { name: 'scores, 30 parties', url: '/scores', history: MANY_PARTIES },
   { name: 'réglages', url: '/reglages' },
-  {
-    name: 'réglages, deux tutoriels passés',
-    url: '/reglages',
-    storage: { 'tutorial:love-letter': '1', 'tutorial:trio': '1' },
-  },
-  { name: 'Love Letter : le jeu', url: LL },
-  { name: 'Love Letter : règles complètes', url: `${LL}/regles` },
-  { name: 'Love Letter : cartes, classique', url: `${LL}/tutoriel/cartes`, mode: 'classic' },
-  { name: 'Love Letter : cartes, connaisseur', url: `${LL}/tutoriel/cartes`, mode: 'expert' },
-  ...[1, 2, 3, 4, 5, 6, 7, 8].flatMap((n): Screen[] => [
-    { name: `Love Letter : carte ${n}, classique`, url: `${LL}/tutoriel/cartes/${n}`, mode: 'classic' },
-    { name: `Love Letter : carte ${n}, connaisseur`, url: `${LL}/tutoriel/cartes/${n}`, mode: 'expert' },
-  ]),
-  { name: 'Love Letter : mise en place', url: `${LL}/tutoriel/mise-en-place` },
-  { name: 'Love Letter : un tour', url: `${LL}/tutoriel/tour` },
-  { name: 'Love Letter : qui joue ?', url: `${LL}/joueurs` },
-  { name: 'Love Letter : partie, 4 joueurs', url: `${LL}/partie`, game: 'love-letter', party: PARTY_4 },
-  { name: 'Love Letter : fin de manche, 4 joueurs', url: `${LL}/partie/scores`, game: 'love-letter', party: PARTY_4 },
-  {
-    name: 'Love Letter : podium, 4 joueurs',
-    url: `${LL}/resultat/1`,
-    history: [entry(1, 'love-letter', 'finished')],
-  },
+  ...GAMES.flatMap(gameScreens),
 ]
 
 test.describe('aucun défilement vertical', () => {
@@ -225,7 +217,7 @@ test.describe('aucun défilement vertical', () => {
             {
               mode: screen.mode,
               party: screen.party,
-              game: screen.game ?? 'trio',
+              game: screen.game,
               history: screen.history,
               storage: screen.storage,
             },

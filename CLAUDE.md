@@ -31,7 +31,7 @@
 
 **Navigation identique partout** (cahier §7.9 bis) : « ‹ Retour » en haut à gauche, « Quitter le tutoriel » en haut à droite (tutoriel), le bouton principal (« Suivant ») toujours en bas. `StepHeader` ne prend que des adresses, pas de libellé.
 
-Accueil « Tes jeux » (recherche, filtres, onglets Jeux / Scores / Réglages) → le jeu (« Jouer » ou « Règles complètes ») → tutoriel : **Tes cartes** (liste, bandeau « Retire… » en bas ; **le mode Classique / Connaisseur se choisit ici**, jamais à l'accueil) → vue à balayer d'un groupe → mise en place → un tour → Qui joue ? → partie en cours ⇄ saisie des scores → podium → historique (`/scores`). Réglages : `/reglages` (tutoriels à réactiver, À propos). Une fois le tutoriel passé, « Jouer » va droit à « Qui joue ? ». Adresses dans `src/routes.ts`.
+Accueil « Tes jeux » (recherche, filtres, onglets Jeux / Scores / Réglages) → le jeu (« Jouer » ou « Règles complètes ») → tutoriel : **Tes cartes** (liste, bandeau « Retire… » en bas ; **le mode Classique / Connaisseur se choisit ici**, jamais à l'accueil) → vue à balayer d'un groupe → mise en place → un tour → Qui joue ? → partie en cours ⇄ saisie des scores → podium → historique (`/scores`). Réglages : `/reglages` (langue, À propos). « Jouer » ouvre toujours « Tes cartes » : pas de raccourci qui dépende de l'historique. Adresses dans `src/routes.ts`.
 
 **Les écrans sont ceux des maquettes** : `maquettes/<jeu>/*.png` (rendues par `npm run maquettes` depuis `maquettes/<jeu>/source/*.html`). Trio : 9 écrans. Love Letter : 14 écrans extraits de la galerie. Quand une maquette de Love Letter diverge de Trio sur une mise en page commune, celle de Trio prime. Le test `e2e/maquettes.spec.ts` compare **chaque écran à sa maquette, pixel par pixel**, et échoue au-delà de son seuil (images d'écart dans `test-results/maquettes/`). Avant de changer un écran, regarde sa maquette ; après, lance `npx playwright test --project=visual e2e/maquettes.spec.ts` et regarde les images d'écart. Les écarts voulus sont listés dans le test et dans le cahier des charges (7.10). Une nouvelle maquette : dépose la page HTML dans `maquettes/<jeu>/source/` (ajoute `*{box-sizing:border-box}` si elle vient d'une galerie), ajoute l'écran à `e2e/maquettes.spec.ts`, relance `npm run maquettes -- <jeu>`.
 
@@ -39,10 +39,14 @@ Accueil « Tes jeux » (recherche, filtres, onglets Jeux / Scores / Réglages) �
 
 ## Ajouter un jeu
 
-1. Crée le dossier `src/content/games/<id>/` avec un `game.json` (modèle : `src/content/game.schema.json`, exemples : `trio/game.json` (sans manche), `love-letter/game.json` (manches, cartes en liste exacte). Ajoute un logo `svg` ou `png` seulement s'il est original ou redessiné.
-2. Les cartes sont regroupées en `card_groups` (une ligne de la liste = une page de la vue à balayer), avec `expert.original` (et `expert.name` si le jeu d'origine nomme ses cartes) pour le mode connaisseur. `ranks` + `suits` pour un rectangle de cartes, `cards` (liste exacte) quand les couleurs diffèrent selon le rang. Ajoute `scoring` (les mots du jeu, manches, `target` pour une fin automatique), `tutorial` (dont `setup.diagram`) et `full_rules`. Le bandeau « Retire… Garde… » est calculé, il ne s'écrit pas. Lance `npm test`. Les tests valident le schéma, les cartes, le contraste, les mots que le jeu interdit (`classic_forbidden_terms`, facultatif), le tutoiement et la longueur des phrases. Le jeu apparaît ensuite tout seul sur l'accueil.
-3. Aucune ligne de code à modifier. Seule exception : une nouvelle police de nom de jeu (paquet `@fontsource`, import dans `main.tsx`, ligne dans `src/core/fonts.ts`).
-4. Les textes de l'interface sont dans `src/i18n/fr.ts`, ceux des jeux dans leur `game.json`.
+Tous les jeux ont les mêmes écrans et le même fonctionnement. **Un jeu = une configuration, sans code.**
+
+1. Copie `docs/modele-jeu.yaml` (modèle commenté) dans `src/content/games/<id>/game.yaml` et remplis-le : identité, couleur du tapis, joueurs, durée, cartes à garder (`card_groups[].cards`, `suits: all` pour les quatre couleurs), correspondances (`expert`), mots du score (`scoring`, `target` pour une fin automatique), tutoriel, règles complètes. Exemples : `trio/game.yaml`, `love-letter/game.yaml`.
+2. Facultatif, dans le même dossier : un logo `svg` ou `png` (original ou redessiné) et la police du nom (`woff2` sous licence libre, avec sa licence), déclarée par `font: { file, family, weight, band_size }`.
+3. Lance `npm test`, puis `npx playwright test e2e/jeux.spec.ts e2e/visual.spec.ts`. Ils valident le schéma, les cartes, le contraste, les mots interdits, le ton, le parcours complet jusqu'au podium et l'absence de défilement, **pour chaque dossier de jeu**, sans les nommer. Le jeu apparaît seul sur l'accueil.
+4. Calculé, ne s'écrit pas : le nombre de cartes de chaque groupe, le bandeau « Retire… Garde… », `{cards}` dans les textes (nombre de cartes gardées).
+5. Pièges YAML : un texte avec « : » ou « # », ou qui commence par un chiffre, se met entre apostrophes droites (`'7'`). Pas d'accolades `{ }` autour d'un texte qui contient une virgule.
+6. Les textes de l'interface sont dans `src/i18n/fr.ts`, ceux des jeux dans leur `game.yaml`. Modifier le code n'est utile que pour une **nouvelle fonction** (nouveau champ du schéma, nouvel écran).
 
 ## Règles du dépôt
 

@@ -259,22 +259,6 @@ test.describe('parcours Love Letter', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Tes scores' })).toBeVisible()
     await expect(page.getByRole('button', { name: /Love Letter.*1 partie/ })).toHaveAttribute('aria-expanded', 'true')
     await expect(page.getByText('Interrompue')).toBeVisible()
-
-    // Le tutoriel est passé : il se réactive dans les réglages, et « Jouer » y retourne.
-    await page.getByRole('link', { name: 'Réglages' }).click()
-    await page.getByRole('button', { name: 'Réactiver le tutoriel de Love Letter' }).click()
-    await expect(page.getByText('Aucun tutoriel passé pour l’instant.')).toBeVisible()
-  })
-
-  test('« Jouer » saute le tutoriel une fois passé', async ({ page }) => {
-    await page.goto('/jeu/love-letter/tutoriel/tour')
-    await page.getByRole('link', { name: 'Jouer' }).click()
-    await expect(page.getByRole('heading', { level: 1, name: 'Qui joue ?' })).toBeVisible()
-    await page.goto('/jeu/love-letter')
-    const play = page.getByRole('link', { name: 'Jouer' })
-    await expect(play).toHaveAttribute('href', '/jeu/love-letter/joueurs')
-    await play.click()
-    await expect(page.getByRole('heading', { level: 1, name: 'Qui joue ?' })).toBeVisible()
   })
 
   test('la partie se termine d’elle-même au score visé : 7 jetons à deux joueurs', async ({ page }) => {

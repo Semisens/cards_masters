@@ -1,6 +1,6 @@
 import { shadowOf } from '../core/color.ts'
 import { MIN_CONTRAST, pickTextColor } from '../core/contrast.ts'
-import { DEFAULT_GAME_FONT, GAME_FONTS, type FontStyle } from '../core/fonts.ts'
+import { gameFontStyle, type FontStyle } from '../core/fonts.ts'
 import { tokens } from '../core/tokens.generated.ts'
 import type { Game, GameBackground } from './types.ts'
 
@@ -40,6 +40,6 @@ export function resolveGameTheme(game: Pick<Game, 'background_color' | 'font'>):
     background,
     text: text.color,
     shadow: shadowOfBackground(game.background_color, background),
-    font: GAME_FONTS[game.font ?? DEFAULT_GAME_FONT],
+    font: gameFontStyle(game.font),
   }
 }

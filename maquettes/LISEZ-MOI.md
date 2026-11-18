@@ -48,7 +48,7 @@ La galerie est une version antérieure aux maquettes de Trio. Les sources ont é
 - **17 cartes** (6 Gardes : 4 valets et 2 rois noirs) : « Garde ces 17 cartes. Retire tout le reste du paquet. », « Mélange les 17 cartes. » ;
 - 05, 06 et 07 reconstruites d'après les maquettes de Trio (lignes de liste, vue à balayer), avec les données de Love Letter ;
 - 08 : la ligne vide sous les cartes du schéma et le décalage de la carte visible (défauts de la galerie) sont corrigés ;
-- 04 : les textes `[…]` sont remplacés par les textes rédigés ; 15 : bloc Compte retiré, note sur les langues et bouton « À propos » ajoutés ;
+- 04 : les textes `[…]` sont remplacés par les textes rédigés ; 15 : blocs Compte et « Tutoriels passés » retirés, note sur les langues et bouton « À propos » ajoutés ;
 - toutes les pages reçoivent `*{box-sizing:border-box}`, la règle globale de la galerie qui se perdait à l'extraction.
 
 ## Mettre à jour

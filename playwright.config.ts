@@ -20,7 +20,7 @@ export default defineConfig({
   },
   projects: [
     // Build de production servi par `vite preview` : PWA, service worker, hors ligne, parcours de l'app.
-    { name: 'pwa', testMatch: /(pwa|app)\.spec\.ts/, use: { baseURL: `http://localhost:${PREVIEW_PORT}` } },
+    { name: 'pwa', testMatch: /(pwa|app|jeux)\.spec\.ts/, use: { baseURL: `http://localhost:${PREVIEW_PORT}` } },
     // Serveur de dev : la page de visite du design system n'existe pas en production.
     // Animations réduites (préférence système que l'app respecte) : les captures ne peuvent pas surprendre un fondu en cours.
     {

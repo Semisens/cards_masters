@@ -6,7 +6,6 @@ import { Screen } from '../../components/Screen/Screen.tsx'
 import { getGame } from '../../data/games.ts'
 import { fr } from '../../i18n/fr.ts'
 import { paths } from '../../routes.ts'
-import { useTutorialDone } from '../../state/tutorial.ts'
 import { NotFoundPage } from '../not-found/NotFoundPage.tsx'
 import styles from './GameDetailPage.module.css'
 
@@ -17,7 +16,6 @@ import styles from './GameDetailPage.module.css'
 export function GameDetailPage() {
   const { gameId } = useParams()
   const game = getGame(gameId)
-  const [tutorialDone] = useTutorialDone(gameId ?? '')
   if (!game) return <NotFoundPage message={fr.errors.gameNotFound} />
 
   return (
@@ -31,7 +29,7 @@ export function GameDetailPage() {
         </Panel>
         <div className={styles.spacer} />
         {/* Tutoriel déjà passé : on va droit à « Qui joue ? » (il se réactive dans les Réglages). */}
-        <ButtonLink block to={tutorialDone ? paths.players(game.id) : paths.cards(game.id)}>
+        <ButtonLink block to={paths.cards(game.id)}>
           {fr.game.play}
         </ButtonLink>
         <ButtonLink block variant="blanc" to={paths.rules(game.id)}>

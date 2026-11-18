@@ -16,7 +16,7 @@ import { playerColor } from './playerColors.ts'
 import { useEndGame } from './useEndGame.ts'
 import styles from './PartyPage.module.css'
 
-/** Partie en cours : les jetons des joueurs et leurs trios, des raccourcis vers les règles, et la saisie des scores. */
+/** Partie en cours : les jetons des joueurs et leurs scores, des raccourcis vers les règles, et la saisie des scores. */
 export function PartyPage() {
   const { gameId } = useParams()
   const game = getGame(gameId)
@@ -30,9 +30,8 @@ export function PartyPage() {
 
   const theme = resolveGameTheme(game)
   const { scoring } = game
-  // Jeu à manches : « Manche 3 ». Sinon, le mot du jeu pour ce qu'on compte (« Trios gagnés »).
-  const aside =
-    scoring.rounds && scoring.round_label ? fill(scoring.round_label, { round: session.round }) : scoring.title
+  // Les mots du jeu : « Manche 3 », « Trios gagnés »…
+  const aside = fill(scoring.party_label, { round: session.round })
 
   return (
     <Screen solid={theme.background}>

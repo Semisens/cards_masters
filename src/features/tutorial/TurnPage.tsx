@@ -8,7 +8,6 @@ import { getGame } from '../../data/games.ts'
 import { fr } from '../../i18n/fr.ts'
 import { paths } from '../../routes.ts'
 import { NotFoundPage } from '../not-found/NotFoundPage.tsx'
-import { useTutorialDone } from '../../state/tutorial.ts'
 import { useFromParty } from './useFlow.ts'
 import styles from './TurnPage.module.css'
 
@@ -17,7 +16,6 @@ export function TurnPage() {
   const { gameId } = useParams()
   const fromParty = useFromParty()
   const game = getGame(gameId)
-  const [, setTutorialDone] = useTutorialDone(gameId ?? '')
   if (!game) return <NotFoundPage message={fr.errors.gameNotFound} />
 
   const { turn } = game.tutorial
@@ -50,7 +48,7 @@ export function TurnPage() {
         </ButtonLink>
       ) : (
         // Arrivé au bout du tutoriel : la prochaine fois, « Jouer » ira droit à « Qui joue ? ».
-        <ButtonLink block to={paths.players(game.id)} onClick={() => setTutorialDone(true)}>
+        <ButtonLink block to={paths.players(game.id)}>
           {fr.nav.play}
         </ButtonLink>
       )}

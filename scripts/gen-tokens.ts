@@ -40,7 +40,6 @@ add('touch-min', `${charte.touch_min_px}px`)
 add('text-min', rem(charte.fonts.texte_min_px))
 add('font-title', "'Fredoka', system-ui, sans-serif")
 add('font-text', "'Nunito', system-ui, sans-serif")
-add('font-script', "'Great Vibes', cursive")
 
 // Icônes
 add('icon-stroke', charte.icons.stroke)

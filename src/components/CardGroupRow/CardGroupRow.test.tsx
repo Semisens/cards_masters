@@ -1,26 +1,25 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
+import { loadCardGroup } from '../../data/loadGame.ts'
 import type { CardGroup } from '../../data/types.ts'
 import { CardGroupRow } from './CardGroupRow.tsx'
 
-const group: CardGroup = {
+const group: CardGroup = loadCardGroup({
   label: '2 à 6',
-  ranks: ['2', '3', '4', '5', '6'],
-  count: 15,
-  display: { rank: '2', suit: 'spades' },
+  cards: [{ ranks: [2, 3, 4, 5, 6], suits: ['spades', 'hearts', 'clubs'] }],
   short: 'Valent 2 à 6.',
   detail: { title: 'T', text: 'X' },
   expert: { original: '2–6' },
-}
-const special: CardGroup = {
-  ...group,
+})
+const special: CardGroup = loadCardGroup({
   label: '7',
-  ranks: ['7'],
-  count: 3,
+  cards: [{ ranks: [7], suits: ['spades', 'hearts', 'clubs'] }],
   short: 'Trio de 7 = victoire.',
   badge: 'Spécial',
-}
+  detail: { title: 'T', text: 'X' },
+  expert: { original: '7' },
+})
 
 const renderRow = (g: CardGroup, mode: 'classic' | 'expert') =>
   render(

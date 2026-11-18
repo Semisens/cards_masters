@@ -17,10 +17,9 @@ import { useEndGame } from './useEndGame.ts'
 import styles from './ScorePage.module.css'
 
 /**
- * Saisie des scores, un compteur par joueur. Rien n'est enregistré avant la validation.
- * - Jeu sans manche (Trio) : les compteurs montrent le total de chacun, qu'on corrige.
- * - Jeu à manches (Love Letter) : les compteurs partent de zéro et donnent les points de la manche ; valider les
- *   ajoute aux scores et passe à la manche suivante. Si quelqu'un atteint le score visé, la partie est terminée.
+ * Saisie des scores, la même pour tous les jeux : un compteur par joueur, qui part de zéro et donne les points
+ * gagnés depuis la saisie précédente. Valider les ajoute aux scores et passe à la manche suivante. Si quelqu'un
+ * atteint le score visé (`scoring.target`), la partie est terminée. Rien n'est enregistré avant la validation.
  */
 export function ScorePage() {
   const { gameId } = useParams()
@@ -28,7 +27,7 @@ export function ScorePage() {
   const game = getGame(gameId)
   const { status, session, save } = useSession(gameId ?? '')
   const endGame = useEndGame(gameId ?? '')
-  // Les valeurs modifiées ; tant qu'il n'y a pas eu de changement, on part des scores (ou de zéro, par manche).
+  // Les points gagnés, tant qu'ils ne sont pas validés.
   const [edited, setEdited] = useState<number[] | null>(null)
 
   if (!game) return <NotFoundPage message={fr.errors.gameNotFound} />
@@ -36,17 +35,9 @@ export function ScorePage() {
   if (!session) return <Navigate to={paths.players(game.id)} replace />
 
   const { scoring } = game
-  const values = edited ?? session.players.map((player) => (scoring.rounds ? 0 : player.score))
+  const values = edited ?? session.players.map(() => 0)
 
   const validate = async () => {
-    if (!scoring.rounds) {
-      await save({
-        ...session,
-        players: session.players.map((player, i) => ({ ...player, score: values[i] ?? player.score })),
-      })
-      navigate(paths.party(game.id))
-      return
-    }
     const next = endRound(session, values)
     if (hasWinner(next, scoring)) await endGame(next, 'finished')
     else {

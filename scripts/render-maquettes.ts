@@ -1,13 +1,14 @@
 // Rend les maquettes HTML de chaque jeu (maquettes/<jeu>/source/*.html) en images PNG 390 x 844 (x2) dans maquettes/<jeu>/.
 // Ces images sont la référence du test de fidélité (e2e/maquettes.spec.ts).
-// Les polices sont servies depuis les paquets @fontsource de l'app, pas depuis Google Fonts : le rendu est
-// identique à celui de l'app et ne dépend pas du réseau.
+// Les polices sont celles de l'app (paquets @fontsource, et police du nom fournie par chaque jeu dans son dossier),
+// pas celles de Google Fonts : le rendu est identique à celui de l'app et ne dépend pas du réseau.
 // Usage : npm run maquettes
 import { createServer } from 'node:http'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
+import { parse } from 'yaml'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const gamesDir = join(root, 'maquettes')
@@ -18,14 +19,26 @@ const games = readdirSync(gamesDir, { withFileTypes: true })
   .map((entry) => entry.name)
   .filter((name) => !only || name === only)
 
-const FONTS: Array<[family: string, pkg: string, weights: number[]]> = [
-  ['Fredoka', 'fredoka', [500, 600, 700]],
-  ['Nunito', 'nunito', [600, 700, 800]],
-  ['Great Vibes', 'great-vibes', [400]],
+const contentDir = join(root, 'src/content/games')
+
+/** Polices servies aux maquettes : [famille, graisse, fichier]. */
+const FONTS: Array<[family: string, weight: number, file: string]> = [
+  ...([500, 600, 700] as const).map((w): [string, number, string] => ['Fredoka', w, fontsource('fredoka', w)]),
+  ...([600, 700, 800] as const).map((w): [string, number, string] => ['Nunito', w, fontsource('nunito', w)]),
+  // Police du nom de chaque jeu qui en fournit une.
+  ...readdirSync(contentDir).flatMap((id): Array<[string, number, string]> => {
+    const configFile = join(contentDir, id, 'game.yaml')
+    if (!existsSync(configFile)) return []
+    const { font } = parse(readFileSync(configFile, 'utf8')) as {
+      font?: { file?: string; family: string; weight?: number }
+    }
+    return font?.file ? [[font.family, font.weight ?? 400, join(contentDir, id, font.file)]] : []
+  }),
 ]
 
-const fontFile = (pkg: string, weight: number) =>
-  join(root, 'node_modules/@fontsource', pkg, 'files', `${pkg}-latin-${weight}-normal.woff2`)
+function fontsource(pkg: string, weight: number) {
+  return join(root, 'node_modules/@fontsource', pkg, 'files', `${pkg}-latin-${weight}-normal.woff2`)
+}
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -37,8 +50,7 @@ const server = createServer((req, res) => {
   const url = new URL(req.url ?? '/', 'http://localhost')
   let file: string
   if (url.pathname.startsWith('/__fonts/')) {
-    const [pkg, weight] = url.pathname.slice('/__fonts/'.length).replace('.woff2', '').split('-')
-    file = fontFile(pkg === 'greatvibes' ? 'great-vibes' : pkg, Number(weight))
+    file = FONTS[Number(url.pathname.slice('/__fonts/'.length).replace('.woff2', ''))]?.[2] ?? ''
   } else {
     file = join(gamesDir, decodeURIComponent(url.pathname))
     if (!file.startsWith(gamesDir)) file = ''
@@ -53,12 +65,10 @@ const server = createServer((req, res) => {
 await new Promise<void>((done) => server.listen(0, '127.0.0.1', done))
 const port = (server.address() as { port: number }).port
 
-const fontCss = FONTS.flatMap(([family, pkg, weights]) =>
-  weights.map(
-    (weight) =>
-      `@font-face{font-family:'${family}';font-weight:${weight};font-style:normal;font-display:block;` +
-      `src:url(http://127.0.0.1:${port}/__fonts/${pkg.replace('-', '')}-${weight}.woff2) format('woff2')}`,
-  ),
+const fontCss = FONTS.map(
+  ([family, weight], index) =>
+    `@font-face{font-family:'${family}';font-weight:${weight};font-style:normal;font-display:block;` +
+    `src:url(http://127.0.0.1:${port}/__fonts/${index}.woff2) format('woff2')}`,
 ).join('\n')
 
 const browser = await chromium.launch()

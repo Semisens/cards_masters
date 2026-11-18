@@ -1,0 +1,134 @@
+# yaml-language-server: $schema=../../game.schema.json
+# Trio : configuration complète du jeu. Modèle commenté : docs/modele-jeu.yaml.
+
+id: trio
+name: Trio
+background_color: vert
+tagline: Trouve trois cartes identiques.
+description: >-
+  Retourne des cartes au centre ou chez tes rivaux. Retiens ce que tu vois. Forme tes trios avant les autres.
+  Le trio de 7 gagne tout de suite.
+players: { min: 3, max: 6 }
+duration_min: 15
+
+# Cartes à garder (36) : As à Dame en pique, cœur et trèfle. Chaque groupe est une ligne de « Tes cartes ».
+card_groups:
+  - label: A
+    cards:
+      - { ranks: [A], suits: [spades, hearts, clubs] }
+    display: { rank: A, suit: hearts }
+    short: Vaut 1.
+    detail:
+      title: L’As vaut 1.
+      text: C’est la carte la plus basse. Dans ta main, elle passe toujours en premier.
+    expert:
+      original: '1'
+
+  - label: 2 à 6
+    cards:
+      - { ranks: [2, 3, 4, 5, 6], suits: [spades, hearts, clubs] }
+    display: { rank: 2, suit: spades }
+    short: Valent 2 à 6.
+    detail:
+      title: Cinq valeurs à retenir.
+      text: Chaque carte vaut son chiffre. Réunis trois cartes identiques pour gagner un trio.
+    expert:
+      original: 2–6
+
+  - label: '7'
+    cards:
+      - { ranks: [7], suits: [spades, hearts, clubs] }
+    display: { rank: 7, suit: hearts }
+    short: Trio de 7 = victoire.
+    badge: Spécial
+    detail:
+      title: Le 7 est spécial.
+      text: 'Réunis les trois 7 : tu gagnes tout de suite. Cache bien ton 7 !'
+    expert:
+      original: '7'
+      power: le trio de 7 donne la victoire immédiate.
+
+  - label: 8 à 10
+    cards:
+      - { ranks: [8, 9, 10], suits: [spades, hearts, clubs] }
+    display: { rank: 8, suit: clubs }
+    short: Valent 8 à 10.
+    detail:
+      title: Trois valeurs à retenir.
+      text: Chaque carte vaut son chiffre. Réunis trois cartes identiques pour gagner un trio.
+    expert:
+      original: 8–10
+
+  - label: Valet
+    cards:
+      - { ranks: [J], suits: [spades, hearts, clubs] }
+    display: { rank: J, suit: hearts }
+    short: Vaut 11.
+    detail:
+      title: Le Valet vaut 11.
+      text: Il se range entre le 10 et la Dame. Réunis les trois Valets pour gagner un trio.
+    expert:
+      original: '11'
+
+  - label: Dame
+    cards:
+      - { ranks: [Q], suits: [spades, hearts, clubs] }
+    display: { rank: Q, suit: spades }
+    short: Vaut 12.
+    detail:
+      title: La Dame vaut 12.
+      text: C’est la carte la plus haute. Dans ta main, elle passe toujours en dernier.
+    expert:
+      original: '12'
+
+# Partie : on note les trios gagnés ; le premier à 3 trios gagne.
+scoring:
+  unit: trio
+  party_label: Trios gagnés
+  title: Trios gagnés
+  question: Qui a gagné un trio ?
+  validate: Valider
+  target: 3
+
+tutorial:
+  setup:
+    title: Mise en place
+    diagram:
+      - label: Ta main, triée
+      - label: Au centre, cachées
+    steps:
+      - Mélange les {cards} cartes.
+      - Donne 9, 7, 6 ou 5 cartes par joueur (3, 4, 5 ou 6 joueurs).
+      - Pose les autres au centre, face cachée.
+      - Trie ta main du plus petit au plus grand. Ne la montre à personne.
+  turn:
+    title: Un tour de jeu
+    steps:
+      - label: Retourne.
+        text: Une carte au centre, ou la plus petite ou la plus grande d’une main.
+      - label: Compare.
+        text: Même nombre ? Retourne-en une autre.
+      - label: Trio.
+        text: 'Trois identiques : garde-les.'
+      - label: Raté.
+        text: Remets tout face cachée. Joueur suivant.
+    win:
+      title: Gagner
+      text: Réunis 3 trios. Ou le trio de 7.
+
+full_rules:
+  - title: But
+    text: 'Gagne 3 trios. Ou gagne le trio de 7 : tu gagnes tout de suite.'
+  - title: Mise en place
+    text: '{cards} cartes. Donne 9, 7, 6 ou 5 cartes par joueur. Pose le reste au centre, face cachée.'
+  - title: Un tour
+    text: >-
+      Retourne une carte : la plus petite ou la plus grande d’une main, ou une carte du centre. Puis une deuxième.
+  - title: Trio
+    text: 'Trois cartes identiques : tu les gardes devant toi.'
+  - title: Cartes différentes
+    text: Ton tour s’arrête. Remets les cartes face cachée.
+  - title: Mode piquant
+    text: >-
+      Deux trios liés suffisent pour gagner. Les liens sont imprimés sur les cartes du jeu d’origine : ce mode n’est
+      pas jouable avec un paquet classique.

@@ -425,15 +425,16 @@ describe('partie en cours', () => {
   })
 })
 
+// La saisie est la même pour tous les jeux : les compteurs partent de zéro, Valider ajoute et passe à la manche suivante.
 describe('trios gagnés', () => {
-  it('affiche un compteur par joueur, à son score actuel', async () => {
+  it('affiche un compteur par joueur, qui part de zéro', async () => {
     seedParty()
     renderApp('/jeu/trio/partie/scores')
     expect(await screen.findByRole('heading', { level: 1, name: 'Trios gagnés' })).toBeInTheDocument()
     expect(screen.getByText('Qui a gagné un trio ?')).toBeInTheDocument()
     expect(screen.getByText('Léa')).toBeInTheDocument()
     expect(screen.getByText('Inès')).toBeInTheDocument()
-    expect(screen.getByLabelText('Léa : 2')).toBeInTheDocument()
+    expect(screen.getByLabelText('Léa : 0')).toBeInTheDocument()
   })
 
   it('compte sans rien enregistrer avant « Valider »', async () => {
@@ -450,14 +451,22 @@ describe('trios gagnés', () => {
     expect(await screen.findByRole('button', { name: 'Un trio de moins pour Inès' })).toBeDisabled()
   })
 
-  it('enregistre à « Valider » et revient à la partie', async () => {
+  it('ajoute les trios gagnés à « Valider » et revient à la partie', async () => {
     seedParty()
     const app = renderApp('/jeu/trio/partie/scores')
     await userEvent.click(await screen.findByRole('button', { name: 'Un trio de plus pour Inès' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Un trio de moins pour Léa' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
-    expect(savedParty().players.map((p: { score: number }) => p.score)).toEqual([1, 1, 1])
+    expect(savedParty().players.map((p: { score: number }) => p.score)).toEqual([2, 1, 1])
+  })
+
+  it('termine la partie au troisième trio et ouvre le podium', async () => {
+    seedParty()
+    const app = renderApp('/jeu/trio/partie/scores')
+    await userEvent.click(await screen.findByRole('button', { name: 'Un trio de plus pour Léa' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    await waitFor(() => expect(app.location()).toMatch(/^\/jeu\/trio\/resultat\/\d+$/))
+    expect(await screen.findByText('Partie terminée')).toBeInTheDocument()
   })
 
   it('revient à la partie sans enregistrer', async () => {

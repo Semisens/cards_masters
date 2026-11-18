@@ -56,7 +56,8 @@ export function newSession(names: string[], defaultName: (n: number) => string):
 
 /** Points à atteindre pour gagner avec ce nombre de joueurs, ou `undefined` si le jeu n'a pas de fin automatique. */
 export function winTarget(scoring: Scoring, playerCount: number): number | undefined {
-  return scoring.target?.[String(playerCount)]
+  const { target } = scoring
+  return typeof target === 'number' ? target : target?.[String(playerCount)]
 }
 
 /** Vrai si un joueur a atteint le score qui fait gagner la partie. */

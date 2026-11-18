@@ -1,12 +1,13 @@
 import Ajv2020 from 'ajv/dist/2020.js'
 import { describe, expect, it } from 'vitest'
 import schema from '../content/game.schema.json'
-import { SUITS, isRedSuit } from '../core/cards.ts'
+import { isRedSuit } from '../core/cards.ts'
 import { contrastRatio, MIN_CONTRAST } from '../core/contrast.ts'
-import { FULL_DECK, deckPlan, groupCards, removalList } from './deck.ts'
-import { gameFiles, games, getGame, logoUrl } from './games.ts'
+import { FULL_DECK, deckPlan, removalList } from './deck.ts'
+import { gameConfigs, gameFiles, games, getGame, logoUrl } from './games.ts'
+import { loadGame } from './loadGame.ts'
 import { resolveGameTheme } from './theme.ts'
-import type { Game } from './types.ts'
+import type { Game, GameConfig } from './types.ts'
 
 // ---------------------------------------------------------------------------------------------------------
 // Aides de relecture éditoriale (testées plus bas, pour prouver qu'elles détectent bien ce qu'elles doivent)
@@ -93,6 +94,24 @@ describe('aides de relecture', () => {
   })
 })
 
+// Le modèle à copier pour ajouter un jeu doit rester valide et jouable tel quel.
+describe('modèle de jeu (docs/modele-jeu.yaml)', () => {
+  const config = Object.values(
+    import.meta.glob<GameConfig>('../../docs/modele-jeu.yaml', { eager: true, import: 'default' }),
+  )[0]
+
+  it('respecte le schéma', () => {
+    expect(validate(config), JSON.stringify(validate.errors, null, 2)).toBe(true)
+  })
+
+  it('se charge sans code en plus', () => {
+    const game = loadGame(config)
+    expect(game.card_groups.length).toBeGreaterThan(0)
+    expect(deckPlan(game).keptTotal).toBeGreaterThan(0)
+    expect(JSON.stringify(game)).not.toContain('{cards}')
+  })
+})
+
 describe('liste des jeux', () => {
   it('contient au moins un jeu', () => {
     expect(games.length).toBeGreaterThan(0)
@@ -109,14 +128,39 @@ describe('liste des jeux', () => {
   })
 })
 
+describe('dossiers des jeux', () => {
+  it('ont tous un game.yaml (aucun autre fichier de configuration)', () => {
+    // Tous les fichiers des dossiers de jeux, quelle que soit leur extension.
+    const files = Object.keys(import.meta.glob('../content/games/*/*', { query: '?url' }))
+    const dirs = [...new Set(files.map((file) => file.split('/')[3]))]
+    expect(gameFiles.toSorted()).toEqual(dirs.map((dir) => `../content/games/${dir}/game.yaml`).toSorted())
+  })
+})
+
 describe.each(games.map((game) => [game.id, game] as const))('jeu « %s »', (id, game) => {
-  it('respecte le schéma JSON', () => {
-    const ok = validate(game)
+  const config = gameConfigs.find((c) => c.id === id)!
+
+  it('respecte le schéma (game.schema.json)', () => {
+    const ok = validate(config)
     expect(ok, JSON.stringify(validate.errors, null, 2)).toBe(true)
   })
 
   it('a un id égal au nom de son dossier', () => {
-    expect(gameFiles.find((f) => f.includes(`/games/${id}/`))).toBe(`../content/games/${id}/game.json`)
+    expect(gameFiles.find((f) => f.includes(`/games/${id}/`))).toBe(`../content/games/${id}/game.yaml`)
+  })
+
+  it('a une police qui existe, s’il en déclare une', () => {
+    if (game.font?.file) expect(game.font.url, `police ${game.font.file} introuvable`).toBeTruthy()
+  })
+
+  it('remplace {cards} dans tous les textes', () => {
+    expect(JSON.stringify(game)).not.toContain('{cards}')
+  })
+
+  it('a un score visé pour chaque nombre de joueurs, s’il en donne une table', () => {
+    const { target } = game.scoring
+    if (target && typeof target === 'object')
+      for (let n = game.players.min; n <= game.players.max; n++) expect(target[String(n)], `${n} joueurs`).toBeDefined()
   })
 
   it('a un nombre de joueurs cohérent', () => {
@@ -133,32 +177,18 @@ describe.each(games.map((game) => [game.id, game] as const))('jeu « %s »', (id
       expect(new Set(ranks).size).toBe(ranks.length)
     })
 
-    it('ont un nombre de cartes égal aux rangs x couleurs listées', () => {
-      for (const group of game.card_groups) {
-        const cards = groupCards(group)
-        if (cards) expect(group.count, group.label).toBe(cards.length)
-        else expect(group.count, group.label).toBeLessThanOrEqual(group.ranks.length * SUITS.length)
-      }
-    })
-
-    it('listent des rangs qui correspondent à leur liste exacte de cartes', () => {
-      for (const group of game.card_groups.filter((g) => g.cards)) {
-        expect(group.suits, group.label).toBeUndefined()
-        expect(new Set(group.cards!.map((c) => c.rank)), group.label).toEqual(new Set(group.ranks))
-      }
-    })
-
     it('ne gardent jamais deux fois la même carte', () => {
-      const cards = game.card_groups.flatMap((g) => groupCards(g) ?? []).map((c) => `${c.rank}-${c.suit}`)
+      const cards = game.card_groups.flatMap((g) => g.cards).map((c) => `${c.rank}-${c.suit}`)
       expect(new Set(cards).size).toBe(cards.length)
     })
 
+    it('ont des noms différents (une page de la vue à balayer chacun)', () => {
+      const labels = game.card_groups.map((g) => g.label)
+      expect(new Set(labels).size).toBe(labels.length)
+    })
+
     it('montrent une carte qui fait partie du groupe', () => {
-      for (const group of game.card_groups) {
-        expect(group.ranks, group.label).toContain(group.display.rank)
-        const cards = groupCards(group)
-        if (cards) expect(cards, group.label).toContainEqual({ rank: group.display.rank, suit: group.display.suit })
-      }
+      for (const group of game.card_groups) expect(group.cards, group.label).toContainEqual(group.display)
     })
 
     it('tiennent dans un paquet de 52 cartes', () => {
@@ -270,6 +300,16 @@ describe('Trio', () => {
   it('ne laisse aucun texte provisoire de la maquette', () => {
     expect(allTexts(trio).join('\n')).not.toMatch(/à détailler|\[|\]/i)
   })
+
+  it('se termine seule au troisième trio, quel que soit le nombre de joueurs', () => {
+    expect(trio.scoring.target).toBe(3)
+    expect(trio.scoring.party_label).toBe('Trios gagnés')
+  })
+
+  it('annonce 36 cartes dans la mise en place, comme le paquet', () => {
+    expect(trio.tutorial.setup.steps[0]).toBe('Mélange les 36 cartes.')
+    expect(trio.full_rules[1].text).toMatch(/^36 cartes\./)
+  })
 })
 
 describe('Love Letter', () => {
@@ -283,7 +323,7 @@ describe('Love Letter', () => {
 
   it('garde 17 cartes : 6 Gardes (4 valets, 2 rois noirs) et 11 autres', () => {
     expect(plan.keptTotal).toBe(17)
-    const guards = groupCards(ll.card_groups[0])!
+    const guards = ll.card_groups[0].cards
     expect(guards.filter((c) => c.rank === 'J')).toHaveLength(4)
     expect(guards.filter((c) => c.rank === 'K').map((c) => c.suit)).toEqual(['spades', 'clubs'])
   })
@@ -320,7 +360,7 @@ describe('Love Letter', () => {
   })
 
   it('se joue en manches, jusqu’à 7, 5 ou 4 jetons selon 2, 3 ou 4 joueurs', () => {
-    expect(ll.scoring.rounds).toBe(true)
+    expect(ll.scoring.party_label).toBe('Manche {round}')
     expect(ll.scoring.target).toEqual({ '2': 7, '3': 5, '4': 4 })
     expect(ll.players).toEqual({ min: 2, max: 4 })
     expect(ll.duration_min).toBe(20)

@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=../src/content/game.schema.json
+#
+# MODÈLE DE JEU — à copier pour ajouter un jeu à MasterCards, sans toucher au code.
+#
+# 1. Crée le dossier src/content/games/<id>/ (id en minuscules, avec des tirets : « mon-jeu »).
+# 2. Copie ce fichier dedans sous le nom game.yaml, puis remplace chaque valeur.
+#    Ligne 1 : remplace le chemin du schéma par ../../game.schema.json (VS Code complète alors les champs,
+#    avec l'extension « YAML » de Red Hat).
+# 3. Facultatif : dépose dans le même dossier un logo (svg ou png, original ou redessiné, jamais le logo officiel)
+#    et une police pour le nom (woff2, sous licence libre, avec son fichier de licence).
+# 4. Lance `npm test` : il vérifie le schéma, les cartes, le contraste, le tutoiement et la longueur des phrases.
+#    Le jeu apparaît ensuite tout seul sur l'accueil, avec les mêmes écrans que les autres.
+#
+# Règles d'écriture : tutoiement, phrases courtes (22 mots au plus), français.
+# Un texte qui contient « : », « # » ou commence par un chiffre se met entre apostrophes droites : '7'.
+# Évite les accolades { } autour d'un texte qui contient une virgule : écris plutôt une clé par ligne.
+# Dans tous les textes, {cards} est remplacé par le nombre de cartes gardées (calculé).
+
+# --- Identité --------------------------------------------------------------------------------------------------
+
+id: mon-jeu # = nom du dossier, sert dans l'adresse (/jeu/mon-jeu)
+name: Mon jeu # 40 caractères au plus
+
+# Police du nom (facultatif ; défaut : Fredoka, la police de titre de l'app).
+# font:
+#   file: ma-police.woff2 # fichier du dossier du jeu
+#   family: Ma Police
+#   weight: 400
+#   band_size: 4 # taille du nom dans le bandeau, en multiples de 16 px (défaut 3,5)
+
+# Couleur du tapis : jaune, vert, rouge, bleu (charte), ou une couleur libre '#RRGGBB'.
+# Le texte (blanc ou encre) est choisi seul ; une couleur sans contraste suffisant est refusée.
+background_color: bleu
+
+# logo: logo.svg # facultatif ; défaut : l'initiale du nom dans un rond blanc
+
+tagline: Une phrase d’accroche courte. # en gras sur la page du jeu
+description: >-
+  Trois ou quatre phrases courtes qui donnent envie de jouer. Elles suivent la phrase d’accroche.
+
+players: { min: 2, max: 5 }
+duration_min: 15 # filtre « Rapide » de l'accueil : 15 minutes ou moins
+
+# Mot qui numérote la vue à balayer : « Groupe 2 / 6 » (défaut) ou, par exemple, « Carte 2 / 8 ».
+# group_word: Carte
+
+# Mots du jeu d'origine à ne jamais écrire en mode Classique (vérifié par `npm test`). Facultatif.
+# classic_forbidden_terms: [Dragon, Chevalier]
+
+# --- Cartes à garder et correspondances ------------------------------------------------------------------------
+#
+# Chaque groupe = une ligne de l'écran « Tes cartes » = une page de la vue à balayer.
+# cards : les cartes du paquet de 52 à garder dans ce groupe. Rangs : A, 2 à 10, J (valet), Q (dame), K (roi).
+#         Couleurs : spades (pique), hearts (cœur), diamonds (carreau), clubs (trèfle), ou all (les quatre).
+# Le nombre de cartes et le bandeau « Retire… Garde… » sont calculés : rien à écrire.
+# expert : la correspondance avec le jeu d'origine, montrée en mode Connaisseur.
+
+card_groups:
+  - label: As # titre de la ligne
+    cards:
+      - ranks: [A]
+        suits: all
+    display: { rank: A, suit: hearts } # carte montrée ; facultatif (défaut : la première carte du groupe)
+    short: Vaut 1. # sous le titre, après « ×4 · »
+    badge: Spécial # pastille à côté du titre ; facultatif
+    detail: # explication de la vue à balayer
+      title: L’As vaut 1.
+      text: C’est la carte la plus basse.
+    expert:
+      original: '1' # carte(s) du jeu d'origine
+      name: Dragon # nom d'origine ; facultatif
+      power: rien n’arrête le dragon # pouvoir d'origine, en une proposition ; facultatif
+
+  - label: 2 à 6
+    cards:
+      - ranks: [2, 3, 4, 5, 6]
+        suits: [spades, hearts]
+      - ranks: [7]
+        suits: [clubs] # plusieurs lignes quand les couleurs diffèrent selon le rang
+    short: Valent leur chiffre.
+    detail:
+      title: Chaque carte vaut son chiffre.
+      text: Garde les plus fortes pour la fin.
+    expert:
+      original: 2–6
+
+# --- Partie et scores -------------------------------------------------------------------------------------------
+#
+# Tous les jeux se marquent pareil : à chaque saisie, on note les points gagnés ; « Valider » les ajoute
+# et passe à la manche suivante. {round} = numéro de la manche.
+
+scoring:
+  unit: point # ce qu'on compte, au singulier (lu par les lecteurs d'écran : « Un point de plus pour Léa »)
+  party_label: Manche {round} # en haut à droite de la partie en cours
+  title: Fin de la manche {round} # titre de l'écran de saisie
+  question: Qui a gagné des points ?
+  validate: Valider la manche
+  target: 5 # score qui termine la partie ; ou par nombre de joueurs : { 2: 7, 3: 5, 4: 4, 5: 3 } ; facultatif
+
+# --- Tutoriel ----------------------------------------------------------------------------------------------------
+
+tutorial:
+  setup:
+    title: Mise en place
+    diagram: # schéma : 1 à 4 tas de cartes, de dos ; ou une carte visible si `card` est donné
+      - label: Pioche
+      - label: Défausse
+        card: { rank: 5, suit: hearts }
+    steps:
+      - Mélange les {cards} cartes.
+      - Donne 5 cartes à chaque joueur.
+      - Le reste forme la pioche.
+  turn:
+    title: Un tour de jeu
+    steps:
+      - label: Pioche.
+        text: Prends la carte du dessus.
+      - label: Joue.
+        text: Pose une carte devant toi.
+    win:
+      title: Gagner
+      text: Sois le premier à 5 points.
+
+# --- Règles complètes -------------------------------------------------------------------------------------------
+
+full_rules:
+  - title: But
+    text: Sois le premier à 5 points.
+  - title: Mise en place
+    text: '{cards} cartes. Donne 5 cartes à chaque joueur. Le reste forme la pioche.'

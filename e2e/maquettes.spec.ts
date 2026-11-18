@@ -51,15 +51,7 @@ const PARTY: Party = {
   ],
   round: 3,
 }
-const SCORES: Party = {
-  players: [
-    { name: 'Léa', score: 1 },
-    { name: 'Tom', score: 0 },
-    { name: 'Inès', score: 0 },
-  ],
-  round: 1,
-}
-/** Love Letter : les compteurs d'une manche partent de zéro ; la maquette montre « Léa 1 », on fait le geste. */
+/** La saisie part de zéro pour tous les jeux ; les maquettes montrent « Léa 1 » : on fait le geste. */
 const ONE_FOR_LEA = async (page: Page) => {
   await page.getByRole('button', { name: /de plus pour Léa/ }).click()
 }
@@ -82,7 +74,14 @@ const TRIO_SCREENS: Screen[] = [
   { name: '06-un-tour', url: '/jeu/trio/tutoriel/tour', max: 0.01 },
   { name: '07-regles-completes', url: '/jeu/trio/regles', masks: [PIQUANT_TEXT], max: 0.01 },
   { name: '08-partie', url: '/jeu/trio/partie', party: PARTY, max: 0.005 },
-  { name: '09-scores', url: '/jeu/trio/partie/scores', party: SCORES, masks: MINUS_AT_ZERO, max: 0.01 },
+  {
+    name: '09-scores',
+    url: '/jeu/trio/partie/scores',
+    party: PARTY,
+    act: ONE_FOR_LEA,
+    masks: MINUS_AT_ZERO,
+    max: 0.01,
+  },
 ]
 
 const LL = '/jeu/love-letter'
@@ -156,13 +155,7 @@ const APP_SCREENS: Screen[] = [
     max: 0.01,
   },
   { game: 'love-letter', name: '14-historique', url: '/scores', history: HISTORY, max: 0.01 },
-  {
-    game: 'love-letter',
-    name: '15-reglages',
-    url: '/reglages',
-    storage: { 'tutorial:love-letter': '1', 'tutorial:trio': '1' },
-    max: 0.01,
-  },
+  { game: 'love-letter', name: '15-reglages', url: '/reglages', max: 0.01 },
 ]
 const SCREENS = [...TRIO_SCREENS, ...LOVE_LETTER_SCREENS, ...APP_SCREENS]
 

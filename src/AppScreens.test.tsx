@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { games } from './data/games.ts'
 import { renderApp } from './test/renderApp.tsx'
 
 const LL_KEY = 'mastercards:session:love-letter'
@@ -256,39 +257,22 @@ describe('réglages', () => {
     renderApp('/reglages')
     expect(await screen.findByRole('link', { name: 'À propos' })).toHaveAttribute('href', '/a-propos')
   })
-
-  it('dit qu’aucun tutoriel n’est passé au départ', async () => {
-    renderApp('/reglages')
-    expect(await screen.findByText('Aucun tutoriel passé pour l’instant.')).toBeInTheDocument()
-  })
 })
 
-describe('tutoriel passé', () => {
-  it('« Jouer » ramène au tutoriel tant qu’il n’est pas fini', async () => {
-    renderApp('/jeu/love-letter')
-    expect(await screen.findByRole('link', { name: 'Jouer' })).toHaveAttribute(
-      'href',
-      '/jeu/love-letter/tutoriel/cartes',
-    )
+// Même chemin pour tous les jeux, à chaque fois : « Jouer » ouvre « Tes cartes », même après un tutoriel fini.
+describe.each(games.map((game) => [game.id, game.name] as const))('« Jouer » : %s', (id) => {
+  it('ouvre « Tes cartes »', async () => {
+    renderApp(`/jeu/${id}`)
+    expect(await screen.findByRole('link', { name: 'Jouer' })).toHaveAttribute('href', `/jeu/${id}/tutoriel/cartes`)
   })
 
-  it('arriver au bout du tutoriel le marque passé : « Jouer » va droit à « Qui joue ? »', async () => {
-    const first = renderApp('/jeu/love-letter/tutoriel/tour')
+  it('ouvre encore « Tes cartes » après avoir fini le tutoriel', async () => {
+    const first = renderApp(`/jeu/${id}/tutoriel/tour`)
     await userEvent.click(await screen.findByRole('link', { name: 'Jouer' }))
-    await waitFor(() => expect(window.localStorage.getItem('mastercards:tutorial:love-letter')).toBe('1'))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Qui joue ?' })).toBeInTheDocument()
     first.unmount()
 
-    renderApp('/jeu/love-letter')
-    await waitFor(() =>
-      expect(screen.getByRole('link', { name: 'Jouer' })).toHaveAttribute('href', '/jeu/love-letter/joueurs'),
-    )
-  })
-
-  it('apparaît dans les Réglages, où « Réactiver » le remet à zéro', async () => {
-    window.localStorage.setItem('mastercards:tutorial:love-letter', '1')
-    renderApp('/reglages')
-    await userEvent.click(await screen.findByRole('button', { name: 'Réactiver le tutoriel de Love Letter' }))
-    expect(screen.queryByRole('button', { name: /Réactiver/ })).not.toBeInTheDocument()
-    expect(window.localStorage.getItem('mastercards:tutorial:love-letter')).toBe('0')
+    renderApp(`/jeu/${id}`)
+    expect(await screen.findByRole('link', { name: 'Jouer' })).toHaveAttribute('href', `/jeu/${id}/tutoriel/cartes`)
   })
 })

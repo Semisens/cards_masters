@@ -1,5 +1,5 @@
 // Textes de l'interface (français, tutoiement, phrases courtes). Les clés sont stables : une autre langue
-// ajoutera un fichier de même forme. Le contenu des jeux, lui, vit dans src/content/games/<id>/game.json.
+// ajoutera un fichier de même forme. Le contenu des jeux, lui, vit dans src/content/games/<id>/game.yaml.
 
 const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`
 
@@ -49,10 +49,6 @@ export const fr = {
     title: 'Réglages',
     language: 'Langue de l’app',
     languageSoon: 'English et Español arrivent bientôt.',
-    tutorials: 'Tutoriels passés',
-    tutorialsNone: 'Aucun tutoriel passé pour l’instant.',
-    reactivate: 'Réactiver',
-    reactivateFor: (name: string) => `Réactiver le tutoriel de ${name}`,
     about: 'À propos',
   },
   mode: {

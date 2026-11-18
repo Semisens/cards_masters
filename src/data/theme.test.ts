@@ -35,9 +35,10 @@ describe('resolveGameTheme', () => {
 
   it('utilise Fredoka par défaut et la police du jeu sinon', () => {
     expect(resolveGameTheme({ background_color: 'vert' }).font.family).toContain('--mc-font-title')
-    expect(resolveGameTheme({ background_color: 'rouge', font: 'Great Vibes' }).font.family).toContain(
-      '--mc-font-script',
-    )
+    const theme = resolveGameTheme({ background_color: 'rouge', font: { family: 'Great Vibes', band_size: 4 } })
+    expect(theme.font.family).toMatch(/^'Great Vibes', /)
+    expect(theme.font.weight).toBe(400)
+    expect(theme.font.bandSize).toBe(4)
   })
 
   it('calcule une ombre différente du fond', () => {

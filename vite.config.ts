@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
+import { parse } from 'yaml'
 
 // Les couleurs viennent de la charte, jamais écrites ici.
 const charte = JSON.parse(readFileSync(new URL('./charte/mastercards-charte.json', import.meta.url), 'utf8'))
@@ -12,6 +13,12 @@ export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [
     react(),
+    {
+      // Configurations des jeux (src/content/games/<id>/game.yaml) : lues au build, embarquées en JSON.
+      name: 'mastercards-yaml',
+      transform: (code, id) =>
+        id.endsWith('.yaml') ? { code: `export default ${JSON.stringify(parse(code))}`, map: null } : undefined,
+    },
     {
       name: 'mastercards-theme-color',
       transformIndexHtml: () => [{ tag: 'meta', attrs: { name: 'theme-color', content: ciel }, injectTo: 'head' }],

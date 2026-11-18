@@ -13,21 +13,15 @@ import {
 } from './session.ts'
 
 const ROUNDS: Scoring = {
-  rounds: true,
   unit: 'point',
+  party_label: 'Manche {round}',
   title: 'Fin de la manche {round}',
   question: 'Qui ?',
   validate: 'Valider la manche',
-  round_label: 'Manche {round}',
   target: { '2': 7, '3': 5, '4': 4 },
 }
-const NO_TARGET: Scoring = {
-  rounds: false,
-  unit: 'trio',
-  title: 'Trios gagnés',
-  question: 'Qui ?',
-  validate: 'Valider',
-}
+const FIXED: Scoring = { ...ROUNDS, unit: 'trio', target: 3 }
+const NO_TARGET: Scoring = { ...ROUNDS, target: undefined }
 
 describe('parseSession', () => {
   it('relit une partie valide', () => {
@@ -110,6 +104,13 @@ describe('fin de partie', () => {
     expect(winTarget(ROUNDS, 4)).toBe(4)
     expect(winTarget(ROUNDS, 5)).toBeUndefined()
     expect(winTarget(NO_TARGET, 3)).toBeUndefined()
+  })
+
+  it('accepte un seul score visé, quel que soit le nombre de joueurs', () => {
+    expect(winTarget(FIXED, 3)).toBe(3)
+    expect(winTarget(FIXED, 6)).toBe(3)
+    expect(hasWinner(session([2, 3, 0]), FIXED)).toBe(true)
+    expect(hasWinner(session([2, 2, 2]), FIXED)).toBe(false)
   })
 
   it('désigne un gagnant dès que le score visé est atteint', () => {
