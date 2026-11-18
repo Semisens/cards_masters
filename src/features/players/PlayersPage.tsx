@@ -33,6 +33,8 @@ export function PlayersPage() {
     : Array.from({ length: game?.players.min ?? 0 }, () => '')
   const names = edited ?? initial
   const setNames = (update: (current: string[]) => string[]) => setEdited(update(names))
+  // Sans aucun prénom, on ne valide pas ici : « Passer cette étape » (en haut) est le chemin des parties sans prénoms.
+  const hasName = names.some((name) => name.trim() !== '')
 
   if (!game) return <NotFoundPage message={fr.errors.gameNotFound} />
   if (status !== 'ready') return null
@@ -99,7 +101,7 @@ export function PlayersPage() {
         ))}
       </Panel>
       <div className={styles.spacer} />
-      <Button block onClick={() => void start(names)}>
+      <Button block disabled={!hasName} onClick={() => void start(names)}>
         {fr.players.start}
       </Button>
     </Screen>

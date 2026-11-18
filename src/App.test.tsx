@@ -403,10 +403,26 @@ describe('qui joue ?', () => {
     expect(savedParty().unnamed).toBeUndefined()
   })
 
-  it('sans prénoms, valider « C’est parti » à vide ramène à la partie, sans boucle', async () => {
-    const app = renderApp('/jeu/trio/joueurs?depuis=partie')
-    await userEvent.click(await screen.findByRole('button', { name: 'C’est parti' }))
-    await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
+  it('sans prénom, « C’est parti » est grisé : on passe par « Passer cette étape »', async () => {
+    renderApp('/jeu/trio/joueurs')
+    const start = await screen.findByRole('button', { name: 'C’est parti' })
+    expect(start).toBeDisabled()
+    // Changer le nombre de joueurs ne suffit pas, ni des espaces seuls.
+    await userEvent.click(screen.getByRole('button', { name: 'Un joueur de plus' }))
+    await userEvent.type(screen.getByRole('textbox', { name: 'Prénom du joueur 1' }), '   ')
+    expect(start).toBeDisabled()
+    // Un seul prénom suffit ; l'effacer grise de nouveau le bouton.
+    await userEvent.type(screen.getByRole('textbox', { name: 'Prénom du joueur 2' }), 'Tom')
+    expect(start).toBeEnabled()
+    await userEvent.clear(screen.getByRole('textbox', { name: 'Prénom du joueur 2' }))
+    expect(start).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Passer cette étape' })).toBeEnabled()
+  })
+
+  it('en venant de la partie, sans prénom, « C’est parti » est grisé (et il n’y a pas de « Passer »)', async () => {
+    renderApp('/jeu/trio/joueurs?depuis=partie')
+    expect(await screen.findByRole('button', { name: 'C’est parti' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Passer cette étape' })).not.toBeInTheDocument()
   })
 
   it('reprend les prénoms de la dernière partie', async () => {
