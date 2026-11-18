@@ -1,7 +1,7 @@
 import { RANKS, SUITS, rankPlural, suitPlural, type Rank, type Suit } from '../core/cards.ts'
 import type { CardGroup, CardSpecConfig, DeckCard, Game } from './types.ts'
 
-/** Taille d'un paquet classique sans jokers. */
+/** Taille d'un paquet classique sans jokers (les jokers viennent en plus, si un jeu en demande). */
 export const FULL_DECK = RANKS.length * SUITS.length
 
 /** Rang d'une configuration : en YAML, `2` est un nombre ; on le ramène au rang `'2'`. */
@@ -26,7 +26,11 @@ export interface DeckPlan {
   groups: CardGroup[]
   /** Tous les rangs gardés, dans l'ordre du paquet (As à Roi). */
   keptRanks: Rank[]
+  /** Cartes gardées, jokers compris. */
   keptTotal: number
+  /** Dont les jokers (à prendre dans la boîte : le paquet de 52 n'en a pas). */
+  keptJokers: number
+  /** Cartes du paquet de 52 à retirer. */
   removedTotal: number
   /** Rangs retirés en entier (aucune carte gardée). */
   removedRanks: Rank[]
@@ -47,20 +51,25 @@ export function deckPlan(game: Pick<Game, 'card_groups'>): DeckPlan {
   const cards: DeckCard[] = groups.flatMap((group) => group.cards)
   const ranks = new Set<Rank>(cards.map((card) => card.rank))
   const suits = new Set<Suit>(cards.map((card) => card.suit))
-  const keptTotal = cards.length
+  const keptJokers = groups.reduce((sum, group) => sum + group.jokers, 0)
+  const keptTotal = cards.length + keptJokers
   const keptRanks = RANKS.filter((rank) => ranks.has(rank))
   const keptSuits = SUITS.filter((suit) => suits.has(suit))
   const removedRanks = RANKS.filter((rank) => !ranks.has(rank))
   const removedSuits = SUITS.filter((suit) => !suits.has(suit))
   // La liste « Retire… » dit vrai seulement si tout le reste du paquet part : gardées = rangs gardés x couleurs gardées.
-  const isProduct = keptTotal === keptRanks.length * keptSuits.length
-  const removalMode = isProduct && removedRanks.length + removedSuits.length <= MAX_REMOVAL_ITEMS ? 'list' : 'keepOnly'
+  const isProduct = cards.length === keptRanks.length * keptSuits.length
+  const removalMode =
+    keptJokers === 0 && isProduct && removedRanks.length + removedSuits.length <= MAX_REMOVAL_ITEMS
+      ? 'list'
+      : 'keepOnly'
 
   return {
     groups,
     keptRanks,
     keptTotal,
-    removedTotal: FULL_DECK - keptTotal,
+    keptJokers,
+    removedTotal: FULL_DECK - cards.length,
     removedRanks,
     removedSuits,
     keptSuits,

@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react'
 import { cardLabel, isRedSuit, rankLetter, type Rank, type Suit } from '../../core/cards.ts'
 import type { TapisName } from '../../core/tokens.generated.ts'
-import { SUIT_PATHS, SYMBOL_VIEWBOX } from './symbols.ts'
+import { fr } from '../../i18n/fr.ts'
+import { JOKER_PATH, SUIT_PATHS, SYMBOL_VIEWBOX } from './symbols.ts'
 import styles from './PlayingCard.module.css'
 
 /**
@@ -16,6 +17,14 @@ export type CardVariant = 'standard' | 'list' | 'focus' | 'diagram'
 interface FaceUp {
   rank: Rank
   suit: Suit
+  joker?: undefined
+  faceDown?: false
+  variant?: CardVariant
+}
+
+/** Un joker : une étoile, sans rang ni couleur. */
+interface Joker {
+  joker: true
   faceDown?: false
   variant?: CardVariant
 }
@@ -28,7 +37,7 @@ interface FaceDown {
   backColor?: string
 }
 
-export type PlayingCardProps = (FaceUp | FaceDown) & {
+export type PlayingCardProps = (FaceUp | Joker | FaceDown) & {
   /** Largeur de la carte : toute longueur CSS (par défaut, définie dans la feuille de style). */
   width?: string
   className?: string
@@ -53,24 +62,32 @@ export function PlayingCard(props: PlayingCardProps) {
     )
   }
 
-  const { rank, suit } = props
+  const label = props.label ?? (props.joker ? fr.cards.jokerLabel : cardLabel(props.rank, props.suit))
+  const color = !props.joker && isRedSuit(props.suit) ? styles.red : styles.black
   return (
     <div
       role="img"
-      aria-label={props.label ?? cardLabel(rank, suit)}
-      className={`${classes} ${isRedSuit(suit) ? styles.red : styles.black} ${props.variant === 'list' ? styles.list : ''} ${props.variant === 'focus' ? styles.focus : ''} ${props.variant === 'diagram' ? styles.diagram : ''}`}
+      aria-label={label}
+      className={`${classes} ${color} ${props.variant === 'list' ? styles.list : ''} ${props.variant === 'focus' ? styles.focus : ''} ${props.variant === 'diagram' ? styles.diagram : ''}`}
       style={style}
     >
-      <span className={styles.rank} aria-hidden="true">
-        {rankLetter(rank)}
-      </span>
+      {!props.joker && (
+        <span className={styles.rank} aria-hidden="true">
+          {rankLetter(props.rank)}
+        </span>
+      )}
       <svg
         className={styles.symbol}
         viewBox={`0 0 ${SYMBOL_VIEWBOX} ${SYMBOL_VIEWBOX}`}
         aria-hidden="true"
         focusable="false"
       >
-        <path d={SUIT_PATHS[suit]} fill="currentColor" stroke="currentColor" strokeLinejoin="round" />
+        <path
+          d={props.joker ? JOKER_PATH : SUIT_PATHS[props.suit]}
+          fill="currentColor"
+          stroke="currentColor"
+          strokeLinejoin="round"
+        />
       </svg>
     </div>
   )

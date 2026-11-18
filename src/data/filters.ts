@@ -5,12 +5,13 @@ export type GameFilter = 'all' | 'small' | 'quick'
 
 /** Jeu « rapide » : une partie dure 15 minutes ou moins. */
 export const QUICK_MAX_MINUTES = 15
-/** Jeu « 2–4 joueurs » : il se joue au plus à quatre. */
+/** Jeu « 2–4 joueurs » : il se joue en petit groupe, c'est-à-dire avec au moins un nombre de joueurs de 2 à 4. */
+export const SMALL_MIN_PLAYERS = 2
 export const SMALL_MAX_PLAYERS = 4
 
 const matches: Record<GameFilter, (game: Game) => boolean> = {
   all: () => true,
-  small: (game) => game.players.max <= SMALL_MAX_PLAYERS,
+  small: (game) => game.players.min <= SMALL_MAX_PLAYERS && game.players.max >= SMALL_MIN_PLAYERS,
   quick: (game) => game.duration_min <= QUICK_MAX_MINUTES,
 }
 

@@ -1,7 +1,7 @@
 import { fill } from '../core/format.ts'
 import { RANKS } from '../core/cards.ts'
 import { expandCards, toRank } from './deck.ts'
-import type { CardGroup, CardGroupConfig, Game, GameConfig } from './types.ts'
+import type { CardGroup, CardGroupConfig, DisplayCard, Game, GameConfig } from './types.ts'
 
 /** Remplace `{cards}` (nombre de cartes gardées) dans tous les textes. Les autres `{…}` (`{round}`) restent. */
 function fillTexts<T>(value: T, values: Record<string, number>): T {
@@ -12,12 +12,17 @@ function fillTexts<T>(value: T, values: Record<string, number>): T {
   return value
 }
 
-/** Un groupe de cartes prêt à l’emploi : cartes exactes, rangs, nombre de cartes, carte montrée. */
+/** Un groupe de cartes prêt à l’emploi : cartes exactes, jokers, rangs, nombre de cartes, carte montrée. */
 export function loadCardGroup(group: CardGroupConfig): CardGroup {
-  const cards = expandCards(group.cards)
+  const cards = expandCards(group.cards ?? [])
+  const jokers = group.jokers ?? 0
   const ranks = RANKS.filter((rank) => cards.some((card) => card.rank === rank))
-  const display = group.display ? { rank: toRank(group.display.rank), suit: group.display.suit } : cards[0]
-  return { ...group, cards, ranks, count: cards.length, display }
+  const display: DisplayCard = !group.display
+    ? (cards[0] ?? { joker: true })
+    : 'joker' in group.display
+      ? { joker: true }
+      : { rank: toRank(group.display.rank), suit: group.display.suit }
+  return { ...group, cards, jokers, ranks, count: cards.length + jokers, display }
 }
 
 /**

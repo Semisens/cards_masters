@@ -32,7 +32,7 @@ export function CardsPage() {
   const removal = removalList(plan)
   const sentence =
     plan.removalMode === 'keepOnly'
-      ? fr.cards.keepOnly(plan.keptTotal)
+      ? fr.cards.keepOnly(plan.keptTotal, plan.keptJokers)
       : removal
         ? `${fr.cards.remove(removal)} ${fr.cards.keep(plan.keptTotal)}`
         : fr.cards.keepAll

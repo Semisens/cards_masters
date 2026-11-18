@@ -23,8 +23,11 @@ describe('filterGames', () => {
     expect(filterGames(GAMES, 'all', 'zzz')).toEqual([])
   })
 
-  it('« 2–4 joueurs » garde les jeux qui se jouent au plus à quatre', () => {
-    expect(names(filterGames(GAMES, 'small', ''))).toEqual(['Love Letter'])
+  it('« 2–4 joueurs » garde les jeux qui se jouent avec 2, 3 ou 4 joueurs', () => {
+    expect(names(filterGames(GAMES, 'small', ''))).toEqual(['Love Letter', 'Trio'])
+    const grand = { ...trio, players: { min: 5, max: 8 } }
+    const duo = { ...loveLetter, players: { min: 1, max: 1 } }
+    expect(names(filterGames([grand, duo], 'small', ''))).toEqual([])
   })
 
   it('« Rapide » garde les parties de 15 minutes ou moins', () => {

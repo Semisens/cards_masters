@@ -224,13 +224,13 @@ test.describe('parcours Love Letter', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Love Letter' })).toBeVisible()
     await page.getByRole('link', { name: 'Jouer' }).click()
 
-    // Tes cartes : 17 cartes, 8 groupes, le mode connaisseur donne les noms d'origine.
-    await expect(page.getByText('Garde ces 17 cartes. Retire tout le reste du paquet.')).toBeVisible()
+    // Tes cartes : 21 cartes dont 2 jokers, 10 groupes, le mode connaisseur donne les noms d'origine.
+    await expect(page.getByText('Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet.')).toBeVisible()
     await page.getByRole('radio', { name: 'Connaisseur' }).check()
     await expect(page.getByText('Prêtre')).toBeVisible()
     await page.getByRole('radio', { name: 'Classique' }).check()
     await page.getByRole('link', { name: /Valets et rois noirs/ }).click()
-    await expect(page.getByText('Carte 1 / 8')).toBeVisible()
+    await expect(page.getByText('Carte 2 / 10')).toBeVisible()
     await page.getByRole('link', { name: /Retour/ }).click()
 
     // Le tutoriel jusqu'au bout.
@@ -240,7 +240,7 @@ test.describe('parcours Love Letter', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Un tour de jeu' })).toBeVisible()
     await page.getByRole('link', { name: 'Jouer' }).click()
 
-    // Deux joueurs : le score visé est 7. On joue deux manches.
+    // Deux joueurs : le score visé est 6. On joue deux manches.
     await page.getByRole('textbox', { name: 'Prénom du joueur 1' }).fill('Léa')
     await page.getByRole('textbox', { name: 'Prénom du joueur 2' }).fill('Tom')
     await page.getByRole('button', { name: 'C’est parti' }).click()
@@ -261,13 +261,13 @@ test.describe('parcours Love Letter', () => {
     await expect(page.getByText('Interrompue')).toBeVisible()
   })
 
-  test('la partie se termine d’elle-même au score visé : 7 jetons à deux joueurs', async ({ page }) => {
+  test('la partie se termine d’elle-même au score visé : 6 points à deux joueurs', async ({ page }) => {
     await page.addInitScript(() =>
       window.localStorage.setItem(
         'mastercards:session:love-letter',
         JSON.stringify({
           players: [
-            { name: 'Léa', score: 6 },
+            { name: 'Léa', score: 5 },
             { name: 'Tom', score: 3 },
           ],
           round: 9,
@@ -279,6 +279,22 @@ test.describe('parcours Love Letter', () => {
     await page.getByRole('button', { name: 'Valider la manche' }).click()
     await expect(page.getByText('Partie terminée')).toBeVisible()
     await expect(page.getByRole('list', { name: 'Podium des joueurs' })).toContainText('Léa')
+  })
+
+  test('à six joueurs, la partie se termine à 3 points', async ({ page }) => {
+    await page.addInitScript(() =>
+      window.localStorage.setItem(
+        'mastercards:session:love-letter',
+        JSON.stringify({
+          players: ['Léa', 'Tom', 'Zoé', 'Max', 'Ana', 'Lou'].map((name, i) => ({ name, score: i === 0 ? 2 : 1 })),
+          round: 5,
+        }),
+      ),
+    )
+    await page.goto('/jeu/love-letter/partie/scores')
+    await page.getByRole('button', { name: 'Un point de plus pour Léa' }).click()
+    await page.getByRole('button', { name: 'Valider la manche' }).click()
+    await expect(page.getByText('Partie terminée')).toBeVisible()
   })
 
   test('la recherche et les filtres de l’accueil', async ({ page }) => {
@@ -300,7 +316,7 @@ test.describe('parcours Love Letter', () => {
     await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true)
     await context.setOffline(true)
     await page.goto('/jeu/love-letter/tutoriel/cartes')
-    await expect(page.getByText('Garde ces 17 cartes. Retire tout le reste du paquet.')).toBeVisible()
+    await expect(page.getByText('Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet.')).toBeVisible()
     await page.goto('/scores')
     await expect(page.getByRole('heading', { level: 1, name: 'Tes scores' })).toBeVisible()
     // La calligraphie du nom (Great Vibes) est servie depuis le cache, elle aussi.

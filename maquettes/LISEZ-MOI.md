@@ -35,7 +35,7 @@ Extraites de la galerie `love-letter-maquettes.html` (15 écrans dans une seule 
 | `03-game-detail` | Le jeu |
 | `04-regles-completes` | Règles complètes |
 | `05-cartes-classique` / `06-cartes-connaisseur` | Tes cartes |
-| `07-carte-swipe` | Vue à balayer (« Carte 2 / 8 ») |
+| `07-carte-swipe` | Vue à balayer (« Carte 3 / 10 ») |
 | `08-mise-en-place` | Mise en place |
 | `09-un-tour` | Un tour de jeu |
 | `10-partie` | Partie en cours (« Manche 3 ») |
@@ -47,10 +47,10 @@ Extraites de la galerie `love-letter-maquettes.html` (15 écrans dans une seule 
 La galerie est une version antérieure aux maquettes de Trio. Les sources ont été retouchées pour suivre nos décisions, et rapprochées de la mise en page validée de Trio :
 
 - navigation homogène (« ‹ Retour », « Quitter le tutoriel », « Suivant ») ;
-- **17 cartes** (6 Gardes : 4 valets et 2 rois noirs) : « Garde ces 17 cartes. Retire tout le reste du paquet. », « Mélange les 17 cartes. » ;
+- **21 cartes**, règle de l'édition 2019 (10 personnages dont 2 jokers pour les Espionnes, la dame de cœur pour la Princesse ; 2 à 6 joueurs) : « Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet. », « Mélange les 21 cartes. », 10 lignes dans « Tes cartes », 7 sections de règles qui défilent dans leur carte ;
 - 05, 06 et 07 reconstruites d'après les maquettes de Trio (lignes de liste, vue à balayer), avec les données de Love Letter ;
 - 08 : la ligne vide sous les cartes du schéma et le décalage de la carte visible (défauts de la galerie) sont corrigés ;
-- 04 : les textes `[…]` sont remplacés par les textes rédigés ; 15 : blocs Compte et « Tutoriels passés » retirés (« Jouer » suit le même chemin pour tous les jeux, il n'y a rien à réactiver), note sur les langues et bouton « À propos » ajoutés ;
+- 02, 03, 04, 05, 06, 07, 08 et 09 refaites pour cette règle (« 2–6 joueurs », règles de 2019, vue à balayer sur le Prêtre, texte « Gagner la manche ») ; 04 : les textes `[…]` sont remplacés par les textes rédigés ; 15 : blocs Compte et « Tutoriels passés » retirés (« Jouer » suit le même chemin pour tous les jeux, il n'y a rien à réactiver), note sur les langues et bouton « À propos » ajoutés ;
 - toutes les pages reçoivent `*{box-sizing:border-box}`, la règle globale de la galerie qui se perdait à l'extraction.
 
 ## Mettre à jour

@@ -62,13 +62,7 @@ export function CardSwipePage() {
           >
             ‹
           </button>
-          <PlayingCard
-            rank={group.display.rank}
-            suit={group.display.suit}
-            variant="focus"
-            width="12.5rem"
-            label={group.label}
-          />
+          <PlayingCard {...group.display} variant="focus" width="12.5rem" label={group.label} />
           <button
             type="button"
             className={styles.chevron}

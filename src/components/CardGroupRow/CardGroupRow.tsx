@@ -32,7 +32,7 @@ export function CardGroupRow({ group, mode, to }: CardGroupRowProps) {
       )}
       {/* La carte est décorative : le titre et le sous-titre portent l'information. */}
       <span aria-hidden="true" className={styles.card}>
-        <PlayingCard rank={group.display.rank} suit={group.display.suit} variant="list" />
+        <PlayingCard {...group.display} variant="list" />
       </span>
       <span className={styles.text}>
         <span className={styles.titleLine}>

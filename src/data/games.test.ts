@@ -7,9 +7,12 @@ import { FULL_DECK, deckPlan, removalList } from './deck.ts'
 import { gameConfigs, gameFiles, games, getGame, logoUrl } from './games.ts'
 import { loadGame } from './loadGame.ts'
 import { resolveGameTheme } from './theme.ts'
-import type { Game, GameConfig } from './types.ts'
+import type { CardGroup, Game, GameConfig } from './types.ts'
 
 // ---------------------------------------------------------------------------------------------------------
+
+/** Le groupe montre-t-il une carte rouge ? Un joker est noir. */
+const isRedGroup = (group: CardGroup): boolean => 'suit' in group.display && isRedSuit(group.display.suit)
 // Aides de relecture éditoriale (testées plus bas, pour prouver qu'elles détectent bien ce qu'elles doivent)
 // ---------------------------------------------------------------------------------------------------------
 
@@ -66,6 +69,10 @@ const allTexts = (game: Game): string[] => [
 const ajv = new Ajv2020({ allErrors: true, strict: true })
 const validate = ajv.compile(schema)
 
+const template = Object.values(
+  import.meta.glob<GameConfig>('../../docs/modele-jeu.yaml', { eager: true, import: 'default' }),
+)[0]
+
 describe('aides de relecture', () => {
   it('détectent un terme interdit, quelle que soit la casse ou l’accent', () => {
     expect(forbiddenTermsIn('Le Trio gagne.', ['trio'])).toEqual(['trio'])
@@ -91,6 +98,16 @@ describe('aides de relecture', () => {
 
   it('le schéma refuse un jeu incomplet', () => {
     expect(validate({ id: 'x' })).toBe(false)
+  })
+
+  it('le schéma accepte un groupe de jokers, et refuse un groupe sans carte ni joker', () => {
+    const base = structuredClone(template)
+    const group = base.card_groups[0] as unknown as Record<string, unknown>
+    const jokers = { ...group, cards: undefined, jokers: 2, display: { joker: true } }
+    expect(validate({ ...base, card_groups: [jokers] }), JSON.stringify(validate.errors)).toBe(true)
+    expect(validate({ ...base, card_groups: [{ ...group, cards: undefined }] })).toBe(false)
+    expect(validate({ ...base, card_groups: [{ ...jokers, jokers: 5 }] })).toBe(false)
+    expect(validate({ ...base, card_groups: [{ ...jokers, jokers: 0 }] })).toBe(false)
   })
 })
 
@@ -188,14 +205,21 @@ describe.each(games.map((game) => [game.id, game] as const))('jeu « %s »', (id
     })
 
     it('montrent une carte qui fait partie du groupe', () => {
-      for (const group of game.card_groups) expect(group.cards, group.label).toContainEqual(group.display)
+      for (const group of game.card_groups) {
+        if ('joker' in group.display) expect(group.jokers, group.label).toBeGreaterThan(0)
+        else expect(group.cards, group.label).toContainEqual(group.display)
+      }
     })
 
-    it('tiennent dans un paquet de 52 cartes', () => {
+    it('ne demandent pas plus de jokers qu’un paquet de 54 cartes n’en a (2)', () => {
+      expect(deckPlan(game).keptJokers).toBeLessThanOrEqual(2)
+    })
+
+    it('tiennent dans un paquet de 52 cartes, jokers en plus', () => {
       const plan = deckPlan(game)
       expect(plan.keptTotal).toBeGreaterThan(0)
-      expect(plan.keptTotal).toBeLessThanOrEqual(FULL_DECK)
-      expect(plan.keptTotal + plan.removedTotal).toBe(FULL_DECK)
+      expect(plan.keptTotal - plan.keptJokers).toBeLessThanOrEqual(FULL_DECK)
+      expect(plan.keptTotal - plan.keptJokers + plan.removedTotal).toBe(FULL_DECK)
     })
 
     it('donnent à chacun son pendant dans le jeu d’origine (mode connaisseur)', () => {
@@ -260,7 +284,7 @@ describe('Trio', () => {
   })
 
   it('alterne cartes rouges et noires dans la liste, comme la maquette', () => {
-    const reds = trio.card_groups.map((g) => isRedSuit(g.display.suit))
+    const reds = trio.card_groups.map((g) => isRedGroup(g))
     expect(reds).toEqual([true, false, true, false, true, false])
   })
 
@@ -316,39 +340,64 @@ describe('Love Letter', () => {
   const ll = getGame('love-letter')!
   const plan = deckPlan(ll)
 
-  it('regroupe les cartes comme la maquette : 8 lignes, les Gardes en premier', () => {
-    expect(ll.card_groups.map((g) => g.label)).toEqual(['Valets et rois noirs', '2', '3', '4', '5', '6', '7', '8'])
-    expect(ll.card_groups.map((g) => g.count)).toEqual([6, 2, 2, 2, 2, 1, 1, 1])
+  it('regroupe les cartes comme la règle : 10 personnages, les jokers en premier', () => {
+    expect(ll.card_groups.map((g) => g.label)).toEqual([
+      'Jokers',
+      'Valets et rois noirs',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      'Dame de cœur',
+    ])
+    expect(ll.card_groups.map((g) => g.count)).toEqual([2, 6, 2, 2, 2, 2, 2, 1, 1, 1])
   })
 
-  it('garde 17 cartes : 6 Gardes (4 valets, 2 rois noirs) et 11 autres', () => {
-    expect(plan.keptTotal).toBe(17)
-    const guards = ll.card_groups[0].cards
+  it('garde 21 cartes : 2 jokers, 6 Gardes (4 valets, 2 rois noirs) et 13 autres', () => {
+    expect(plan.keptTotal).toBe(21)
+    expect(plan.keptJokers).toBe(2)
+    const guards = ll.card_groups[1].cards
     expect(guards.filter((c) => c.rank === 'J')).toHaveLength(4)
     expect(guards.filter((c) => c.rank === 'K').map((c) => c.suit)).toEqual(['spades', 'clubs'])
+  })
+
+  it('prend les jokers pour Espionnes et la dame de cœur pour Princesse', () => {
+    const [spies] = ll.card_groups
+    expect(spies.jokers).toBe(2)
+    expect(spies.cards).toEqual([])
+    expect(spies.display).toEqual({ joker: true })
+    expect(ll.card_groups.at(-1)!.cards).toEqual([{ rank: 'Q', suit: 'hearts' }])
+  })
+
+  it('prend un rang par valeur de 2 à 8, comme la règle', () => {
+    expect(ll.card_groups.slice(2, 9).map((g) => g.ranks)).toEqual([['2'], ['3'], ['4'], ['5'], ['6'], ['7'], ['8']])
   })
 
   it('dit « Retire tout le reste » : les cartes gardées ne forment pas des couleurs et valeurs entières', () => {
     expect(plan.removalMode).toBe('keepOnly')
   })
 
-  it('numérote les personnages d’origine de 1 à 8, avec leur nom', () => {
-    expect(ll.card_groups.map((g) => g.expert.original)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8'])
+  it('numérote les personnages d’origine de 0 à 9, avec leur nom', () => {
+    expect(ll.card_groups.map((g) => g.expert.original)).toEqual(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
     expect(ll.card_groups.map((g) => g.expert.name)).toEqual([
+      'Espionne',
       'Garde',
       'Prêtre',
       'Baron',
       'Servante',
       'Prince',
+      'Chancelier',
       'Roi',
       'Comtesse',
       'Princesse',
     ])
   })
 
-  it('alterne cartes rouges et noires dans la liste, comme la maquette', () => {
-    expect(ll.card_groups.map((g) => isRedSuit(g.display.suit))).toEqual([
-      true,
+  it('alterne cartes noires et rouges dans la liste', () => {
+    expect(ll.card_groups.map((g) => isRedGroup(g))).toEqual([
       false,
       true,
       false,
@@ -356,17 +405,20 @@ describe('Love Letter', () => {
       false,
       true,
       false,
+      true,
+      false,
+      true,
     ])
   })
 
-  it('se joue en manches, jusqu’à 7, 5 ou 4 jetons selon 2, 3 ou 4 joueurs', () => {
+  it('se joue en manches, jusqu’à 6, 5, 4, 3 ou 3 points selon 2 à 6 joueurs', () => {
     expect(ll.scoring.party_label).toBe('Manche {round}')
-    expect(ll.scoring.target).toEqual({ '2': 7, '3': 5, '4': 4 })
-    expect(ll.players).toEqual({ min: 2, max: 4 })
+    expect(ll.scoring.target).toEqual({ '2': 6, '3': 5, '4': 4, '5': 3, '6': 3 })
+    expect(ll.players).toEqual({ min: 2, max: 6 })
     expect(ll.duration_min).toBe(20)
   })
 
-  it('reprend les textes de la maquette mot pour mot', () => {
+  it('reprend les textes de la maquette', () => {
     expect(ll.tagline).toBe('Une lettre. Une princesse. Un seul gagnant.')
     expect(ll.tutorial.turn.win.title).toBe('Gagner la manche')
     expect(ll.tutorial.setup.diagram.map((item) => item.label)).toEqual([
@@ -374,33 +426,33 @@ describe('Love Letter', () => {
       'Écartée, cachée',
       'Visibles (2 joueurs)',
     ])
-    expect(ll.card_groups.slice(1).map((g) => g.short)).toEqual([
-      'Regarde sa main.',
-      'Compare. La plus faible sort.',
-      'Tu es protégé un tour.',
-      'Un joueur défausse sa carte.',
-      'Échange ta main.',
-      'À jouer avec le 5 ou le 6.',
-      'Si tu la défausses, tu sors.',
-    ])
     expect(ll.full_rules.map((s) => s.title)).toEqual([
       'But',
+      'Valeurs des cartes',
       'Mise en place',
       'Un tour',
       'Fin de manche',
+      'Jokers',
       'Cas particuliers',
     ])
   })
 
-  it('annonce 17 cartes dans la mise en place, comme le paquet', () => {
-    expect(ll.tutorial.setup.steps[0]).toBe('Mélange les 17 cartes.')
+  it('dit le comptage des points de la règle : 1 point, 2 au plus avec les jokers', () => {
+    const rules = ll.full_rules.map((s) => s.text).join('\n')
+    expect(rules).toMatch(/6 points à 2 joueurs, 5 à 3 joueurs, 4 à 4 joueurs, 3 à 5 ou 6 joueurs/)
+    expect(rules).toMatch(/2 points au plus/)
+    expect(rules).not.toMatch(/additionn/)
+  })
+
+  it('annonce 21 cartes dans la mise en place, comme le paquet', () => {
+    expect(ll.tutorial.setup.steps[0]).toBe('Mélange les 21 cartes.')
   })
 
   it('ne laisse aucun texte provisoire de la maquette', () => {
     expect(allTexts(ll).join('\n')).not.toMatch(/\[|\]/)
   })
 
-  it('écrit « Carte 2 / 8 » dans la vue à balayer', () => {
+  it('écrit « Carte 2 / 10 » dans la vue à balayer', () => {
     expect(ll.group_word).toBe('Carte')
   })
 })

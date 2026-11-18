@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { RANKS } from '../core/cards.ts'
 import { FULL_DECK, deckPlan, expandCards, removalList, toRank } from './deck.ts'
 import { loadCardGroup } from './loadGame.ts'
 import type { CardGroup, CardSpecConfig } from './types.ts'
@@ -48,6 +49,50 @@ describe('loadCardGroup', () => {
     expect(g.ranks).toEqual(['A', 'K'])
     expect(g.count).toBe(4)
     expect(g.display).toEqual({ rank: 'K', suit: 'hearts' })
+  })
+})
+
+describe('jokers', () => {
+  const jokers = loadCardGroup({
+    label: 'Jokers',
+    jokers: 2,
+    short: 's',
+    detail: { title: 't', text: 'x' },
+    expert: { original: '0' },
+  })
+
+  it('un groupe de jokers n’a aucune carte du paquet, deux cartes en tout, et montre un joker', () => {
+    expect(jokers.cards).toEqual([])
+    expect(jokers.ranks).toEqual([])
+    expect(jokers.jokers).toBe(2)
+    expect(jokers.count).toBe(2)
+    expect(jokers.display).toEqual({ joker: true })
+  })
+
+  it('un groupe mixte compte les cartes et les jokers, et montre sa première carte', () => {
+    const mixed = loadCardGroup({
+      label: 'm',
+      jokers: 1,
+      cards: [{ ranks: ['A'], suits: ['hearts'] }],
+      short: 's',
+      detail: { title: 't', text: 'x' },
+      expert: { original: 'o' },
+    })
+    expect(mixed.count).toBe(2)
+    expect(mixed.display).toEqual({ rank: 'A', suit: 'hearts' })
+  })
+
+  it('le plan compte les jokers dans les cartes à garder, pas dans le paquet de 52 à retirer', () => {
+    const plan = deckPlan({ card_groups: [jokers, group([{ ranks: ['A'], suits: ['hearts', 'spades'] }])] })
+    expect(plan.keptJokers).toBe(2)
+    expect(plan.keptTotal).toBe(4)
+    expect(plan.removedTotal).toBe(50)
+  })
+
+  it('avec des jokers, on dit « Retire tout le reste », jamais une liste', () => {
+    const full = group([{ ranks: RANKS.filter((rank) => rank !== 'K'), suits: 'all' }])
+    expect(deckPlan({ card_groups: [full] }).removalMode).toBe('list')
+    expect(deckPlan({ card_groups: [full, jokers] }).removalMode).toBe('keepOnly')
   })
 })
 

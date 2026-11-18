@@ -88,7 +88,7 @@ const LOVE_LETTER_SCREENS: Screen[] = [
   { game: 'love-letter', name: '04-regles-completes', url: `${LL}/regles`, max: 0.01 },
   { game: 'love-letter', name: '05-cartes-classique', url: `${LL}/tutoriel/cartes`, mode: 'classic', max: 0.01 },
   { game: 'love-letter', name: '06-cartes-connaisseur', url: `${LL}/tutoriel/cartes`, mode: 'expert', max: 0.01 },
-  { game: 'love-letter', name: '07-carte-swipe', url: `${LL}/tutoriel/cartes/2`, mode: 'expert', max: 0.01 },
+  { game: 'love-letter', name: '07-carte-swipe', url: `${LL}/tutoriel/cartes/3`, mode: 'expert', max: 0.01 },
   { game: 'love-letter', name: '08-mise-en-place', url: `${LL}/tutoriel/mise-en-place`, max: 0.01 },
   { game: 'love-letter', name: '09-un-tour', url: `${LL}/tutoriel/tour`, max: 0.01 },
   { game: 'love-letter', name: '10-partie', url: `${LL}/partie`, party: PARTY, max: 0.01 },

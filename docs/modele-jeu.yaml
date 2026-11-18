@@ -50,8 +50,11 @@ duration_min: 15 # filtre « Rapide » de l'accueil : 15 minutes ou moins
 # --- Cartes à garder et correspondances ------------------------------------------------------------------------
 #
 # Chaque groupe = une ligne de l'écran « Tes cartes » = une page de la vue à balayer.
-# cards : les cartes du paquet de 52 à garder dans ce groupe. Rangs : A, 2 à 10, J (valet), Q (dame), K (roi).
+# cards : les cartes du paquet de 52 à garder dans ce groupe (facultatif si le groupe est fait de jokers). Rangs : A, 2 à 10, J (valet), Q (dame), K (roi).
 #         Couleurs : spades (pique), hearts (cœur), diamonds (carreau), clubs (trèfle), ou all (les quatre).
+# jokers : nombre de jokers du groupe (facultatif). Le paquet de 52 n'en a pas : on prend ceux de la boîte, 2 au plus.
+#         Un groupe de jokers seul s'écrit sans `cards` : `jokers: 2` et `display: { joker: true }`.
+#         Le bandeau dit alors « Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet. ».
 # Le nombre de cartes et le bandeau « Retire… Garde… » sont calculés : rien à écrire.
 # expert : la correspondance avec le jeu d'origine, montrée en mode Connaisseur.
 

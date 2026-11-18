@@ -21,6 +21,14 @@ export interface DeckCard {
   suit: Suit
 }
 
+/** Un joker : il n'a ni rang ni couleur. Il vient en plus du paquet de 52 (paquet de 54). */
+export interface JokerCard {
+  joker: true
+}
+
+/** Ce que montre un groupe : une carte du paquet, ou un joker. */
+export type DisplayCard = DeckCard | JokerCard
+
 /** Des rangs, dans des couleurs (`all` : les quatre). Ex. les rois noirs : `{ ranks: [K], suits: [spades, clubs] }`. */
 export interface CardSpecConfig {
   ranks: RankInput[]
@@ -58,9 +66,12 @@ interface CardGroupBase {
 
 /** Un groupe de cartes à garder, tel qu'écrit dans la configuration. */
 export interface CardGroupConfig extends CardGroupBase {
-  cards: CardSpecConfig[]
-  /** Carte montrée dans la liste et la vue à balayer. Absent : la première carte du groupe. */
-  display?: { rank: RankInput; suit: Suit }
+  /** Cartes du paquet de 52. Absent : un groupe de jokers seulement. */
+  cards?: CardSpecConfig[]
+  /** Nombre de jokers du groupe (le paquet de 52 n'en a pas : on prend ceux de la boîte). */
+  jokers?: number
+  /** Carte montrée dans la liste et la vue à balayer. Absent : la première carte du groupe, ou le joker. */
+  display?: { rank: RankInput; suit: Suit } | JokerCard
 }
 
 /**
@@ -68,12 +79,15 @@ export interface CardGroupConfig extends CardGroupBase {
  * Ex. pour Trio, « 2 à 6 » réunit cinq rangs en trois couleurs, soit 15 cartes.
  */
 export interface CardGroup extends CardGroupBase {
-  /** Les cartes exactes du groupe. */
+  /** Les cartes exactes du groupe, jokers exclus. */
   cards: DeckCard[]
+  /** Nombre de jokers du groupe. */
+  jokers: number
   /** Les rangs du groupe, dans l'ordre du paquet. */
   ranks: Rank[]
+  /** Cartes du groupe, jokers compris. */
   count: number
-  display: DeckCard
+  display: DisplayCard
 }
 
 export interface TurnStep {

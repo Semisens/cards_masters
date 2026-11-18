@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { PlayingCard } from './PlayingCard.tsx'
-import { SUIT_PATHS } from './symbols.ts'
+import { JOKER_PATH, SUIT_PATHS } from './symbols.ts'
 import { SUITS } from '../../core/cards.ts'
 
 describe('PlayingCard', () => {
@@ -58,5 +58,21 @@ describe('PlayingCard', () => {
   it('le dos de pioche accepte une couleur libre', () => {
     render(<PlayingCard faceDown backColor="#187A33" />)
     expect(screen.getByRole('img', { name: 'Dos de carte' }).style.getPropertyValue('--back-color')).toBe('#187A33')
+  })
+
+  it('dessine un joker : une étoile, sans rang, avec son libellé', () => {
+    const { container } = render(<PlayingCard joker />)
+    expect(screen.getByRole('img', { name: 'Joker' })).toBeInTheDocument()
+    expect(container).toHaveTextContent('')
+    expect(container.querySelectorAll('svg')).toHaveLength(1)
+    expect(container.querySelector('path')?.getAttribute('d')).toBe(JOKER_PATH)
+    expect(Object.values(SUIT_PATHS)).not.toContain(JOKER_PATH)
+  })
+
+  it('un joker a les mêmes variantes que les autres cartes', () => {
+    const { container: list } = render(<PlayingCard joker variant="list" />)
+    const { container: focus } = render(<PlayingCard joker variant="focus" label="Jokers" />)
+    expect((list.firstChild as HTMLElement).className).not.toBe((focus.firstChild as HTMLElement).className)
+    expect(screen.getByRole('img', { name: 'Jokers' })).toBeInTheDocument()
   })
 })

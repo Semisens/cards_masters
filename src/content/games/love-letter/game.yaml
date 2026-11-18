@@ -8,14 +8,29 @@ background_color: rouge
 tagline: Une lettre. Une princesse. Un seul gagnant.
 description: >-
   Tu gardes une seule carte en main. Chaque tour, tu en piocheras une autre et tu joues l’une des deux. Devine,
-  espionne, élimine tes rivaux. Fais parvenir ta lettre avant les autres.
-players: { min: 2, max: 4 }
+  observe, élimine tes rivaux. Fais parvenir ta lettre avant les autres.
+players: { min: 2, max: 6 }
 duration_min: 20
 group_word: Carte
-classic_forbidden_terms: [Garde, Prêtre, Baron, Servante, Comtesse]
+classic_forbidden_terms: [Espionne, Garde, Prêtre, Baron, Servante, Chancelier, Comtesse]
 
-# Cartes à garder (17). Une ligne de « Tes cartes » par personnage du jeu d'origine.
+# Cartes à garder (21) : les 10 personnages de l'édition 2019, valeur = rang.
+# Espionne = les 2 jokers, Garde = 4 valets et 2 rois noirs, Princesse = la dame de cœur.
+# Une ligne de « Tes cartes » par personnage.
 card_groups:
+  - label: Jokers
+    jokers: 2
+    short: Valent 0. Sans effet.
+    detail:
+      title: Valent 0. Sans effet.
+      text: >-
+        Pose-les devant toi. À la fin de la manche, celui qui reste en jeu avec le plus de jokers devant lui marque
+        1 point. Égalité : personne ne marque.
+    expert:
+      original: '0'
+      name: Espionne
+      power: marquer un point si l’on en a le plus devant soi
+
   - label: Valets et rois noirs
     cards:
       - { ranks: [J], suits: all }
@@ -24,7 +39,7 @@ card_groups:
     short: Devine la carte d’un rival.
     detail:
       title: Devine la carte d’un rival.
-      text: Choisis un rival. Dis une valeur de 2 à 8. S’il a cette carte, il est éliminé.
+      text: Choisis un rival. Dis une valeur, sauf 1. S’il a cette carte, il est éliminé.
     expert:
       original: '1'
       name: Garde
@@ -51,8 +66,8 @@ card_groups:
     detail:
       title: Compare. La plus faible sort.
       text: >-
-        Choisis un rival. Compare ta carte avec la sienne, en secret. La plus faible est éliminée. Égalité : personne
-        ne sort.
+        Choisis un rival. Compare ta carte en main avec la sienne, en secret. La plus faible est éliminée. Égalité :
+        personne ne sort.
     expert:
       original: '3'
       name: Baron
@@ -79,8 +94,8 @@ card_groups:
     detail:
       title: Un joueur défausse sa carte.
       text: >-
-        Choisis un joueur, toi compris. Il défausse sa carte et en pioche une nouvelle. S’il défausse le 8, il est
-        éliminé.
+        Choisis un joueur, toi compris. Il défausse sa carte et en pioche une nouvelle. Si c’est la dame de cœur, il
+        est éliminé. Pioche vide : il prend la carte écartée.
     expert:
       original: '5'
       name: Prince
@@ -88,48 +103,63 @@ card_groups:
 
   - label: '6'
     cards:
-      - { ranks: [6], suits: [spades] }
+      - { ranks: [6], suits: [hearts, spades] }
+    display: { rank: 6, suit: spades }
+    short: Pioche deux cartes, choisis-en une.
+    detail:
+      title: Pioche deux cartes, choisis-en une.
+      text: Pioche les deux cartes du dessus. Choisis-en une pour ta main. Remets les deux autres sous la pioche, dans l’ordre de ton choix.
+    expert:
+      original: '6'
+      name: Chancelier
+      power: piocher deux cartes, en garder une
+
+  - label: '7'
+    cards:
+      - { ranks: [7], suits: [hearts] }
     short: Échange ta main.
     detail:
       title: Échange ta main.
       text: Choisis un rival. Échange ta carte contre la sienne, en secret.
     expert:
-      original: '6'
+      original: '7'
       name: Roi
       power: échanger sa main avec celle d’un joueur
-
-  - label: '7'
-    cards:
-      - { ranks: [7], suits: [hearts] }
-    short: À jouer avec le 5 ou le 6.
-    detail:
-      title: À jouer avec le 5 ou le 6.
-      text: Si tu as aussi un 5 ou un 6 en main, tu dois jouer le 7. Il n’a aucun autre effet.
-    expert:
-      original: '7'
-      name: Comtesse
-      power: devoir être jouée avec le Roi ou le Prince
 
   - label: '8'
     cards:
       - { ranks: [8], suits: [spades] }
+    short: À jouer avec le 5 ou le 7.
+    detail:
+      title: À jouer avec le 5 ou le 7.
+      text: Si tu as aussi un 5 ou un 7 en main, tu dois jouer le 8. Il n’a aucun autre effet.
+    expert:
+      original: '8'
+      name: Comtesse
+      power: devoir être jouée avec le Prince ou le Roi
+
+  - label: Dame de cœur
+    cards:
+      - { ranks: [Q], suits: [hearts] }
     short: Si tu la défausses, tu sors.
     detail:
       title: Si tu la défausses, tu sors.
-      text: Conserve-la jusqu’à la fin. Si tu la défausses, pour quelque raison que ce soit, tu es éliminé.
+      text: >-
+        Conserve-la jusqu’à la fin. Si tu la joues ou la défausses, pour quelque raison que ce soit, tu es éliminé.
     expert:
-      original: '8'
+      original: '9'
       name: Princesse
-      power: éliminer celui qui la défausse
+      power: éliminer celui qui la joue ou la défausse
 
-# Partie en manches : le gagnant d'une manche prend un jeton. 7, 5 ou 4 jetons pour gagner à 2, 3 ou 4 joueurs.
+# Partie en manches : le gagnant d'une manche marque 1 point (2 au plus, avec les jokers). Le premier à 6, 5, 4, 3
+# ou 3 points gagne, à 2, 3, 4, 5 ou 6 joueurs.
 scoring:
   unit: point
   party_label: Manche {round}
   title: Fin de la manche {round}
   question: Qui a gagné des points ?
   validate: Valider la manche
-  target: { 2: 7, 3: 5, 4: 4 }
+  target: { 2: 6, 3: 5, 4: 4, 5: 3, 6: 3 }
 
 tutorial:
   setup:
@@ -158,18 +188,32 @@ tutorial:
         text: C’est au joueur suivant.
     win:
       title: Gagner la manche
-      text: Sois le dernier en jeu. Ou aie la plus forte carte quand la pioche est vide.
+      text: >-
+        Sois le dernier en jeu. Ou aie la plus forte carte quand la pioche est vide. Le plus de jokers devant toi : 1
+        point de plus.
 
 full_rules:
   - title: But
-    text: Reste le dernier en jeu. Ou aie la plus forte carte à la fin de la pioche.
-  - title: Mise en place
-    text: Mélange. Écarte une carte. Distribue une carte par joueur.
-  - title: Un tour
-    text: Pioche. Joue une carte. Applique son pouvoir.
-  - title: Fin de manche
-    text: Le gagnant remporte un jeton. Il en faut 7 à 2 joueurs, 5 à 3 joueurs et 4 à 4 joueurs.
-  - title: Cas particuliers
     text: >-
-      À 2 joueurs, pose aussi 3 cartes face visible au début. Si la pioche est vide, la plus forte carte gagne. En
-      cas d’égalité, on additionne les cartes jouées.
+      Marque des points, manche après manche. Le premier qui atteint le score visé gagne : 6 points à 2 joueurs, 5 à 3
+      joueurs, 4 à 4 joueurs, 3 à 5 ou 6 joueurs.
+  - title: Valeurs des cartes
+    text: 'Joker : 0. Valets et rois noirs : 1. Cartes de 2 à 8 : leur chiffre. Dame de cœur : 9.'
+  - title: Mise en place
+    text: >-
+      Mélange les {cards} cartes. Écarte la première, face cachée. Donne une carte à chaque joueur. Le reste forme la
+      pioche.
+  - title: Un tour
+    text: >-
+      Pioche, puis joue une de tes deux cartes devant toi. Son pouvoir s’applique. Au premier tour, le dernier à avoir
+      écrit une lettre commence. Ensuite, le gagnant de la manche précédente commence.
+  - title: Fin de manche
+    text: >-
+      La manche s’arrête quand il ne reste qu’un joueur en jeu, ou quand la pioche est vide. Le dernier en jeu marque 1
+      point. Pioche vide : la plus forte carte marque 1 point. Égalité : chacun marque 1 point.
+  - title: Jokers
+    text: >-
+      Le joueur en jeu qui a le plus de jokers devant lui marque 1 point de plus. Il en faut au moins un. Égalité :
+      personne ne marque. Une manche rapporte donc 2 points au plus.
+  - title: Cas particuliers
+    text: À 2 joueurs, pose aussi 3 cartes face visible au début de la manche.

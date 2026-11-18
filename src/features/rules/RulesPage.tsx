@@ -10,7 +10,10 @@ import { NotFoundPage } from '../not-found/NotFoundPage.tsx'
 import { useFromParty } from '../tutorial/useFlow.ts'
 import styles from './RulesPage.module.css'
 
-/** Règles complètes : toutes les sections sur une seule carte, pour s'y retrouver en un coup d'œil. */
+/**
+ * Règles complètes : toutes les sections sur une seule carte, pour s'y retrouver en un coup d'œil.
+ * Quand les règles dépassent l'écran, la carte défile dans son cadre : la page, elle, ne bouge pas.
+ */
 export function RulesPage() {
   const { gameId } = useParams()
   const fromParty = useFromParty()
@@ -18,10 +21,10 @@ export function RulesPage() {
   if (!game) return <NotFoundPage message={fr.errors.gameNotFound} />
 
   return (
-    <Screen>
+    <Screen fixed>
       <StepHeader backTo={fromParty ? paths.party(game.id) : paths.game(game.id)} />
       <PageTitle>{fr.rules.title}</PageTitle>
-      <Panel>
+      <Panel className={styles.panel}>
         {game.full_rules.map((section) => (
           <div key={section.title} className={styles.section}>
             <b className={styles.title}>{section.title}</b>

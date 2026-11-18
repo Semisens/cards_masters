@@ -17,3 +17,6 @@ export const SUIT_PATHS: Record<Suit, string> = {
     'M38 55 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 Z ' +
     'M50 55 L37 94 L63 94 Z',
 }
+
+/** Étoile à cinq branches du joker, dans la même grille. */
+export const JOKER_PATH = 'M50 6 L62 37 L95 38 L69 58 L78 90 L50 71 L22 90 L31 58 L5 38 L38 37 Z'

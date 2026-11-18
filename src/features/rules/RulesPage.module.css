@@ -1,3 +1,16 @@
+/* Prend la hauteur de son texte ; au-delà de l'écran, défile dans son cadre, sans barre (app mobile). */
+.panel {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.panel::-webkit-scrollbar {
+  display: none;
+}
+
 .section + .section {
   margin-top: calc(var(--mc-text-min) * 1.364);
 }

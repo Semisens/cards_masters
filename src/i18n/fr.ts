@@ -70,8 +70,11 @@ export const fr = {
     remove: (list: string) => `Retire ${list}.`,
     keep: (count: number) => `Garde ${plural(count, 'carte', 'cartes')}.`,
     keepAll: 'Garde tout le paquet.',
+    /** Libellé d'un joker pour lecteurs d'écran. */
+    jokerLabel: 'Joker',
     /** Quand les cartes à retirer ne se disent pas en une liste (couleurs et valeurs entières). */
-    keepOnly: (count: number) => `Garde ces ${plural(count, 'carte', 'cartes')}. Retire tout le reste du paquet.`,
+    keepOnly: (count: number, jokers = 0) =>
+      `Garde ces ${plural(count, 'carte', 'cartes')}${jokers > 0 ? `, dont ${plural(jokers, 'joker', 'jokers')}` : ''}. Retire tout le reste du paquet.`,
     /** Titre d'une ligne en mode connaisseur : « 2–6 → 2 à 6 ». */
     mapped: (original: string, label: string) => `${original} → ${label}`,
     /** Sous le titre d'une ligne : « ×15 · Valent 2 à 6. ». */

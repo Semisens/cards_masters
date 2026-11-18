@@ -35,7 +35,7 @@ describe('accueil « Tes jeux »', () => {
   it('liste Love Letter et Trio, avec joueurs et durée', async () => {
     renderApp('/')
     expect(await screen.findByRole('heading', { level: 1, name: 'Tes jeux' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Love Letter/ })).toHaveTextContent('2–4 joueurs · 20 min')
+    expect(screen.getByRole('link', { name: /Love Letter/ })).toHaveTextContent('2–6 joueurs · 20 min')
     expect(screen.getByRole('link', { name: /Trio/ })).toHaveTextContent('3–6 joueurs · 15 min')
   })
 
@@ -50,7 +50,7 @@ describe('accueil « Tes jeux »', () => {
     renderApp('/')
     await userEvent.click(await screen.findByRole('radio', { name: '2–4 joueurs' }))
     expect(screen.getByRole('link', { name: /Love Letter/ })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /Trio/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Trio/ })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('radio', { name: 'Rapide' }))
     expect(screen.getByRole('link', { name: /Trio/ })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /Love Letter/ })).not.toBeInTheDocument()
@@ -73,33 +73,53 @@ describe('accueil « Tes jeux »', () => {
 })
 
 describe('Love Letter : tutoriel', () => {
-  it('annonce 17 cartes à garder, sans liste à retirer', async () => {
+  const KEEP = 'Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet.'
+
+  it('annonce 21 cartes à garder, dont 2 jokers, sans liste à retirer', async () => {
     renderApp('/jeu/love-letter/tutoriel/cartes')
-    expect(await screen.findByText('Garde ces 17 cartes. Retire tout le reste du paquet.')).toBeInTheDocument()
+    expect(await screen.findByText(KEEP)).toBeInTheDocument()
   })
 
-  it('liste 8 groupes ; le mode connaisseur donne le nom du personnage', async () => {
+  it('liste 10 groupes ; le mode connaisseur donne le nom du personnage', async () => {
     renderApp('/jeu/love-letter/tutoriel/cartes')
     const rows = () =>
       screen.getAllByRole('link').filter((link) => link.getAttribute('href')?.includes('/tutoriel/cartes/'))
-    await screen.findByText('Garde ces 17 cartes. Retire tout le reste du paquet.')
-    expect(rows()).toHaveLength(8)
-    expect(rows()[0]).toHaveTextContent('Valets et rois noirs')
-    expect(rows()[0]).toHaveTextContent('×6 · Devine la carte d’un rival.')
+    await screen.findByText(KEEP)
+    expect(rows()).toHaveLength(10)
+    expect(rows()[0]).toHaveTextContent('Jokers')
+    expect(rows()[0]).toHaveTextContent('×2 · Valent 0. Sans effet.')
+    expect(rows()[1]).toHaveTextContent('Valets et rois noirs')
+    expect(rows()[1]).toHaveTextContent('×6 · Devine la carte d’un rival.')
+    expect(rows()[9]).toHaveTextContent('Dame de cœur')
     await userEvent.click(screen.getByRole('radio', { name: 'Connaisseur' }))
-    expect(rows()[0]).toHaveTextContent('Garde')
-    expect(rows()[1]).toHaveTextContent('Prêtre')
-    expect(rows()[7]).toHaveTextContent('Princesse')
+    expect(rows()[0]).toHaveTextContent('Espionne')
+    expect(rows()[1]).toHaveTextContent('Garde')
+    expect(rows()[2]).toHaveTextContent('Prêtre')
+    expect(rows()[9]).toHaveTextContent('Princesse')
   })
 
-  it('numérote la vue à balayer « Carte 2 / 8 » et explique le pouvoir en mode connaisseur', async () => {
+  it('dessine le joker : une étoile, sans lettre de rang', async () => {
+    renderApp('/jeu/love-letter/tutoriel/cartes')
+    await screen.findByText(KEEP)
+    const first = screen.getAllByRole('link').find((link) => link.getAttribute('href')?.endsWith('/tutoriel/cartes/1'))!
+    expect(first.querySelector('svg')).not.toBeNull()
+    expect(first.textContent).not.toMatch(/\bJ\b/)
+  })
+
+  it('numérote la vue à balayer « Carte 3 / 10 » et explique le pouvoir en mode connaisseur', async () => {
     window.localStorage.setItem('mastercards:mode', 'expert')
-    renderApp('/jeu/love-letter/tutoriel/cartes/2')
-    expect(await screen.findByText('Carte 2 / 8')).toBeInTheDocument()
+    renderApp('/jeu/love-letter/tutoriel/cartes/3')
+    expect(await screen.findByText('Carte 3 / 10')).toBeInTheDocument()
     expect(screen.getByText('Choisis un rival. Il te montre sa carte. Ne la répète à personne.')).toBeInTheDocument()
     expect(
       screen.getByText('Mode connaisseur : Prêtre. Pouvoir d’origine : voir la main d’un joueur.'),
     ).toBeInTheDocument()
+  })
+
+  it('montre le joker sur la vue à balayer du premier groupe', async () => {
+    renderApp('/jeu/love-letter/tutoriel/cartes/1')
+    expect(await screen.findByText('Carte 1 / 10')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Jokers' })).toBeInTheDocument()
   })
 
   it('dessine les trois éléments de la mise en place', async () => {
@@ -107,7 +127,7 @@ describe('Love Letter : tutoriel', () => {
     expect(await screen.findByText('Pioche')).toBeInTheDocument()
     expect(screen.getByText('Écartée, cachée')).toBeInTheDocument()
     expect(screen.getByText('Visibles (2 joueurs)')).toBeInTheDocument()
-    expect(screen.getByText('Mélange les 17 cartes.')).toBeInTheDocument()
+    expect(screen.getByText('Mélange les 21 cartes.')).toBeInTheDocument()
   })
 })
 
