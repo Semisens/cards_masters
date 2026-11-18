@@ -48,7 +48,9 @@ export function CardSwipePage() {
       <StepHeader backTo={listPath} quitTo={fromParty ? undefined : paths.game(game.id)} />
       {/* Le geste porte sur toute la zone : carte, points et explication. */}
       <div className={styles.zone} tabIndex={-1} {...swipe}>
-        <div className={styles.counter}>{fr.cards.groupCounter(index + 1, groups.length)}</div>
+        <div className={styles.counter}>
+          {fr.cards.groupCounter(game.group_word ?? fr.cards.groupWord, index + 1, groups.length)}
+        </div>
 
         <div className={styles.stage}>
           <button
@@ -93,7 +95,12 @@ export function CardSwipePage() {
               <br />
               <br />
               <span className={styles.note}>
-                {fr.cards.expertNote(group.expert.original, group.ranks.length > 1, group.expert.power)}
+                {fr.cards.expertNote(
+                  group.expert.original,
+                  group.ranks.length > 1,
+                  group.expert.power,
+                  group.expert.name,
+                )}
               </span>
             </>
           )}

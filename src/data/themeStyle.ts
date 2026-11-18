@@ -9,5 +9,6 @@ export function themeStyle(theme: GameTheme): CSSProperties {
     '--game-shadow': theme.shadow,
     '--game-font': theme.font.family,
     '--game-font-weight': theme.font.weight,
+    '--game-band-size': theme.font.bandSize,
   } as CSSProperties
 }

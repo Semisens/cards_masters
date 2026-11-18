@@ -3,13 +3,14 @@ import { Screen } from '../../components/Screen/Screen.tsx'
 import { StepHeader } from '../../components/StepHeader/StepHeader.tsx'
 import { PageTitle } from '../../components/PageTitle/PageTitle.tsx'
 import { fr } from '../../i18n/fr.ts'
+import { paths } from '../../routes.ts'
 import styles from './AboutPage.module.css'
 
 /** Mentions légales, crédits, licences des polices et version. */
 export function AboutPage() {
   return (
     <Screen>
-      <StepHeader backTo="/" />
+      <StepHeader backTo={paths.settings()} />
       <PageTitle>{fr.about.title}</PageTitle>
 
       <Panel labelledBy="about-disclaimer" className={styles.panel}>

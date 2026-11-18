@@ -26,7 +26,7 @@ export function SetupPage() {
         quitTo={fromParty ? undefined : paths.game(game.id)}
       />
       <PageTitle>{setup.title}</PageTitle>
-      <PileDiagram hand={setup.hand} center={setup.center} />
+      <PileDiagram items={setup.diagram} />
       <Panel>
         {setup.steps.map((step, index) => (
           <div key={step}>

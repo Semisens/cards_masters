@@ -1,8 +1,8 @@
 # Cahier des charges : MasterCards
 
-Version 1.2 · Plateformes : PWA installable (web) + iOS et Android via Capacitor · Base écran : 390 × 844
+Version 1.3 · Plateformes : PWA installable (web) + iOS et Android via Capacitor · Base écran : 390 × 844
 
-> Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor. Version 1.2 : écrans de Trio alignés sur les maquettes (charte v6).
+> Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor. Version 1.2 : écrans de Trio alignés sur les maquettes (charte v6). Version 1.3 : second jeu Love Letter, podium, historique, réglages, accueil « Tes jeux » à onglets ; moteur généralisé.
 > Raisons : contenu statique et hors ligne, aucune API native nécessaire, partage par lien, référencement web, pas de review de store pour la v1. Voir `docs/contexte/mastercards-contexte.md`.
 
 ---
@@ -43,9 +43,10 @@ Le mode se choisit **après le choix du jeu**, avec la bascule de l'écran « Te
 - Projets natifs **Android et iOS** générés et maintenus avec Capacitor, dès le jalon 0. La **publication sur les stores** est décidée au jalon 6, pas avant.
 
 ### 2.2 Hors périmètre (v1)
-- Compte utilisateur, connexion, cloud.
+- Compte utilisateur, connexion, cloud. (L'écran « Login » et le bloc « Compte » de la galerie Love Letter ne sont pas faits.)
 - Partie en ligne ou multijoueur sur plusieurs appareils.
-- Détection automatique du gagnant et gestion fine des tours : l'app **compte les trios**, elle ne **joue** pas à la place des joueurs.
+- Gestion fine des tours : l'app **compte les points** (trios, jetons) et les manches, elle ne **joue** pas à la place des joueurs. Seule exception : un jeu à manches qui déclare un score à atteindre (`scoring.target`) termine la partie quand un joueur l'atteint.
+- Langues autres que le français : les réglages montrent English et Español, grisés.
 - Règles de jeux de cartes classiques.
 - Création de jeux par l'utilisateur (à envisager en v2).
 - Achats intégrés et publicité (à trancher avec le modèle économique, question 5).
@@ -149,18 +150,19 @@ Règle de contraste automatique : calculer le ratio WCAG entre la couleur de fon
 
 ## 7. Écrans
 
-Les écrans sont ceux des **maquettes de Trio** (`maquettes/trio/*.png`, sources HTML dans `maquettes/trio/source/`). L'app est **comparée pixel à pixel** à chacune par `e2e/maquettes.spec.ts`.
+Les écrans sont ceux des **maquettes** : `maquettes/trio/*.png` (sources HTML dans `maquettes/trio/source/`) et `maquettes/love-letter/*.png` (extraites de la galerie `love-letter-maquettes.html`). L'app est **comparée pixel à pixel** à chacune par `e2e/maquettes.spec.ts`. Quand la galerie de Love Letter et les maquettes de Trio (plus abouties) divergent sur une mise en page commune, **celle de Trio fait foi** (écarts en 7.10).
 
 ### 7.0 Parcours et principes
-Accueil → le jeu → **Jouer** : Tes cartes (liste) → *[détail d'un groupe : vue à balayer]* → Mise en place → Un tour de jeu → Qui joue ? → Partie en cours ⇄ Trios gagnés.
-Le jeu → **Règles complètes**.
+Accueil → le jeu → **Jouer** : Tes cartes (liste) → *[détail d'un groupe : vue à balayer]* → Mise en place → Un tour de jeu → Qui joue ? → Partie en cours ⇄ saisie des scores → **Podium** (partie terminée ou interrompue) → Historique.
+Le jeu → **Règles complètes**. Une fois le tutoriel passé jusqu'au bout, **Jouer** va droit à « Qui joue ? » ; il se réactive dans les Réglages.
+Trois écrans racines ont la **barre d'onglets** Jeux / Scores / Réglages : l'accueil, l'historique, les réglages.
 
 - **Le mode se choisit après le jeu**, avec la bascule de « Tes cartes ».
 - **Chaque écran tient sans défilement vertical** : vérifié sur tous les écrans, à 390 × 844 et à 393 × 852, y compris une partie à 6 joueurs. Seule la liste des cartes défile **dans son cadre** si un jeu a beaucoup plus de groupes que Trio.
 - Format des maquettes : 390 × 844, marges 48 / 24 / 24, blocs espacés de 16.
 
-### 7.1 Accueil *(sans maquette)*
-Titre MasterCards, mot de bienvenue au premier lancement, liste des jeux (vignette : tapis, logo ou initiale, nom dans sa police, joueurs et durée), accès à « À propos ». Aucun choix de mode ici.
+### 7.1 Accueil « Tes jeux » (maquette *Games* de Love Letter)
+Titre, **recherche** (« Un jeu, un titre… », filtre sur le nom, sans casse ni accents), **filtres** en pastilles (Tous ; « 2–4 joueurs » : se joue à 4 au plus ; « Rapide » : 15 minutes ou moins), liste des jeux (carré aux couleurs du jeu avec son initiale, nom, « 2–4 joueurs · 20 min »), barre d'onglets. Mot de bienvenue au premier lancement. Aucun choix de mode ici. La liste défile dans son cadre, sans barre, s'il y a beaucoup de jeux.
 
 ### 7.2 Le jeu (maquette *GameDetail*)
 Bandeau plein cadre aux couleurs du jeu (« ‹ Retour », nom en grand, « 3–6 joueurs · 15 min »), carte blanche (phrase d'accroche en gras + texte), boutons **Jouer** et **Règles complètes**.
@@ -174,14 +176,21 @@ En-tête (voir « Navigation » ci-dessous). Titre, **bascule Classique / Connai
 Un clic sur une ligne ouvre cette vue sur le groupe touché. « Groupe 3 / 6 », grande carte (200 × 280, cadre soleil), flèches ‹ ›, points de progression, carte d'explication (« ×3 · Le 7 est spécial. » + texte), bouton « Suivant ». On balaie, on touche les flèches ou le bouton, ou on utilise le clavier. Mode connaisseur : une ligne grise ajoute la carte d'origine et son pouvoir. Après le dernier groupe : « Terminer » ramène à la liste.
 
 ### 7.5 Mise en place et un tour de jeu (maquettes *Setup* et *TurnFlow*)
-Mise en place : schéma (ta main, triée / au centre, cachées) et 4 étapes numérotées. Un tour de jeu : 4 étapes (Retourne, Compare, Trio, Raté), « Gagner », bouton « Jouer ».
+Mise en place : schéma (2 à 4 éléments, chacun un dos de carte ou une carte visible : « Ta main, triée / Au centre, cachées » pour Trio ; « Pioche / Écartée, cachée / Visibles (2 joueurs) » pour Love Letter) et les étapes numérotées. Un tour de jeu : 4 étapes, la façon de gagner (« Gagner » ou « Gagner la manche »), bouton « Jouer ».
 
 ### 7.6 Règles complètes (maquette *FullRules*)
 Une carte blanche avec toutes les sections : But, Mise en place, Un tour, Trio, Cartes différentes, Mode piquant.
 
-### 7.7 Partie en cours et Trios gagnés (maquettes *Play* et *ScoreEntry*)
-Fond du tapis du jeu ; jetons des joueurs (cercle à bord pointillé, trios, nom) ; tuiles Règles / Mise en place / Cartes / Un tour (elles ouvrent ces écrans, avec retour à la partie) ; « Noter les scores » ; « Terminer la partie » (efface la partie). Trios gagnés : un compteur − / + par joueur, « Valider » enregistre.
+### 7.7 Partie en cours et saisie des scores (maquettes *Play* et *ScoreEntry*)
+Fond du tapis du jeu ; en haut à droite, le mot du jeu pour ce qu'on compte (« Trios gagnés ») ou, pour un jeu à manches, « Manche 3 » ; jetons des joueurs (cercle à bord pointillé, score, nom) ; tuiles Règles / Mise en place / Cartes / Un tour (elles ouvrent ces écrans, avec retour à la partie) ; « Noter les scores » ; « Terminer la partie » (archive la partie comme **interrompue**, l'efface, ouvre le podium).
+- **Sans manche (Trio)** : un compteur − / + par joueur, qui montre le **total** ; « Valider » l'enregistre.
+- **Par manches (Love Letter)** : « Fin de la manche 3 », « Qui a gagné des points ? » ; les compteurs **partent de zéro** (points de la manche) ; « Valider la manche » les ajoute aux scores et passe à la manche suivante. Si un joueur atteint le score visé (7, 5 ou 4 à 2, 3 ou 4 joueurs), la partie est **terminée** : podium.
 - *Ajout (absent des maquettes)* : **Qui joue ?**, le nombre de joueurs (dans les limites du jeu) et leurs prénoms.
+
+### 7.7 bis Podium, historique, réglages (maquettes *Results*, *History*, *Settings* de Love Letter)
+- **Podium** : pastille « Partie terminée » (verte) ou « Partie interrompue » (jaune), les trois premiers sur des marches (2e à gauche, 1er au centre, 3e à droite), les suivants en liste (« 4e Sam 0 »), « Voir l'historique », « Retour aux jeux ». Les égalités partagent le même rang. La partie est lue dans l'historique.
+- **Tes scores** : parties passées par jeu (date, deux meilleurs scores, « Terminée » / « Interrompue »). Un jeu est ouvert à la fois, le plus récemment joué au départ ; les autres montrent « 1 partie › ». Les 100 dernières parties sont gardées.
+- **Réglages** : langue (Français ; English et Español grisés, avec « arrivent bientôt »), « Tutoriels passés » (un jeu y figure une fois son tutoriel terminé, « Réactiver » le remet à zéro), lien « À propos ». Ni compte ni déconnexion.
 
 ### 7.8 Mentions / À propos
 Crédits, licences des polices, avertissement légal, version.
@@ -192,6 +201,7 @@ Premier lancement, liste vide, jeu / groupe / page introuvable (avec retour), pa
 ### 7.9 bis Navigation (la même dans toute l'app)
 
 - **En haut à gauche** : « ‹ Retour », toujours ce libellé, jamais le nom d'un écran (composant `StepHeader`, ou le bandeau du jeu).
+- **Écrans racines** (Jeux, Scores, Réglages) : la barre d'onglets du bas tient lieu de navigation ; pas de « Retour ».
 - **En haut à droite** : pastille « Quitter le tutoriel », sur les écrans du tutoriel (Tes cartes, vue à balayer, Mise en place, Un tour). Absente quand l'écran est ouvert depuis la partie.
 - **En bas de page** : le bouton principal de l'étape, toujours à la même place : « Suivant » (Tes cartes, vue à balayer, Mise en place), « Jouer » à la dernière étape du tutoriel. Depuis la partie : « Retour à la partie ».
 - Le libellé du retour n'est pas personnalisable : `StepHeader` n'accepte que l'adresse.
@@ -201,6 +211,13 @@ Premier lancement, liste vide, jeu / groupe / page introuvable (avec retour), pa
 |---|---|
 | Navigation homogène (voir ci-dessous) ; sur « Tes cartes » : bandeau « Retire… » en bas, bouton « Suivant » en bas, pas de légende en connaisseur, liste sans barre de défilement | Demandé par l'utilisateur après la reprise des maquettes. Les sources `maquettes/trio/source/01`, `02`, `03`, `04`, `07` et `08` ont été modifiées de même (libellés de retour, pastille, bouton), pour que le test de fidélité reste la référence. |
 | Écran « Qui joue ? » | Les maquettes montrent la partie (Léa, Tom, Inès) mais pas sa création. |
+| **Love Letter** : 17 cartes (6 Gardes : 4 valets et 2 rois noirs), au lieu des 16 de la galerie | Un paquet de 52 n'a que 4 as : décision de l'utilisateur. Les as sont retirés avec le reste ; « Garde ces 17 cartes. Retire tout le reste du paquet. » |
+| **Love Letter** : lignes de liste au format de Trio (« Valets et rois noirs » / « ×6 · Devine… ») ; vue à balayer, mise en place sans la ligne vide, sources reconstruites d'après Trio | La galerie est une version antérieure : la mise en page validée de Trio prime. En mode connaisseur la ligne dit le nom d'origine (« Garde »). |
+| **Love Letter** : textes « Fin de manche » et « Cas particuliers » | La galerie contient des `[…]` : textes rédigés (jetons 7 / 5 / 4, égalités), à relire. Sept textes de détail de groupe aussi (seul celui du 2 est donné). |
+| Réglages : pas de bloc Compte ni « Se déconnecter » ; note « English et Español arrivent bientôt » ; « À propos » à la place | Pas de compte en v1. Les sources de la maquette 15 sont retouchées de même. |
+| Accueil : troisième vignette « [JEU 3] » non rendue | Gabarit de la maquette, masqué dans le test. |
+| Podium : l'écran n'a pas de « ‹ Retour » | Fidèle à la maquette : on en sort par « Voir l'historique » ou « Retour aux jeux ». |
+| « Terminer la partie » de **Trio** mène aussi au podium (partie interrompue) et à l'historique | Cohérence des jeux ; la maquette de Trio n'a pas ce cas. |
 | Texte du « Mode piquant » | La maquette contient « [Deux trios liés. À détailler.] » : remplacé par un texte publiable. |
 | « − » grisé quand un score est à 0 | On ne descend pas sous zéro ; la maquette montre le bouton actif. |
 | Cœurs à la place des symboles provisoires | Les mini-cartes de la maquette sont toutes des cœurs ; l'app montre les vrais symboles, avec la même alternance rouge / noir. |
@@ -255,11 +272,13 @@ Source de vérité : `src/content/game.schema.json` (types TypeScript miroirs da
       "short": "Valent 2 à 6.",
       "badge": "Spécial",
       "detail": { "title": "Cinq valeurs à retenir.", "text": "…" },
-      "expert": { "original": "2–6", "power": "…" }
+      "expert": { "original": "2–6", "name": "Prêtre", "power": "…" }
     }
   ],
+  "group_word": "Carte",
+  "scoring": { "rounds": true, "unit": "point", "title": "Fin de la manche {round}", "question": "Qui a gagné des points ?", "validate": "Valider la manche", "round_label": "Manche {round}", "target": { "2": 7, "3": 5, "4": 4 } },
   "tutorial": {
-    "setup": { "title": "Mise en place", "hand": "Ta main, triée", "center": "Au centre, cachées", "steps": ["…"] },
+    "setup": { "title": "Mise en place", "diagram": [{ "label": "Pioche" }, { "label": "Visibles", "card": { "rank": "J", "suit": "hearts" } }], "steps": ["…"] },
     "turn": { "title": "Un tour de jeu", "steps": [{ "label": "Retourne.", "text": "…" }], "win": { "title": "Gagner", "text": "…" } }
   },
   "full_rules": [{ "title": "But", "text": "…" }]
@@ -271,29 +290,34 @@ Source de vérité : `src/content/game.schema.json` (types TypeScript miroirs da
 | `id` | Identifiant d'URL. Doit être égal au nom du dossier. |
 | `font` | Absent : Fredoka 700. Sinon une police embarquée (`Fredoka`, `Great Vibes`). |
 | `background_color` | `jaune`, `vert`, `rouge`, `bleu` ou `#RRGGBB`. Le texte est **choisi automatiquement** ; une couleur sans contraste ≥ 4,5 est refusée. L'ombre vient de `tapis_ombres` (charte) ou, pour une couleur libre, de la couleur assombrie. |
-| `card_groups` | Une ligne de la liste = une page de la vue à balayer. `ranks` : les rangs réunis ; `suits` listé : `count` = rangs × couleurs ; `display` : la carte montrée ; `short` : sous le titre, après « ×15 · » ; `badge` : pastille facultative ; `detail` : carte d'explication de la vue à balayer ; `expert.original` : la carte d'origine (« 2–6 ») ; `expert.power` : son pouvoir, en une proposition. |
-| bandeau « Retire… Garde… » | **Dérivé** de `card_groups` (`removalList` dans `src/data/deck.ts`) : couleurs puis valeurs jamais gardées. Rien à écrire. |
+| `card_groups` | Une ligne de la liste = une page de la vue à balayer. `ranks` : les rangs réunis ; `suits` listé : `count` = rangs × couleurs ; **ou** `cards` : liste exacte `[{rank, suits}]` quand les rangs n'ont pas les mêmes couleurs (4 valets et 2 rois noirs), alors `count` = nombre de cartes et `suits` est absent ; `display` : la carte montrée ; `short` : sous le titre, après « ×15 · » ; `badge` : pastille facultative ; `detail` : carte d'explication de la vue à balayer ; `expert.original` : la carte d'origine (« 2–6 », « 1 ») ; `expert.name` : son nom (« Prêtre »), qui remplace « 2–6 → 2 à 6 » dans la liste ; `expert.power` : son pouvoir, en une proposition. |
+| `group_word` | « Groupe » (défaut) ou « Carte » : « Carte 2 / 8 » dans la vue à balayer. |
+| `scoring` | Les mots du jeu et la règle de fin : `rounds` (jeu à manches ?), `unit` (« trio », « point », pour les boutons − et +), `title` (`{round}` = numéro de manche), `question`, `validate`, `round_label` (« Manche {round} », obligatoire si `rounds`), `target` (score à atteindre selon le nombre de joueurs ; absent : pas de fin automatique). |
+| `tutorial.setup.diagram` | 1 à 4 éléments `{label, card?}` : un dos de carte, ou une carte visible si `card` est donné. |
+| bandeau « Retire… Garde… » | **Dérivé** de `card_groups` (`deckPlan` dans `src/data/deck.ts`). Si les cartes gardées sont exactement toutes les couleurs gardées dans tous les rangs gardés, et qu'il y a au plus 3 éléments à retirer : « Retire les carreaux et les rois. Garde 36 cartes. » Sinon : « Garde ces 17 cartes. Retire tout le reste du paquet. » Rien à écrire. |
 | `classic_forbidden_terms` | Facultatif. Vocabulaire d'origine interdit dans les textes (test). Absent pour Trio. |
 | pioche | Pas de champ : le dos prend la couleur du jeu. |
 
 Un test automatisé (`src/data/games.test.ts`, Vitest + Ajv) vérifie **chaque jeu** :
 - conformité au schéma, id égal au dossier, logo existant ;
-- groupes : rangs jamais répétés, `count` = rangs × couleurs, carte montrée dans le groupe, tient dans 52 cartes, chaque groupe a son `expert.original` ;
+- groupes : rangs jamais répétés, aucune carte gardée deux fois, `count` = nombre de cartes (rangs × couleurs, ou liste `cards`), carte montrée dans le groupe, tient dans 52 cartes, chaque groupe a son `expert.original` ;
 - contraste texte / fond ≥ 4,5 ;
 - vocabulaire interdit par le jeu absent des textes ;
 - **ton** : tutoiement, phrases de 22 mots au plus.
 
 ### 9.3 Jeux livrés en v1
 1. **Trio** *(réalisé, d'après les maquettes)*. 36 cartes d'origine (valeurs 1 à 12 en trois exemplaires) jouées avec le paquet de 52 : on garde pique, cœur et trèfle de l'As à la Dame, et on **retire les carreaux et les rois**. As = 1, Valet = 11, Dame = 12. Six groupes : A, 2 à 6, 7 (« Spécial »), 8 à 10, Valet, Dame. 3 à 6 joueurs, environ 15 minutes. Le mode « Piquant » n'est pas jouable : ses liens entre numéros sont imprimés sur les cartes d'origine.
-2. **Love Letter** (16 cartes d'origine) : à reprendre. L'exemple « as ×5 » du cahier d'origine n'est pas réalisable tel quel avec 4 as (voir question 11).
+2. **Love Letter** *(réalisé, d'après la galerie de maquettes)*. 2 à 4 joueurs, 20 minutes, nom en Great Vibes, tapis rouge. **17 cartes** : les 6 Gardes sont les 4 valets et les 2 rois noirs (un paquet de 52 n'a que 4 as : décision de l'utilisateur), puis Prêtre = 2 (×2, cœur et pique), Baron = 3 (×2), Servante = 4 (×2), Prince = 5 (×2), Roi = 6 (×1), Comtesse = 7 (×1), Princesse = 8 (×1). Huit groupes. Les as, 9, 10, dames et autres rois sont retirés. Jeu en **manches**, jusqu'à 7, 5 ou 4 jetons à 2, 3 ou 4 joueurs.
 
-> Les textes de Trio viennent des **maquettes, mot pour mot**. Seuls cinq textes manquaient (la vue à balayer n'est montrée que pour le 7) : ceux des groupes A, 2 à 6, 8 à 10, Valet et Dame, rédigés sur le même modèle, à relire. Le contenu de Love Letter reste à rédiger et à relire.
+> Les textes viennent des **maquettes, mot pour mot**. Rédigés par nous, à relire : pour Trio, cinq textes de la vue à balayer ; pour Love Letter, « Fin de manche », « Cas particuliers » et sept textes de détail de groupe.
 
 ### 9.4 Persistance locale
 Via `src/core/storage.ts` : `@capacitor/preferences` dans les apps natives (non purgé par le système), `localStorage` sur le web, avec repli silencieux si le navigateur le bloque.
 - **Mode de lecture** (Classique / Connaisseur), changé par la bascule de « Tes cartes ».
 - **Message de bienvenue** déjà vu.
-- **Partie en cours**, par jeu (`session:<id>`) : joueurs et trios gagnés. Relue avec validation stricte : une donnée abîmée est ignorée, l'app démarre normalement. « Terminer la partie » l'efface.
+- **Partie en cours**, par jeu (`session:<id>`) : joueurs, scores et manche. Relue avec validation stricte : une donnée abîmée est ignorée, l'app démarre normalement ; l'ancien format (`trios`, sans manche) est relu. « Terminer la partie » l'efface.
+- **Historique** (`history`) : les 100 dernières parties (jeu, date, statut, scores). Les entrées abîmées sont ignorées une à une.
+- **Tutoriel passé**, par jeu (`tutorial:<id>`) : « Jouer » saute le tutoriel ; « Réactiver » (Réglages) l'efface.
 
 Aucune donnée n'est indispensable au fonctionnement : sans stockage, l'app reste utilisable.
 
@@ -343,7 +367,10 @@ android/  ios/   # projets natifs Capacitor
 | `/jeu/:id/tutoriel/tour` | Un tour de jeu |
 | `/jeu/:id/joueurs` | Qui joue ? |
 | `/jeu/:id/partie` | Partie en cours |
-| `/jeu/:id/partie/scores` | Trios gagnés |
+| `/jeu/:id/partie/scores` | Saisie des scores (trios gagnés, fin de manche) |
+| `/jeu/:id/resultat/:partieId` | Podium d'une partie terminée ou interrompue |
+| `/scores` | Historique « Tes scores » |
+| `/reglages` | Réglages |
 | `/a-propos` | Mentions légales, crédits, version |
 
 Toutes les adresses sont construites par `src/routes.ts`. Depuis la partie, les écrans de règles, cartes, mise en place et tour s'ouvrent avec `?depuis=partie` : le retour mène à la partie. Un groupe, un jeu ou une page inconnus affichent « introuvable ».
@@ -380,7 +407,7 @@ Aucune collecte en v1, aucun compte, pas de tracking. Si des statistiques sont a
 
 ## 11. Critères d'acceptation
 
-- [x] Chaque écran de Trio est **conforme à sa maquette, mesuré** : moins de 1 % de pixels différents (`e2e/maquettes.spec.ts`), écarts assumés listés en 7.10.
+- [x] Chaque écran de Trio et de Love Letter est **conforme à sa maquette, mesuré** : moins de 1 % de pixels différents (`e2e/maquettes.spec.ts`), écarts assumés listés en 7.10.
 - [x] Chaque écran tient sans défilement vertical à 390 × 844 et 393 × 852 (test automatisé).
 - [x] Le mode de lecture se choisit après le jeu, jamais à l'accueil.
 - [ ] Aucune couleur / rayon / espacement / taille de texte en dur (test automatisé vert).
@@ -412,14 +439,14 @@ Types, schéma JSON, chargement des jeux (`import.meta.glob`), plan du paquet (`
 Page du jeu, tutoriel (Tes cartes en deux modes, vue à balayer, mise en place, un tour), règles complètes, partie en cours, trios gagnés, plus « Qui joue ? ». Charte v6 (ombres de tapis, carte fantôme, voile, rayon 16). **Test de fidélité pixel à pixel** aux maquettes.
 
 **Jalon 5 : second jeu et finitions** *(en partie)*
-Fait : page À propos et mentions légales, états vides, erreur et premier lancement. Reste : second jeu (Love Letter, avec ses maquettes), accessibilité à auditer sur appareil, performances (Lighthouse), maquette de l'accueil.
+Fait : page À propos et mentions légales, états vides, erreur et premier lancement ; **second jeu, Love Letter** (manches, podium, historique, réglages, accueil « Tes jeux » avec onglets, recherche et filtres), **moteur généralisé** (liste exacte de cartes, retrait « tout le reste », schéma de mise en place libre, scoring par jeu). Reste : accessibilité à auditer sur appareil, performances (Lighthouse).
 
 **Jalon 6 : publication**
 Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capacitor/assets`), vérification des droits (voir section 6), puis, si décidé : builds Android et iOS, fiches et captures de stores, plugin d'écran maintenu allumé.
 
 ### Prompt de démarrage conseillé pour Claude Code
 
-> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (second jeu). Utilise `charte/mastercards-charte.json` comme seule source des tokens et les images de `maquettes/trio/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
+> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (finitions) ou ajoute un troisième jeu. Utilise `charte/mastercards-charte.json` comme seule source des tokens et les images de `maquettes/<jeu>/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
 
 ---
 
@@ -435,9 +462,12 @@ Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capa
 8. Hébergement web et nom de domaine.
 9. Identifiant d'application définitif (`io.mastercards.app` est provisoire) : à fixer avant toute publication sur un store.
 10. Prérendu statique des pages par jeu pour le référencement : nécessaire ou non ?
-11. Love Letter : comment représenter les cartes avec un paquet de 52 ? Le modèle limite chaque rang à 4 cartes ; il faudra décider quelles cartes jouent le rôle de chaque personnage.
+11. ~~Love Letter : comment représenter les cartes avec un paquet de 52 ?~~ *Tranché : 6 Gardes = 4 valets + 2 rois noirs, 17 cartes (7.10).*
 12. Relecture éditoriale de Trio : les textes viennent des maquettes ; cinq textes de la vue à balayer (A, 2 à 6, 8 à 10, Valet, Dame) ont été rédigés sur le même modèle. « Un tour » (maquette) dit « puis une deuxième » alors qu'on peut retourner jusqu'à trois cartes : à confirmer.
 13. Durée de Trio : « environ 15 minutes » d'après l'éditeur et les revendeurs, une source indique 15 à 20 minutes.
-14. Maquette de l'**accueil** (la liste des jeux) : elle n'a pas été fournie, l'accueil actuel est provisoire.
+14. ~~Maquette de l'accueil~~ *Fournie avec la galerie Love Letter (« Tes jeux »), réalisée.* Reste à valider : les filtres « 2–4 joueurs » et « Rapide », que la maquette ne définit pas.
 15. Écran **« Qui joue ? »** (ajouté, sans maquette) : à valider ou à remplacer par la maquette.
-16. Les maquettes d'un **second jeu** (Love Letter) : le modèle suppose un `display`, une carte d'origine et un pouvoir par groupe.
+16. ~~Maquettes d'un second jeu~~ *Reçues et réalisées (Love Letter).*
+17. Love Letter : relire les textes rédigés par nous (« Fin de manche », « Cas particuliers », sept détails de groupe), et confirmer le jeu à **6 Gardes** (17 cartes) plutôt que 5 (16 cartes).
+18. « Terminer la partie » de Trio mène au podium et à l'historique ; un trio de 7 ou trois trios ne terminent pas la partie tout seuls (pas de `target` pour Trio).
+19. Langues English et Español : affichées grisées dans les Réglages, à traduire ou à retirer.

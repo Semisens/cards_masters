@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { useSession } from './useSession.ts'
 
 const KEY = 'mastercards:session:trio'
-const PARTY = { players: [{ name: 'Léa', trios: 2 }] }
+const PARTY = { players: [{ name: 'Léa', score: 2 }], round: 1 }
 
 beforeEach(() => window.localStorage.clear())
 

@@ -56,3 +56,12 @@
   outline: medium solid var(--mc-color-blanc-carte);
   outline-offset: 2px;
 }
+
+/* Option pas encore disponible (une langue à venir) : grisée, sans curseur de clic. */
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.input:disabled + .label {
+  opacity: 0.55;
+}

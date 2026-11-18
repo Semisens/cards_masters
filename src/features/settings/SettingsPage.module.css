@@ -1,0 +1,20 @@
+.note {
+  margin-top: calc(var(--mc-space-1) * -1);
+}
+
+.none {
+  margin-top: var(--mc-space-1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mc-space-2);
+  padding: var(--mc-space-1) 0;
+  border-top: calc(var(--mc-space-1) / 4) solid var(--mc-color-bordure);
+}
+
+.spacer {
+  flex: 1;
+}

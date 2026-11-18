@@ -30,7 +30,7 @@ test.describe('PWA (build de production)', () => {
 
   test('fonctionne entièrement hors ligne', async ({ page, context }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: 'MasterCards' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Tes jeux' })).toBeVisible()
 
     // Attend que le service worker soit actif et qu'il contrôle la page.
     await page.evaluate(async () => {
@@ -41,7 +41,7 @@ test.describe('PWA (build de production)', () => {
 
     await context.setOffline(true)
     await page.reload()
-    await expect(page.getByRole('heading', { name: 'MasterCards' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Tes jeux' })).toBeVisible()
     await expect(page.getByRole('link', { name: /Trio/ })).toBeVisible()
 
     // Les polices embarquées sont bien servies depuis le cache.

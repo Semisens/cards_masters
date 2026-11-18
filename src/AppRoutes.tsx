@@ -4,12 +4,15 @@ import { AboutPage } from './features/about/AboutPage.tsx'
 import { CardSwipePage } from './features/cards/CardSwipePage.tsx'
 import { CardsPage } from './features/cards/CardsPage.tsx'
 import { GameDetailPage } from './features/game-detail/GameDetailPage.tsx'
+import { HistoryPage } from './features/history/HistoryPage.tsx'
 import { HomePage } from './features/home/HomePage.tsx'
 import { NotFoundPage } from './features/not-found/NotFoundPage.tsx'
 import { PartyPage } from './features/party/PartyPage.tsx'
 import { ScorePage } from './features/party/ScorePage.tsx'
 import { PlayersPage } from './features/players/PlayersPage.tsx'
+import { ResultsPage } from './features/results/ResultsPage.tsx'
 import { RulesPage } from './features/rules/RulesPage.tsx'
+import { SettingsPage } from './features/settings/SettingsPage.tsx'
 import { SetupPage } from './features/tutorial/SetupPage.tsx'
 import { TurnPage } from './features/tutorial/TurnPage.tsx'
 
@@ -32,6 +35,9 @@ export function AppRoutes() {
       <Route path="/jeu/:gameId/joueurs" element={<PlayersPage />} />
       <Route path="/jeu/:gameId/partie" element={<PartyPage />} />
       <Route path="/jeu/:gameId/partie/scores" element={<ScorePage />} />
+      <Route path="/jeu/:gameId/resultat/:partieId" element={<ResultsPage />} />
+      <Route path="/scores" element={<HistoryPage />} />
+      <Route path="/reglages" element={<SettingsPage />} />
       <Route path="/a-propos" element={<AboutPage />} />
       {DesignSystemPage && (
         <Route

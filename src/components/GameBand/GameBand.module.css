@@ -34,7 +34,7 @@
   margin: var(--mc-space-2) 0 0;
   font-family: var(--game-font);
   font-weight: var(--game-font-weight);
-  font-size: calc(var(--mc-text-min) * 3.5);
+  font-size: calc(var(--mc-text-min) * var(--game-band-size, 3.5));
   line-height: 1.2;
 }
 

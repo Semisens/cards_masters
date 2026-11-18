@@ -1,21 +1,29 @@
-/** Un joueur de la partie en cours et ses trios gagnés. */
+import type { Scoring } from '../data/types.ts'
+
+/** Un joueur de la partie en cours et son score (trios gagnés, jetons…). */
 export interface Player {
   name: string
-  trios: number
+  score: number
 }
 
 export interface Session {
   players: Player[]
+  /** Manche en cours, à partir de 1. Sert aux jeux à manches ; vaut 1 pour les autres. */
+  round: number
 }
 
-export const MAX_TRIOS = 99
+export const MAX_SCORE = 99
+export const MAX_ROUND = 99
 
 /** Clé de stockage de la partie d'un jeu. */
 export const sessionKey = (gameId: string) => `session:${gameId}`
 
+const isCount = (value: unknown, max: number): value is number =>
+  typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= max
+
 /**
  * Relit une partie mémorisée. Renvoie `null` si le texte est absent ou n'a pas la bonne forme :
- * une donnée abîmée ne doit jamais empêcher l'app de démarrer.
+ * une donnée abîmée ne doit jamais empêcher l'app de démarrer. L'ancien format (`trios`, sans manche) est accepté.
  */
 export function parseSession(raw: string | null): Session | null {
   if (!raw) return null
@@ -23,23 +31,62 @@ export function parseSession(raw: string | null): Session | null {
     const data: unknown = JSON.parse(raw)
     if (typeof data !== 'object' || data === null || !Array.isArray((data as { players?: unknown }).players))
       return null
-    const players = (data as { players: unknown[] }).players
+    const { players, round } = data as { players: unknown[]; round?: unknown }
     if (players.length === 0) return null
     const valid: Player[] = []
     for (const item of players) {
       if (typeof item !== 'object' || item === null) return null
-      const { name, trios } = item as { name?: unknown; trios?: unknown }
+      const { name, score, trios } = item as { name?: unknown; score?: unknown; trios?: unknown }
+      const value = score ?? trios
       if (typeof name !== 'string' || name.trim() === '') return null
-      if (typeof trios !== 'number' || !Number.isInteger(trios) || trios < 0 || trios > MAX_TRIOS) return null
-      valid.push({ name, trios })
+      if (!isCount(value, MAX_SCORE)) return null
+      valid.push({ name, score: value })
     }
-    return { players: valid }
+    if (round !== undefined && (!isCount(round, MAX_ROUND) || round < 1)) return null
+    return { players: valid, round: round ?? 1 }
   } catch {
     return null
   }
 }
 
-/** Nouvelle partie : tous les joueurs à zéro. Les noms vides reçoivent un nom par défaut. */
+/** Nouvelle partie : tous les joueurs à zéro, première manche. Les noms vides reçoivent un nom par défaut. */
 export function newSession(names: string[], defaultName: (n: number) => string): Session {
-  return { players: names.map((name, i) => ({ name: name.trim() || defaultName(i + 1), trios: 0 })) }
+  return { players: names.map((name, i) => ({ name: name.trim() || defaultName(i + 1), score: 0 })), round: 1 }
+}
+
+/** Points à atteindre pour gagner avec ce nombre de joueurs, ou `undefined` si le jeu n'a pas de fin automatique. */
+export function winTarget(scoring: Scoring, playerCount: number): number | undefined {
+  return scoring.target?.[String(playerCount)]
+}
+
+/** Vrai si un joueur a atteint le score qui fait gagner la partie. */
+export function hasWinner(session: Session, scoring: Scoring): boolean {
+  const target = winTarget(scoring, session.players.length)
+  return target !== undefined && session.players.some((player) => player.score >= target)
+}
+
+/** Fin de manche : ajoute les points gagnés à chacun (sans dépasser le maximum) et passe à la manche suivante. */
+export function endRound(session: Session, gains: number[]): Session {
+  return {
+    players: session.players.map((player, i) => ({
+      ...player,
+      score: Math.min(MAX_SCORE, player.score + (gains[i] ?? 0)),
+    })),
+    round: Math.min(MAX_ROUND, session.round + 1),
+  }
+}
+
+export interface RankedPlayer extends Player {
+  /** 1 pour le premier. Deux joueurs à égalité ont le même rang. */
+  rank: number
+}
+
+/** Classement par score décroissant. Les égalités gardent l'ordre de la partie et partagent le même rang. */
+export function rankPlayers(players: Player[]): RankedPlayer[] {
+  const sorted = [...players].sort((a, b) => b.score - a.score)
+  let rank = 0
+  return sorted.map((player, i) => {
+    if (i === 0 || player.score !== sorted[i - 1].score) rank = i + 1
+    return { ...player, rank }
+  })
 }

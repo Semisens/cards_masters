@@ -1,34 +1,18 @@
-import { useId } from 'react'
 import type { ReadingMode } from '../../data/types.ts'
 import { fr } from '../../i18n/fr.ts'
-import styles from './ModeToggle.module.css'
+import { Segmented } from '../Segmented/Segmented.tsx'
 
 export interface ModeToggleProps {
   mode: ReadingMode
   onChange: (mode: ReadingMode) => void
 }
 
-const OPTIONS: ReadingMode[] = ['classic', 'expert']
+const OPTIONS = [
+  { value: 'classic', label: fr.mode.classic },
+  { value: 'expert', label: fr.mode.expert },
+] as const
 
-/** Bascule Classique / Connaisseur. De vrais boutons radio : clavier et lecteur d'écran gratuits. */
+/** Bascule Classique / Connaisseur. */
 export function ModeToggle({ mode, onChange }: ModeToggleProps) {
-  const name = useId()
-  return (
-    <fieldset className={styles.toggle}>
-      <legend className={styles.legend}>{fr.mode.legend}</legend>
-      {OPTIONS.map((option) => (
-        <label key={option} className={styles.option}>
-          <input
-            className={styles.input}
-            type="radio"
-            name={name}
-            value={option}
-            checked={mode === option}
-            onChange={() => onChange(option)}
-          />
-          <span className={styles.label}>{fr.mode[option]}</span>
-        </label>
-      ))}
-    </fieldset>
-  )
+  return <Segmented legend={fr.mode.legend} options={[...OPTIONS]} value={mode} onChange={onChange} />
 }

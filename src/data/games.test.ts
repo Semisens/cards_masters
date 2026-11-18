@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import schema from '../content/game.schema.json'
 import { SUITS, isRedSuit } from '../core/cards.ts'
 import { contrastRatio, MIN_CONTRAST } from '../core/contrast.ts'
-import { FULL_DECK, deckPlan, removalList } from './deck.ts'
+import { FULL_DECK, deckPlan, groupCards, removalList } from './deck.ts'
 import { gameFiles, games, getGame, logoUrl } from './games.ts'
 import { resolveGameTheme } from './theme.ts'
 import type { Game } from './types.ts'
@@ -47,8 +47,7 @@ const classicTexts = (game: Game): string[] => [
   game.description,
   ...game.card_groups.flatMap((g) => [g.label, g.short, g.badge ?? '', g.detail.title, g.detail.text]),
   game.tutorial.setup.title,
-  game.tutorial.setup.hand,
-  game.tutorial.setup.center,
+  ...game.tutorial.setup.diagram.map((item) => item.label),
   ...game.tutorial.setup.steps,
   game.tutorial.turn.title,
   ...game.tutorial.turn.steps.flatMap((s) => [s.label, s.text]),
@@ -136,15 +135,29 @@ describe.each(games.map((game) => [game.id, game] as const))('jeu « %s »', (id
 
     it('ont un nombre de cartes égal aux rangs x couleurs listées', () => {
       for (const group of game.card_groups) {
-        if (group.suits) expect(group.count, group.label).toBe(group.ranks.length * group.suits.length)
+        const cards = groupCards(group)
+        if (cards) expect(group.count, group.label).toBe(cards.length)
         else expect(group.count, group.label).toBeLessThanOrEqual(group.ranks.length * SUITS.length)
       }
+    })
+
+    it('listent des rangs qui correspondent à leur liste exacte de cartes', () => {
+      for (const group of game.card_groups.filter((g) => g.cards)) {
+        expect(group.suits, group.label).toBeUndefined()
+        expect(new Set(group.cards!.map((c) => c.rank)), group.label).toEqual(new Set(group.ranks))
+      }
+    })
+
+    it('ne gardent jamais deux fois la même carte', () => {
+      const cards = game.card_groups.flatMap((g) => groupCards(g) ?? []).map((c) => `${c.rank}-${c.suit}`)
+      expect(new Set(cards).size).toBe(cards.length)
     })
 
     it('montrent une carte qui fait partie du groupe', () => {
       for (const group of game.card_groups) {
         expect(group.ranks, group.label).toContain(group.display.rank)
-        if (group.suits) expect(group.suits, group.label).toContain(group.display.suit)
+        const cards = groupCards(group)
+        if (cards) expect(cards, group.label).toContainEqual({ rank: group.display.rank, suit: group.display.suit })
       }
     })
 
@@ -202,6 +215,7 @@ describe('Trio', () => {
     expect(plan.removedRanks).toEqual(['K'])
     expect(plan.keptSuits).toEqual(['spades', 'hearts', 'clubs'])
     expect(removalList(plan)).toBe('les carreaux et les rois')
+    expect(plan.removalMode).toBe('list')
   })
 
   it('numérote les valeurs d’origine de 1 à 12', () => {
@@ -242,8 +256,7 @@ describe('Trio', () => {
   it('reprend les textes de la maquette mot pour mot', () => {
     expect(trio.tagline).toBe('Trouve trois cartes identiques.')
     expect(trio.tutorial.turn.win.text).toBe('Réunis 3 trios. Ou le trio de 7.')
-    expect(trio.tutorial.setup.hand).toBe('Ta main, triée')
-    expect(trio.tutorial.setup.center).toBe('Au centre, cachées')
+    expect(trio.tutorial.setup.diagram.map((item) => item.label)).toEqual(['Ta main, triée', 'Au centre, cachées'])
     expect(trio.full_rules.map((s) => s.title)).toEqual([
       'But',
       'Mise en place',
@@ -256,5 +269,98 @@ describe('Trio', () => {
 
   it('ne laisse aucun texte provisoire de la maquette', () => {
     expect(allTexts(trio).join('\n')).not.toMatch(/à détailler|\[|\]/i)
+  })
+})
+
+describe('Love Letter', () => {
+  const ll = getGame('love-letter')!
+  const plan = deckPlan(ll)
+
+  it('regroupe les cartes comme la maquette : 8 lignes, les Gardes en premier', () => {
+    expect(ll.card_groups.map((g) => g.label)).toEqual(['Valets et rois noirs', '2', '3', '4', '5', '6', '7', '8'])
+    expect(ll.card_groups.map((g) => g.count)).toEqual([6, 2, 2, 2, 2, 1, 1, 1])
+  })
+
+  it('garde 17 cartes : 6 Gardes (4 valets, 2 rois noirs) et 11 autres', () => {
+    expect(plan.keptTotal).toBe(17)
+    const guards = groupCards(ll.card_groups[0])!
+    expect(guards.filter((c) => c.rank === 'J')).toHaveLength(4)
+    expect(guards.filter((c) => c.rank === 'K').map((c) => c.suit)).toEqual(['spades', 'clubs'])
+  })
+
+  it('dit « Retire tout le reste » : les cartes gardées ne forment pas des couleurs et valeurs entières', () => {
+    expect(plan.removalMode).toBe('keepOnly')
+  })
+
+  it('numérote les personnages d’origine de 1 à 8, avec leur nom', () => {
+    expect(ll.card_groups.map((g) => g.expert.original)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8'])
+    expect(ll.card_groups.map((g) => g.expert.name)).toEqual([
+      'Garde',
+      'Prêtre',
+      'Baron',
+      'Servante',
+      'Prince',
+      'Roi',
+      'Comtesse',
+      'Princesse',
+    ])
+  })
+
+  it('alterne cartes rouges et noires dans la liste, comme la maquette', () => {
+    expect(ll.card_groups.map((g) => isRedSuit(g.display.suit))).toEqual([
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+    ])
+  })
+
+  it('se joue en manches, jusqu’à 7, 5 ou 4 jetons selon 2, 3 ou 4 joueurs', () => {
+    expect(ll.scoring.rounds).toBe(true)
+    expect(ll.scoring.target).toEqual({ '2': 7, '3': 5, '4': 4 })
+    expect(ll.players).toEqual({ min: 2, max: 4 })
+    expect(ll.duration_min).toBe(20)
+  })
+
+  it('reprend les textes de la maquette mot pour mot', () => {
+    expect(ll.tagline).toBe('Une lettre. Une princesse. Un seul gagnant.')
+    expect(ll.tutorial.turn.win.title).toBe('Gagner la manche')
+    expect(ll.tutorial.setup.diagram.map((item) => item.label)).toEqual([
+      'Pioche',
+      'Écartée, cachée',
+      'Visibles (2 joueurs)',
+    ])
+    expect(ll.card_groups.slice(1).map((g) => g.short)).toEqual([
+      'Regarde sa main.',
+      'Compare. La plus faible sort.',
+      'Tu es protégé un tour.',
+      'Un joueur défausse sa carte.',
+      'Échange ta main.',
+      'À jouer avec le 5 ou le 6.',
+      'Si tu la défausses, tu sors.',
+    ])
+    expect(ll.full_rules.map((s) => s.title)).toEqual([
+      'But',
+      'Mise en place',
+      'Un tour',
+      'Fin de manche',
+      'Cas particuliers',
+    ])
+  })
+
+  it('annonce 17 cartes dans la mise en place, comme le paquet', () => {
+    expect(ll.tutorial.setup.steps[0]).toBe('Mélange les 17 cartes.')
+  })
+
+  it('ne laisse aucun texte provisoire de la maquette', () => {
+    expect(allTexts(ll).join('\n')).not.toMatch(/\[|\]/)
+  })
+
+  it('écrit « Carte 2 / 8 » dans la vue à balayer', () => {
+    expect(ll.group_word).toBe('Carte')
   })
 })

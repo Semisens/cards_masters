@@ -12,11 +12,16 @@ describe('ScoreStepper', () => {
 
   it('ajoute et retire un trio', async () => {
     const onChange = vi.fn()
-    render(<ScoreStepper name="Léa" value={2} onChange={onChange} />)
+    render(<ScoreStepper name="Léa" unit="trio" value={2} onChange={onChange} />)
     await userEvent.click(screen.getByRole('button', { name: 'Un trio de plus pour Léa' }))
     expect(onChange).toHaveBeenLastCalledWith(3)
     await userEvent.click(screen.getByRole('button', { name: 'Un trio de moins pour Léa' }))
     expect(onChange).toHaveBeenLastCalledWith(1)
+  })
+
+  it('parle de points par défaut', () => {
+    render(<ScoreStepper name="Léa" value={2} onChange={() => {}} />)
+    expect(screen.getByRole('button', { name: 'Un point de plus pour Léa' })).toBeInTheDocument()
   })
 
   it('ne descend pas sous le minimum', () => {

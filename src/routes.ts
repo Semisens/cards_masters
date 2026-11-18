@@ -10,7 +10,10 @@
  *   /jeu/:id/tutoriel/tour              un tour de jeu
  *   /jeu/:id/joueurs                    qui joue ?
  *   /jeu/:id/partie                     partie en cours
- *   /jeu/:id/partie/scores              trios gagnés
+ *   /jeu/:id/partie/scores              saisie des scores (trios gagnés, fin de manche)
+ *   /jeu/:id/resultat/:partieId         podium d'une partie terminée ou interrompue
+ *   /scores                             historique des parties
+ *   /reglages                           réglages
  *   /a-propos                           mentions légales
  *
  * Depuis « Partie en cours », les tuiles ouvrent règles, cartes, mise en place et tour avec `?depuis=partie` :
@@ -32,4 +35,7 @@ export const paths = {
   players: (id: string) => `/jeu/${id}/joueurs`,
   party: (id: string) => `/jeu/${id}/partie`,
   scores: (id: string) => `/jeu/${id}/partie/scores`,
+  results: (id: string, partyId: string) => `/jeu/${id}/resultat/${partyId}`,
+  history: () => '/scores',
+  settings: () => '/reglages',
 }

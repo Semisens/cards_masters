@@ -21,3 +21,9 @@
   border-radius: var(--mc-card-radius);
   background: var(--mc-color-nuit);
 }
+
+/* La carte visible est centrée comme les dos de carte, sans la ligne vide que laisse un élément « en ligne ». */
+.face {
+  display: flex;
+  justify-content: center;
+}

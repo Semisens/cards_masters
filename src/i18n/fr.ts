@@ -13,17 +13,47 @@ export const fr = {
     play: 'Jouer',
     finish: 'Terminer',
   },
+  tabs: {
+    label: 'Navigation principale',
+    games: 'Jeux',
+    scores: 'Scores',
+    settings: 'Réglages',
+  },
   home: {
-    title: 'MasterCards',
-    lead: 'Joue à tes jeux de société avec un simple paquet de 52 cartes.',
-    gamesTitle: 'Choisis ton jeu',
-    about: 'À propos',
+    title: 'Tes jeux',
+    searchLabel: 'Recherche',
+    searchPlaceholder: 'Un jeu, un titre…',
+    filtersLabel: 'Filtres',
+    filterAll: 'Tous',
+    filterSmall: '2–4 joueurs',
+    filterQuick: 'Rapide',
     emptyTitle: 'Aucun jeu pour le moment',
     emptyText: 'Les jeux arrivent bientôt. Reviens vite !',
+    noMatchTitle: 'Aucun jeu trouvé',
+    noMatchText: 'Essaie un autre mot, ou choisis « Tous ».',
     welcomeTitle: 'Bienvenue !',
     welcomeText:
       'Choisis un jeu. Tu découvres ses cartes en mode Classique, ou en mode Connaisseur pour faire le lien avec le jeu d’origine.',
     welcomeDismiss: 'C’est compris',
+  },
+  history: {
+    title: 'Tes scores',
+    games: (count: number) => `${count} ${count > 1 ? 'parties' : 'partie'}`,
+    finished: 'Terminée',
+    interrupted: 'Interrompue',
+    emptyTitle: 'Aucune partie pour le moment',
+    emptyText: 'Tes parties apparaîtront ici quand tu les auras terminées.',
+    open: (name: string) => `Voir les parties de ${name}`,
+  },
+  settings: {
+    title: 'Réglages',
+    language: 'Langue de l’app',
+    languageSoon: 'English et Español arrivent bientôt.',
+    tutorials: 'Tutoriels passés',
+    tutorialsNone: 'Aucun tutoriel passé pour l’instant.',
+    reactivate: 'Réactiver',
+    reactivateFor: (name: string) => `Réactiver le tutoriel de ${name}`,
+    about: 'À propos',
   },
   mode: {
     legend: 'Mode de lecture',
@@ -46,16 +76,19 @@ export const fr = {
     remove: (list: string) => `Retire ${list}.`,
     keep: (count: number) => `Garde ${plural(count, 'carte', 'cartes')}.`,
     keepAll: 'Garde tout le paquet.',
+    /** Quand les cartes à retirer ne se disent pas en une liste (couleurs et valeurs entières). */
+    keepOnly: (count: number) => `Garde ces ${plural(count, 'carte', 'cartes')}. Retire tout le reste du paquet.`,
     /** Titre d'une ligne en mode connaisseur : « 2–6 → 2 à 6 ». */
     mapped: (original: string, label: string) => `${original} → ${label}`,
     /** Sous le titre d'une ligne : « ×15 · Valent 2 à 6. ». */
     countAndShort: (count: number, short: string) => `×${count} · ${short}`,
-    groupCounter: (current: number, total: number) => `Groupe ${current} / ${total}`,
+    groupCounter: (word: string, current: number, total: number) => `${word} ${current} / ${total}`,
+    groupWord: 'Groupe',
     previousGroup: 'Groupe précédent',
     nextGroup: 'Groupe suivant',
     /** Ligne grise de la vue à balayer en mode connaisseur. */
-    expertNote: (original: string, several: boolean, power?: string) =>
-      `Mode connaisseur : ${several ? 'cartes' : 'carte'} ${original} du jeu d’origine.${power ? ` Pouvoir d’origine : ${power}` : ''}`,
+    expertNote: (original: string, several: boolean, power?: string, name?: string) =>
+      `Mode connaisseur : ${name ?? `${several ? 'cartes' : 'carte'} ${original} du jeu d’origine`}.${power ? ` Pouvoir d’origine : ${power}${/[.!?]$/.test(power) ? '' : '.'}` : ''}`,
     dots: 'Position dans les groupes de cartes',
   },
   rules: {
@@ -63,7 +96,6 @@ export const fr = {
   },
   party: {
     title: 'Partie en cours',
-    scoreLabel: 'Trios gagnés',
     rules: 'Règles',
     setup: 'Mise en place',
     cards: 'Cartes',
@@ -72,10 +104,16 @@ export const fr = {
     end: 'Terminer la partie',
     players: 'Joueurs de la partie',
   },
-  scores: {
-    title: 'Trios gagnés',
-    question: 'Qui a gagné un trio ?',
-    validate: 'Valider',
+  results: {
+    finished: 'Partie terminée',
+    interrupted: 'Partie interrompue',
+    title: 'Podium',
+    /** Rang de la liste sous le podium : « 4e ». */
+    place: (rank: number) => (rank === 1 ? '1er' : `${rank}e`),
+    seeHistory: 'Voir l’historique',
+    backToGames: 'Retour aux jeux',
+    notFound: 'Cette partie est introuvable.',
+    podium: 'Podium des joueurs',
   },
   players: {
     title: 'Qui joue ?',

@@ -121,11 +121,24 @@
       }
     }
   ],
+  "scoring": {
+    "rounds": false,
+    "unit": "trio",
+    "title": "Trios gagnés",
+    "question": "Qui a gagné un trio ?",
+    "validate": "Valider"
+  },
   "tutorial": {
     "setup": {
       "title": "Mise en place",
-      "hand": "Ta main, triée",
-      "center": "Au centre, cachées",
+      "diagram": [
+        {
+          "label": "Ta main, triée"
+        },
+        {
+          "label": "Au centre, cachées"
+        }
+      ],
       "steps": [
         "Mélange les 36 cartes.",
         "Donne 9, 7, 6 ou 5 cartes par joueur (3, 4, 5 ou 6 joueurs).",

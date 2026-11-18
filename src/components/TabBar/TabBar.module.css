@@ -1,0 +1,36 @@
+/* La barre est sur fond blanc, arrondie en haut, collée au bas de l'écran. Elle tient compte de la zone sûre. */
+.bar {
+  display: flex;
+  gap: var(--mc-space-1);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--mc-text-min) * 32);
+  margin: 0 auto;
+  padding: var(--mc-space-1) var(--mc-space-2) max(var(--mc-space-3), env(safe-area-inset-bottom));
+  border-radius: var(--mc-radius-l) var(--mc-radius-l) 0 0;
+  background: var(--mc-card-face);
+}
+
+.tab {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--mc-space-1) / 4);
+  min-height: calc(var(--mc-touch-min) * 1.25);
+  border-radius: var(--mc-radius-ligne);
+  color: var(--mc-color-nuit);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.active {
+  background: var(--mc-color-soleil);
+  color: var(--mc-color-nuit);
+}
+
+.tab:focus-visible {
+  outline: medium solid var(--mc-color-nuit);
+  outline-offset: 2px;
+}

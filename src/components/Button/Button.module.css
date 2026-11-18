@@ -97,3 +97,15 @@
   --btn-fg: var(--mc-color-nuit);
   --btn-shadow: var(--mc-color-bordure);
 }
+
+/* Petit bouton des lignes de liste : 44 px de haut, texte de 16 px, relief de 4 px. */
+.compact {
+  min-height: var(--mc-touch-min);
+  border-radius: var(--mc-radius-ligne);
+  font-size: var(--mc-text-min);
+  box-shadow: 0 var(--mc-elevation-s) 0 var(--btn-shadow);
+}
+
+.compact:active:not(:disabled) {
+  transform: translateY(var(--mc-elevation-s));
+}

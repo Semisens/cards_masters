@@ -22,7 +22,9 @@ test.describe('parcours Trio', () => {
     await page.goto('/')
     await page.getByRole('button', { name: 'C’est compris' }).click()
     // Pas de choix de mode à l'accueil : il se fait dans « Tes cartes ».
-    await expect(page.getByRole('radio')).toHaveCount(0)
+    // Les pastilles de filtre sont des radios : le mode de lecture, lui, ne se choisit pas ici.
+    await expect(page.getByRole('radio', { name: 'Classique' })).toHaveCount(0)
+    await expect(page.getByRole('radio', { name: 'Connaisseur' })).toHaveCount(0)
     await page.getByRole('link', { name: /Trio/ }).click()
 
     await expect(page).toHaveURL(/\/jeu\/trio$/)
@@ -73,9 +75,9 @@ test.describe('parcours Trio', () => {
           'mastercards:session:trio',
           JSON.stringify({
             players: [
-              { name: 'Léa', trios: 2 },
-              { name: 'Tom', trios: 1 },
-              { name: 'Inès', trios: 0 },
+              { name: 'Léa', score: 2 },
+              { name: 'Tom', score: 1 },
+              { name: 'Inès', score: 0 },
             ],
           }),
         )
@@ -86,8 +88,10 @@ test.describe('parcours Trio', () => {
     await expect(page.getByRole('img', { name: 'Léa : 2' })).toBeVisible()
 
     await page.getByRole('button', { name: 'Terminer la partie' }).click()
-    await expect(page).toHaveURL(/\/jeu\/trio$/)
+    await expect(page).toHaveURL(/\/jeu\/trio\/resultat\/\d+$/)
+    await expect(page.getByText('Partie interrompue')).toBeVisible()
     expect(await page.evaluate(() => window.localStorage.getItem('mastercards:session:trio'))).toBeNull()
+    expect(await page.evaluate(() => window.localStorage.getItem('mastercards:history'))).toContain('"interrupted"')
   })
 
   test('les raccourcis de la partie y ramènent', async ({ page }) => {
@@ -96,9 +100,9 @@ test.describe('parcours Trio', () => {
         'mastercards:session:trio',
         JSON.stringify({
           players: [
-            { name: 'Léa', trios: 0 },
-            { name: 'Tom', trios: 0 },
-            { name: 'Inès', trios: 0 },
+            { name: 'Léa', score: 0 },
+            { name: 'Tom', score: 0 },
+            { name: 'Inès', score: 0 },
           ],
         }),
       ),
@@ -200,5 +204,128 @@ test.describe('hors ligne', () => {
       return [document.fonts.check('700 16px Fredoka'), document.fonts.check('700 16px Nunito')]
     })
     expect(fonts).toEqual([true, true])
+  })
+})
+
+test.describe('parcours Love Letter', () => {
+  test.beforeEach(async ({ page }) => {
+    // Une seule fois par test : sans cette garde, chaque navigation effacerait ce que l'app a mémorisé.
+    await page.addInitScript(() => {
+      if (window.sessionStorage.getItem('test-init')) return
+      window.sessionStorage.setItem('test-init', '1')
+      window.localStorage.clear()
+      window.localStorage.setItem('mastercards:welcomed', '1')
+    })
+  })
+
+  test('du choix du jeu au podium, en manches, puis l’historique et les réglages', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: /Love Letter/ }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Love Letter' })).toBeVisible()
+    await page.getByRole('link', { name: 'Jouer' }).click()
+
+    // Tes cartes : 17 cartes, 8 groupes, le mode connaisseur donne les noms d'origine.
+    await expect(page.getByText('Garde ces 17 cartes. Retire tout le reste du paquet.')).toBeVisible()
+    await page.getByRole('radio', { name: 'Connaisseur' }).check()
+    await expect(page.getByText('Prêtre')).toBeVisible()
+    await page.getByRole('radio', { name: 'Classique' }).check()
+    await page.getByRole('link', { name: /Valets et rois noirs/ }).click()
+    await expect(page.getByText('Carte 1 / 8')).toBeVisible()
+    await page.getByRole('link', { name: /Retour/ }).click()
+
+    // Le tutoriel jusqu'au bout.
+    await page.getByRole('link', { name: 'Suivant' }).click()
+    await expect(page.getByText('Visibles (2 joueurs)')).toBeVisible()
+    await page.getByRole('link', { name: 'Suivant' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Un tour de jeu' })).toBeVisible()
+    await page.getByRole('link', { name: 'Jouer' }).click()
+
+    // Deux joueurs : le score visé est 7. On joue deux manches.
+    await page.getByRole('textbox', { name: 'Prénom du joueur 1' }).fill('Léa')
+    await page.getByRole('textbox', { name: 'Prénom du joueur 2' }).fill('Tom')
+    await page.getByRole('button', { name: 'C’est parti' }).click()
+    await expect(page.getByText('Manche 1')).toBeVisible()
+    await page.getByRole('link', { name: 'Noter les scores' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Fin de la manche 1' })).toBeVisible()
+    await page.getByRole('button', { name: 'Un point de plus pour Léa' }).click()
+    await page.getByRole('button', { name: 'Valider la manche' }).click()
+    await expect(page.getByText('Manche 2')).toBeVisible()
+    await expect(page.getByRole('img', { name: 'Léa : 1' })).toBeVisible()
+
+    // Une partie interrompue arrive dans l'historique.
+    await page.getByRole('button', { name: 'Terminer la partie' }).click()
+    await expect(page.getByText('Partie interrompue')).toBeVisible()
+    await page.getByRole('link', { name: 'Voir l’historique' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Tes scores' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Love Letter.*1 partie/ })).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByText('Interrompue')).toBeVisible()
+
+    // Le tutoriel est passé : il se réactive dans les réglages, et « Jouer » y retourne.
+    await page.getByRole('link', { name: 'Réglages' }).click()
+    await page.getByRole('button', { name: 'Réactiver le tutoriel de Love Letter' }).click()
+    await expect(page.getByText('Aucun tutoriel passé pour l’instant.')).toBeVisible()
+  })
+
+  test('« Jouer » saute le tutoriel une fois passé', async ({ page }) => {
+    await page.goto('/jeu/love-letter/tutoriel/tour')
+    await page.getByRole('link', { name: 'Jouer' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Qui joue ?' })).toBeVisible()
+    await page.goto('/jeu/love-letter')
+    const play = page.getByRole('link', { name: 'Jouer' })
+    await expect(play).toHaveAttribute('href', '/jeu/love-letter/joueurs')
+    await play.click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Qui joue ?' })).toBeVisible()
+  })
+
+  test('la partie se termine d’elle-même au score visé : 7 jetons à deux joueurs', async ({ page }) => {
+    await page.addInitScript(() =>
+      window.localStorage.setItem(
+        'mastercards:session:love-letter',
+        JSON.stringify({
+          players: [
+            { name: 'Léa', score: 6 },
+            { name: 'Tom', score: 3 },
+          ],
+          round: 9,
+        }),
+      ),
+    )
+    await page.goto('/jeu/love-letter/partie/scores')
+    await page.getByRole('button', { name: 'Un point de plus pour Léa' }).click()
+    await page.getByRole('button', { name: 'Valider la manche' }).click()
+    await expect(page.getByText('Partie terminée')).toBeVisible()
+    await expect(page.getByRole('list', { name: 'Podium des joueurs' })).toContainText('Léa')
+  })
+
+  test('la recherche et les filtres de l’accueil', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('searchbox', { name: 'Recherche' }).fill('trio')
+    await expect(page.getByRole('link', { name: /Love Letter/ })).toHaveCount(0)
+    await page.getByRole('searchbox', { name: 'Recherche' }).fill('')
+    await page.getByRole('radio', { name: 'Rapide' }).check()
+    await expect(page.getByRole('link', { name: /Love Letter/ })).toHaveCount(0)
+    await expect(page.getByRole('link', { name: /Trio/ })).toBeVisible()
+  })
+
+  test('Love Letter se lit sans réseau', async ({ page, context }) => {
+    await page.goto('/')
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready
+    })
+    await page.reload()
+    await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true)
+    await context.setOffline(true)
+    await page.goto('/jeu/love-letter/tutoriel/cartes')
+    await expect(page.getByText('Garde ces 17 cartes. Retire tout le reste du paquet.')).toBeVisible()
+    await page.goto('/scores')
+    await expect(page.getByRole('heading', { level: 1, name: 'Tes scores' })).toBeVisible()
+    // La calligraphie du nom (Great Vibes) est servie depuis le cache, elle aussi.
+    await page.goto('/jeu/love-letter')
+    await expect(page.getByRole('heading', { level: 1, name: 'Love Letter' })).toBeVisible()
+    const fonts = await page.evaluate(async () => {
+      await document.fonts.ready
+      return document.fonts.check('400 64px "Great Vibes"')
+    })
+    expect(fonts).toBe(true)
   })
 })

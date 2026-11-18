@@ -19,7 +19,7 @@ export interface CardGroupRowProps {
  */
 export function CardGroupRow({ group, mode, to }: CardGroupRowProps) {
   const expert = mode === 'expert'
-  const title = expert ? fr.cards.mapped(group.expert.original, group.label) : group.label
+  const title = expert ? (group.expert.name ?? fr.cards.mapped(group.expert.original, group.label)) : group.label
   return (
     <Link to={to} className={styles.row}>
       {expert && (

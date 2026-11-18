@@ -4,7 +4,7 @@ import pixelmatch from 'pixelmatch'
 import { PNG } from 'pngjs'
 
 // Fidélité aux maquettes : chaque écran de l'app est comparé, pixel par pixel, à l'image de sa maquette
-// (maquettes/trio/*.png, produites par `npm run maquettes`). Les images d'écart sont écrites dans
+// (maquettes/<jeu>/*.png, produites par `npm run maquettes`). Les images d'écart sont écrites dans
 // test-results/maquettes/ (rouge = pixels différents) : on peut les regarder même quand le test passe.
 
 interface Rect {
@@ -15,6 +15,8 @@ interface Rect {
 }
 
 interface Screen {
+  /** Jeu de la maquette : dossier `maquettes/<jeu>/` et partie mémorisée sous ce nom. */
+  game?: string
   /** Nom du fichier de la maquette, sans extension. */
   name: string
   url: string
@@ -26,23 +28,40 @@ interface Screen {
   why?: string
   mode?: 'classic' | 'expert'
   /** Partie en cours à charger dans l'app. */
-  party?: { players: Array<{ name: string; trios: number }> }
+  party?: Party
+  /** Parties passées à charger dans l'historique. */
+  history?: unknown[]
+  /** Autres valeurs à mémoriser (clés sans le préfixe `mastercards:`). */
+  storage?: Record<string, string>
+  /** Gestes à faire avant la capture (la maquette montre un état qu'on n'a pas au chargement). */
+  act?: (page: Page) => Promise<void>
+}
+
+interface Party {
+  players: Array<{ name: string; score: number }>
+  round: number
 }
 
 // États de l'app qui correspondent à ce que montre chaque maquette (elles ne montrent pas les mêmes scores).
-const PARTY = {
+const PARTY: Party = {
   players: [
-    { name: 'Léa', trios: 2 },
-    { name: 'Tom', trios: 1 },
-    { name: 'Inès', trios: 0 },
+    { name: 'Léa', score: 2 },
+    { name: 'Tom', score: 1 },
+    { name: 'Inès', score: 0 },
   ],
+  round: 3,
 }
-const SCORES = {
+const SCORES: Party = {
   players: [
-    { name: 'Léa', trios: 1 },
-    { name: 'Tom', trios: 0 },
-    { name: 'Inès', trios: 0 },
+    { name: 'Léa', score: 1 },
+    { name: 'Tom', score: 0 },
+    { name: 'Inès', score: 0 },
   ],
+  round: 1,
+}
+/** Love Letter : les compteurs d'une manche partent de zéro ; la maquette montre « Léa 1 », on fait le geste. */
+const ONE_FOR_LEA = async (page: Page) => {
+  await page.getByRole('button', { name: /de plus pour Léa/ }).click()
 }
 
 // Écarts voulus, tous expliqués. Tout le reste doit correspondre à la maquette.
@@ -54,7 +73,7 @@ const MINUS_AT_ZERO: Rect[] = [
   { x: 204, y: 350, w: 48, h: 48 },
 ]
 
-const SCREENS: Screen[] = [
+const TRIO_SCREENS: Screen[] = [
   { name: '01-game-detail', url: '/jeu/trio', max: 0.005 },
   { name: '02-cartes-classique', url: '/jeu/trio/tutoriel/cartes', mode: 'classic', max: 0.005 },
   { name: '03-cartes-connaisseur', url: '/jeu/trio/tutoriel/cartes', mode: 'expert', max: 0.005 },
@@ -66,6 +85,87 @@ const SCREENS: Screen[] = [
   { name: '09-scores', url: '/jeu/trio/partie/scores', party: SCORES, masks: MINUS_AT_ZERO, max: 0.01 },
 ]
 
+const LL = '/jeu/love-letter'
+const LOVE_LETTER_SCREENS: Screen[] = [
+  { game: 'love-letter', name: '03-game-detail', url: LL, max: 0.01 },
+  { game: 'love-letter', name: '04-regles-completes', url: `${LL}/regles`, max: 0.01 },
+  { game: 'love-letter', name: '05-cartes-classique', url: `${LL}/tutoriel/cartes`, mode: 'classic', max: 0.01 },
+  { game: 'love-letter', name: '06-cartes-connaisseur', url: `${LL}/tutoriel/cartes`, mode: 'expert', max: 0.01 },
+  { game: 'love-letter', name: '07-carte-swipe', url: `${LL}/tutoriel/cartes/2`, mode: 'expert', max: 0.01 },
+  { game: 'love-letter', name: '08-mise-en-place', url: `${LL}/tutoriel/mise-en-place`, max: 0.01 },
+  { game: 'love-letter', name: '09-un-tour', url: `${LL}/tutoriel/tour`, max: 0.01 },
+  { game: 'love-letter', name: '10-partie', url: `${LL}/partie`, party: PARTY, max: 0.01 },
+  { game: 'love-letter', name: '11-scores', url: `${LL}/partie/scores`, party: PARTY, act: ONE_FOR_LEA, max: 0.01 },
+]
+
+const entry = (id: string, date: string, status: string, players: Array<[string, number]>, gameId = 'love-letter') => ({
+  id,
+  gameId,
+  date,
+  status,
+  players: players.map(([name, score]) => ({ name, score })),
+})
+const PODIUM = [
+  entry('1', '2026-10-12T12:00:00.000Z', 'finished', [
+    ['Léa', 4],
+    ['Tom', 2],
+    ['Inès', 1],
+    ['Sam', 0],
+  ]),
+]
+const HISTORY = [
+  entry('3', '2026-10-12T12:00:00.000Z', 'finished', [
+    ['Léa', 4],
+    ['Tom', 2],
+    ['Inès', 0],
+  ]),
+  entry('2', '2026-10-03T12:00:00.000Z', 'interrupted', [
+    ['Inès', 3],
+    ['Tom', 1],
+    ['Léa', 0],
+  ]),
+  entry('1', '2026-09-28T12:00:00.000Z', 'finished', [
+    ['Léa', 4],
+    ['Sam', 1],
+    ['Tom', 0],
+  ]),
+  entry(
+    '0',
+    '2026-09-01T12:00:00.000Z',
+    'finished',
+    [
+      ['Léa', 3],
+      ['Tom', 1],
+      ['Inès', 0],
+    ],
+    'trio',
+  ),
+]
+
+/** Troisième vignette de l'accueil : un gabarit « [JEU 3] » dans la maquette, qu'on ne publie pas. */
+const GAME_3_TILE: Rect = { x: 24, y: 444, w: 342, h: 96 }
+
+const APP_SCREENS: Screen[] = [
+  { game: 'love-letter', name: '02-accueil', url: '/', masks: [GAME_3_TILE], max: 0.01 },
+  { game: 'love-letter', name: '12-podium-termine', url: `${LL}/resultat/1`, history: PODIUM, max: 0.01 },
+  {
+    game: 'love-letter',
+    name: '13-podium-interrompu',
+    url: `${LL}/resultat/1`,
+    history: [{ ...PODIUM[0], status: 'interrupted' }],
+    max: 0.01,
+  },
+  { game: 'love-letter', name: '14-historique', url: '/scores', history: HISTORY, max: 0.01 },
+  {
+    game: 'love-letter',
+    name: '15-reglages',
+    url: '/reglages',
+    storage: { 'tutorial:love-letter': '1', 'tutorial:trio': '1' },
+    max: 0.01,
+  },
+]
+const SCREENS = [...TRIO_SCREENS, ...LOVE_LETTER_SCREENS, ...APP_SCREENS]
+
 const ready = async (page: Page) => {
   await page.evaluate(async () => {
     await Promise.all([
@@ -73,6 +173,7 @@ const ready = async (page: Page) => {
       document.fonts.load('600 32px Fredoka'),
       document.fonts.load('700 16px Nunito'),
       document.fonts.load('800 16px Nunito'),
+      document.fonts.load('400 64px "Great Vibes"'),
     ])
     await document.fonts.ready
   })
@@ -92,22 +193,28 @@ function blank(png: PNG, rect: Rect) {
 
 test.describe('fidélité aux maquettes', () => {
   for (const screen of SCREENS) {
-    test(screen.name, async ({ page }, testInfo) => {
+    const game = screen.game ?? 'trio'
+    const label = `${game}/${screen.name}`
+    test(label, async ({ page }, testInfo) => {
       await page.addInitScript(
-        ({ mode, party }) => {
+        ({ mode, party, history, game, storage }) => {
           window.localStorage.clear()
           window.localStorage.setItem('mastercards:welcomed', '1')
           if (mode) window.localStorage.setItem('mastercards:mode', mode)
-          if (party) window.localStorage.setItem('mastercards:session:trio', JSON.stringify(party))
+          if (party) window.localStorage.setItem(`mastercards:session:${game}`, JSON.stringify(party))
+          if (history) window.localStorage.setItem('mastercards:history', JSON.stringify(history))
+          for (const [key, value] of Object.entries(storage ?? {}))
+            window.localStorage.setItem(`mastercards:${key}`, value)
         },
-        { mode: screen.mode, party: screen.party },
+        { mode: screen.mode, party: screen.party, history: screen.history, storage: screen.storage, game },
       )
       await page.goto(screen.url)
       await ready(page)
+      await screen.act?.(page)
       await page.waitForTimeout(150)
 
       const actual = PNG.sync.read(await page.screenshot())
-      const expected = PNG.sync.read(readFileSync(`maquettes/trio/${screen.name}.png`))
+      const expected = PNG.sync.read(readFileSync(`maquettes/${game}/${screen.name}.png`))
       expect([actual.width, actual.height], 'même taille que la maquette').toEqual([expected.width, expected.height])
 
       for (const mask of screen.masks ?? []) {
@@ -122,14 +229,12 @@ test.describe('fidélité aux maquettes', () => {
       })
       const ratio = different / (expected.width * expected.height)
 
+      const out = `test-results/maquettes/${game}-${screen.name}`
       mkdirSync('test-results/maquettes', { recursive: true })
-      writeFileSync(`test-results/maquettes/${screen.name}-diff.png`, PNG.sync.write(diff))
-      writeFileSync(
-        `test-results/maquettes/${screen.name}-app.png`,
-        PNG.sync.write(PNG.sync.read(await page.screenshot())),
-      )
+      writeFileSync(`${out}-diff.png`, PNG.sync.write(diff))
+      writeFileSync(`${out}-app.png`, PNG.sync.write(PNG.sync.read(await page.screenshot())))
       testInfo.annotations.push({ type: 'écart', description: `${(ratio * 100).toFixed(2)} % des pixels` })
-      console.log(`${screen.name}: ${(ratio * 100).toFixed(2)} % de pixels différents`)
+      console.log(`${label}: ${(ratio * 100).toFixed(2)} % de pixels différents`)
 
       expect(
         ratio,

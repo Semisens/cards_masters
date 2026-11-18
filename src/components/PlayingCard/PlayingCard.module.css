@@ -71,9 +71,18 @@
   box-shadow: none;
 }
 
+/* Carte visible du schéma de mise en place : 56 x 78 px, cadre de 4 px, estompée pour dire « pas à jouer ». */
+.diagram {
+  aspect-ratio: 1 / var(--mc-card-ratio-list);
+  border: var(--mc-card-frame-focus) solid var(--mc-color-bordure);
+  box-shadow: none;
+  opacity: 0.6;
+}
+
 /* Rang des cartes de la maquette : taille fixe (14 px, 28 px) et décalage de 2 px / 6 px depuis le coin. */
 .list .rank,
-.focus .rank {
+.focus .rank,
+.diagram .rank {
   top: calc(var(--mc-space-1) / 4);
   left: calc(var(--mc-space-1) * 0.75);
 }
@@ -86,8 +95,13 @@
   font-size: calc(var(--mc-text-min) * 1.75);
 }
 
+.diagram .rank {
+  font-size: calc(var(--mc-text-min) * 1.125);
+}
+
 /* Symbole des cartes de la maquette : le glyphe occupe environ la moitié de la largeur, un peu moins que la carte standard. */
 .list .symbol,
-.focus .symbol {
+.focus .symbol,
+.diagram .symbol {
   width: calc(var(--mc-card-symbol-ratio-list) * 100%);
 }

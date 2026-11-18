@@ -1,0 +1,74 @@
+/* Pastille d'état en haut à gauche : verte si la partie est terminée, jaune si elle a été interrompue. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  box-sizing: border-box;
+  min-height: var(--mc-touch-min);
+  padding: 0 var(--mc-space-2);
+  border-radius: calc(var(--mc-touch-min) / 2);
+}
+
+.finished {
+  background: var(--mc-color-prairie);
+  color: var(--mc-text-on-prairie);
+}
+
+.interrupted {
+  background: var(--mc-color-soleil);
+  color: var(--mc-text-on-soleil);
+}
+
+.podium {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--mc-space-1);
+  margin: var(--mc-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.column {
+  flex: 1;
+  text-align: center;
+}
+
+/* Marches : 160, 110 et 70 px de haut. La plus haute est celle du premier. */
+.step {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin-top: var(--mc-space-1);
+  padding-top: var(--mc-space-1);
+  border-radius: var(--mc-radius-ligne) var(--mc-radius-ligne) 0 0;
+  color: var(--mc-color-encre);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--mc-text-min) * 1.75);
+}
+
+.first {
+  height: 10rem;
+  background: var(--mc-color-soleil);
+}
+
+.second {
+  height: 6.875rem;
+  background: var(--mc-card-face);
+}
+
+.third {
+  height: 4.375rem;
+  background: var(--mc-color-azur);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: calc(var(--mc-space-1) * 1.5) 0;
+  border-top: calc(var(--mc-space-1) / 4) solid var(--mc-color-bordure);
+}
+
+.spacer {
+  flex: 1;
+}

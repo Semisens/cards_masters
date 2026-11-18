@@ -1,14 +1,11 @@
 .tile {
   display: flex;
-  align-items: center;
-  gap: var(--mc-space-2);
-  min-height: calc(var(--mc-touch-min) * 2);
-  padding: var(--mc-space-2) var(--mc-space-3);
-  border-radius: var(--mc-radius-l);
-  background: var(--game-bg);
-  color: var(--game-fg);
+  overflow: hidden;
+  border-radius: var(--mc-radius-m);
+  background: var(--mc-card-face);
+  color: var(--mc-color-encre);
   text-decoration: none;
-  box-shadow: 0 var(--mc-elevation-l) 0 var(--game-shadow);
+  box-shadow: 0 var(--mc-elevation-m) 0 var(--mc-color-bordure);
   transition:
     transform 80ms ease-out,
     box-shadow 80ms ease-out;
@@ -16,8 +13,8 @@
 }
 
 .tile:active {
-  transform: translateY(var(--mc-elevation-l));
-  box-shadow: 0 0 0 var(--game-shadow);
+  transform: translateY(var(--mc-elevation-m));
+  box-shadow: 0 0 0 var(--mc-color-bordure);
 }
 
 .tile:focus-visible {
@@ -25,30 +22,43 @@
   outline-offset: 2px;
 }
 
+/* Carré aux couleurs du jeu : l'initiale en Fredoka (le nom en calligraphie ne tiendrait pas), ou le logo. */
+.mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--mc-space-5) * 1.75);
+  background: var(--game-bg);
+  color: var(--game-fg);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  font-size: calc(var(--mc-text-min) * 2.25);
+}
+
+.image {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
+
 .text {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-width: 0;
+  padding: var(--mc-space-2);
 }
 
 .name {
-  font-family: var(--game-font);
-  font-weight: var(--game-font-weight);
-  font-size: calc(var(--mc-text-min) * 1.75);
-  line-height: 1.1;
+  font-family: var(--mc-font-title);
+  font-weight: 600;
+  font-size: calc(var(--mc-text-min) * 1.25);
   overflow-wrap: anywhere;
 }
 
 .meta {
-  font-weight: 700;
-  font-size: var(--mc-text-min);
-}
-
-/* La pioche dépasse de la vignette, un peu penchée. */
-.pile {
-  flex: none;
-  transform: rotate(8deg);
+  color: var(--mc-color-texte-secondaire);
 }
 
 @media (prefers-reduced-motion: reduce) {

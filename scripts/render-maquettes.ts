@@ -1,4 +1,4 @@
-// Rend les maquettes de Trio (maquettes/trio/source/*.dc.html) en images PNG 390 x 844 (x2) dans maquettes/trio/.
+// Rend les maquettes HTML de chaque jeu (maquettes/<jeu>/source/*.html) en images PNG 390 x 844 (x2) dans maquettes/<jeu>/.
 // Ces images sont la référence du test de fidélité (e2e/maquettes.spec.ts).
 // Les polices sont servies depuis les paquets @fontsource de l'app, pas depuis Google Fonts : le rendu est
 // identique à celui de l'app et ne dépend pas du réseau.
@@ -10,8 +10,13 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const sourceDir = join(root, 'maquettes/trio/source')
-const outDir = join(root, 'maquettes/trio')
+const gamesDir = join(root, 'maquettes')
+// Un dossier de maquettes par jeu. `npm run maquettes -- love-letter` n'en rend qu'un.
+const only = process.argv[2]
+const games = readdirSync(gamesDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && existsSync(join(gamesDir, entry.name, 'source')))
+  .map((entry) => entry.name)
+  .filter((name) => !only || name === only)
 
 const FONTS: Array<[family: string, pkg: string, weights: number[]]> = [
   ['Fredoka', 'fredoka', [500, 600, 700]],
@@ -35,8 +40,8 @@ const server = createServer((req, res) => {
     const [pkg, weight] = url.pathname.slice('/__fonts/'.length).replace('.woff2', '').split('-')
     file = fontFile(pkg === 'greatvibes' ? 'great-vibes' : pkg, Number(weight))
   } else {
-    file = join(sourceDir, decodeURIComponent(url.pathname))
-    if (!file.startsWith(sourceDir)) file = ''
+    file = join(gamesDir, decodeURIComponent(url.pathname))
+    if (!file.startsWith(gamesDir)) file = ''
   }
   if (!file || !existsSync(file)) {
     res.writeHead(404).end()
@@ -63,25 +68,29 @@ await context.route('https://fonts.googleapis.com/**', (route) =>
 )
 await context.route('https://fonts.gstatic.com/**', (route) => route.abort())
 
-const pages = readdirSync(sourceDir).filter((f) => f.endsWith('.dc.html'))
-for (const file of pages) {
-  const page = await context.newPage()
-  await page.goto(`http://127.0.0.1:${port}/${file}`)
-  // Le moteur de la maquette dessine l'écran après le chargement : on attend du texte visible, puis les polices.
-  await page.waitForFunction(() => document.body.innerText.trim().length > 0)
-  await page.evaluate(async () => {
-    await Promise.all([
-      document.fonts.load('700 16px Fredoka'),
-      document.fonts.load('600 32px Fredoka'),
-      document.fonts.load('700 16px Nunito'),
-      document.fonts.load('800 16px Nunito'),
-    ])
-    await document.fonts.ready
-  })
-  const name = file.replace('.dc.html', '')
-  await page.screenshot({ path: join(outDir, `${name}.png`), clip: { x: 0, y: 0, width: 390, height: 844 } })
-  console.log(`maquette : ${name}.png`)
-  await page.close()
+for (const game of games) {
+  const sourceDir = join(gamesDir, game, 'source')
+  const pages = readdirSync(sourceDir).filter((f) => f.endsWith('.html'))
+  for (const file of pages) {
+    const page = await context.newPage()
+    await page.goto(`http://127.0.0.1:${port}/${game}/source/${file}`)
+    // Le moteur de la maquette dessine l'écran après le chargement : on attend du texte visible, puis les polices.
+    await page.waitForFunction(() => document.body.innerText.trim().length > 0)
+    await page.evaluate(async () => {
+      await Promise.all([
+        document.fonts.load('700 16px Fredoka'),
+        document.fonts.load('600 32px Fredoka'),
+        document.fonts.load('700 16px Nunito'),
+        document.fonts.load('800 16px Nunito'),
+        document.fonts.load('400 64px "Great Vibes"'),
+      ])
+      await document.fonts.ready
+    })
+    const name = file.replace(/\.(dc\.)?html$/, '')
+    await page.screenshot({ path: join(gamesDir, game, `${name}.png`), clip: { x: 0, y: 0, width: 390, height: 844 } })
+    console.log(`maquette : ${game}/${name}.png`)
+    await page.close()
+  }
 }
 
 await browser.close()

@@ -30,7 +30,12 @@ export function CardsPage() {
 
   const plan = deckPlan(game)
   const removal = removalList(plan)
-  const sentence = removal ? `${fr.cards.remove(removal)} ${fr.cards.keep(plan.keptTotal)}` : fr.cards.keepAll
+  const sentence =
+    plan.removalMode === 'keepOnly'
+      ? fr.cards.keepOnly(plan.keptTotal)
+      : removal
+        ? `${fr.cards.remove(removal)} ${fr.cards.keep(plan.keptTotal)}`
+        : fr.cards.keepAll
 
   return (
     <Screen fixed tight>

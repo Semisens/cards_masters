@@ -37,3 +37,16 @@
 .tight {
   gap: calc(var(--mc-space-1) * 1.5);
 }
+
+/* Écran racine : le contenu prend la hauteur restante au-dessus de la barre d'onglets, sans que la page défile. */
+.withTabs {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.withTabs > .content {
+  flex: 1;
+  min-height: 0;
+}

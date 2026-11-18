@@ -1,0 +1,54 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mc-space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* La légende reste pour les lecteurs d'écran, sans prendre de place. */
+.legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.option {
+  position: relative;
+  display: block;
+}
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: var(--mc-touch-min);
+  padding: 0 var(--mc-space-2);
+  border-radius: calc(var(--mc-touch-min) / 2);
+  background: var(--mc-color-nuit);
+  color: var(--mc-text-on-nuit);
+}
+
+.input:checked + .label {
+  background: var(--mc-color-soleil);
+  color: var(--mc-text-on-soleil);
+}
+
+.input:focus-visible + .label {
+  outline: medium solid var(--mc-color-blanc-carte);
+  outline-offset: 2px;
+}

@@ -14,6 +14,7 @@
     "players",
     "duration_min",
     "card_groups",
+    "scoring",
     "tutorial",
     "full_rules"
   ],
@@ -99,6 +100,64 @@
         "$ref": "#/$defs/cardGroup"
       }
     },
+    "group_word": {
+      "description": "Mot de la vue à balayer : « Groupe 3 / 6 » (défaut) ou « Carte 2 / 8 ».",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 12
+    },
+    "scoring": {
+      "description": "Comment la partie se marque : mots du jeu, manches, points à atteindre.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rounds", "unit", "title", "question", "validate"],
+      "properties": {
+        "rounds": {
+          "description": "Vrai : la partie se joue en manches ; on note les points gagnés à chaque manche.",
+          "type": "boolean"
+        },
+        "unit": {
+          "description": "Ce qu'on compte, au singulier : « trio », « point ». Sert aux libellés des boutons − et +.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "title": {
+          "description": "Titre de l'écran de saisie. {round} est remplacé par le numéro de manche.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "validate": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "round_label": {
+          "description": "Ex. « Manche {round} ». Obligatoire pour un jeu à manches.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "target": {
+          "description": "Points à atteindre pour gagner, selon le nombre de joueurs. Absent : pas de fin automatique.",
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[0-9]{1,2}$"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          }
+        }
+      }
+    },
     "tutorial": {
       "type": "object",
       "additionalProperties": false,
@@ -107,19 +166,42 @@
         "setup": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["title", "hand", "center", "steps"],
+          "required": ["title", "diagram", "steps"],
           "properties": {
             "title": {
               "type": "string",
               "minLength": 1
             },
-            "hand": {
-              "type": "string",
-              "minLength": 1
-            },
-            "center": {
-              "type": "string",
-              "minLength": 1
+            "diagram": {
+              "description": "Schéma de mise en place : un dos de carte par élément, ou une carte visible si `card` est donné.",
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["label"],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 30
+                  },
+                  "card": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["rank", "suit"],
+                    "properties": {
+                      "rank": {
+                        "$ref": "#/$defs/rank"
+                      },
+                      "suit": {
+                        "$ref": "#/$defs/suit"
+                      }
+                    }
+                  }
+                }
+              }
             },
             "steps": {
               "type": "array",
@@ -235,6 +317,29 @@
           "minimum": 1,
           "maximum": 52
         },
+        "cards": {
+          "description": "Liste exacte quand les rangs n'ont pas les mêmes couleurs (ex. 4 valets et 2 rois noirs). Alors `ranks` en est la liste des rangs, `count` le total, et `suits` est absent.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rank", "suits"],
+            "properties": {
+              "rank": {
+                "$ref": "#/$defs/rank"
+              },
+              "suits": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/$defs/suit"
+                }
+              }
+            }
+          }
+        },
         "suits": {
           "description": "Couleurs gardées. Absent : n'importe lesquelles. Si présent, count = rangs x couleurs.",
           "type": "array",
@@ -299,6 +404,12 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 12
+            },
+            "name": {
+              "description": "Nom du personnage ou de la carte d'origine, ex. « Prêtre ». Absent : la ligne dit « 2–6 → 2 à 6 ».",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20
             },
             "power": {
               "description": "Pouvoir ou règle d'origine, en une proposition.",

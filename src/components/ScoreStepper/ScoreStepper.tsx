@@ -6,17 +6,19 @@ export interface ScoreStepperProps {
   onChange: (value: number) => void
   min?: number
   max?: number
+  /** Ce qu'on compte, au singulier : « trio », « point ». Sert aux libellés pour lecteurs d'écran. */
+  unit?: string
 }
 
 /** Ligne de saisie d'un score : le nom du joueur, un bouton −, le nombre, un bouton +. */
-export function ScoreStepper({ name, value, onChange, min = 0, max = 99 }: ScoreStepperProps) {
+export function ScoreStepper({ name, value, onChange, min = 0, max = 99, unit = 'point' }: ScoreStepperProps) {
   return (
     <div className={styles.row}>
       <span className={styles.name}>{name}</span>
       <button
         type="button"
         className={styles.button}
-        aria-label={`Un trio de moins pour ${name}`}
+        aria-label={`Un ${unit} de moins pour ${name}`}
         disabled={value <= min}
         onClick={() => onChange(value - 1)}
       >
@@ -28,7 +30,7 @@ export function ScoreStepper({ name, value, onChange, min = 0, max = 99 }: Score
       <button
         type="button"
         className={styles.button}
-        aria-label={`Un trio de plus pour ${name}`}
+        aria-label={`Un ${unit} de plus pour ${name}`}
         disabled={value >= max}
         onClick={() => onChange(value + 1)}
       >

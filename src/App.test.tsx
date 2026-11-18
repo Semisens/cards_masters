@@ -8,10 +8,11 @@ const trio = getGame('trio')!
 const SESSION_KEY = 'mastercards:session:trio'
 const PARTY = {
   players: [
-    { name: 'Léa', trios: 2 },
-    { name: 'Tom', trios: 1 },
-    { name: 'Inès', trios: 0 },
+    { name: 'Léa', score: 2 },
+    { name: 'Tom', score: 1 },
+    { name: 'Inès', score: 0 },
   ],
+  round: 1,
 }
 const seedParty = () => window.localStorage.setItem(SESSION_KEY, JSON.stringify(PARTY))
 const savedParty = () => JSON.parse(window.localStorage.getItem(SESSION_KEY) ?? 'null')
@@ -29,9 +30,9 @@ describe('accueil', () => {
   it('ne propose pas le choix du mode : il se fait après le choix du jeu', async () => {
     renderApp('/')
     await screen.findByRole('link', { name: /Trio/ })
-    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
-    expect(screen.queryByText('Classique')).not.toBeInTheDocument()
-    expect(screen.queryByText('Connaisseur')).not.toBeInTheDocument()
+    // Les pastilles de filtre sont des boutons radio : on vérifie qu'aucun n'est le mode de lecture.
+    expect(screen.queryByRole('radio', { name: 'Classique' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'Connaisseur' })).not.toBeInTheDocument()
   })
 
   it('affiche un mot de bienvenue au premier lancement, une seule fois', async () => {
@@ -47,9 +48,10 @@ describe('accueil', () => {
     expect(screen.queryByText('Bienvenue !')).not.toBeInTheDocument()
   })
 
-  it('mène à la page À propos', async () => {
+  it('n’a plus de lien À propos : il est dans les Réglages', async () => {
     renderApp('/')
-    expect(await screen.findByRole('link', { name: 'À propos' })).toHaveAttribute('href', '/a-propos')
+    await screen.findByRole('link', { name: /Trio/ })
+    expect(screen.queryByRole('link', { name: 'À propos' })).not.toBeInTheDocument()
   })
 })
 
@@ -342,10 +344,11 @@ describe('qui joue ?', () => {
     await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
     expect(savedParty()).toEqual({
       players: [
-        { name: 'Léa', trios: 0 },
-        { name: 'Tom', trios: 0 },
-        { name: 'Joueur 3', trios: 0 },
+        { name: 'Léa', score: 0 },
+        { name: 'Tom', score: 0 },
+        { name: 'Joueur 3', score: 0 },
       ],
+      round: 1,
     })
   })
 
@@ -402,12 +405,17 @@ describe('partie en cours', () => {
     expect(savedParty()).toEqual(PARTY)
   })
 
-  it('« Terminer la partie » l’efface et revient au jeu', async () => {
+  it('« Terminer la partie » l’efface, l’archive comme interrompue et ouvre le podium', async () => {
     seedParty()
     const app = renderApp('/jeu/trio/partie')
     await userEvent.click(await screen.findByRole('button', { name: 'Terminer la partie' }))
-    await waitFor(() => expect(app.location()).toBe('/jeu/trio'))
+    await waitFor(() => expect(app.location()).toMatch(/^\/jeu\/trio\/resultat\/\d+$/))
     expect(savedParty()).toBeNull()
+    const history = JSON.parse(window.localStorage.getItem('mastercards:history') ?? '[]')
+    expect(history).toHaveLength(1)
+    expect(history[0]).toMatchObject({ gameId: 'trio', status: 'interrupted' })
+    expect(await screen.findByText('Partie interrompue')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1, name: 'Podium' })).toBeInTheDocument()
   })
 
   it('une donnée abîmée équivaut à pas de partie', async () => {
@@ -449,7 +457,7 @@ describe('trios gagnés', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Un trio de moins pour Léa' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     await waitFor(() => expect(app.location()).toBe('/jeu/trio/partie'))
-    expect(savedParty().players.map((p: { trios: number }) => p.trios)).toEqual([1, 1, 1])
+    expect(savedParty().players.map((p: { score: number }) => p.score)).toEqual([1, 1, 1])
   })
 
   it('revient à la partie sans enregistrer', async () => {
@@ -498,9 +506,9 @@ describe('à propos', () => {
     ).toBeInTheDocument()
   })
 
-  it('revient à l’accueil', async () => {
+  it('revient aux Réglages', async () => {
     renderApp('/a-propos')
-    expect(await screen.findByRole('link', { name: /Retour/ })).toHaveAttribute('href', '/')
+    expect(await screen.findByRole('link', { name: /Retour/ })).toHaveAttribute('href', '/reglages')
   })
 })
 
