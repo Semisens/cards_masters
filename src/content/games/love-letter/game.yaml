@@ -28,11 +28,10 @@ card_groups:
     jokers: 2
     short: Peut remporter 1 point.
     detail:
-      title: Valent 0. Peuvent rapporter 1 point.
+      title: Peut remporter 1 point.
       text: >-
-        Rien ne se passe quand tu en joues un. À la fin de la manche, tu marques 1 point si tu es encore en jeu. Il faut
-        aussi être le seul à avoir un joker devant toi. Si un rival en a un, personne ne marque. En avoir deux ne
-        rapporte pas plus.
+        Rien ne se passe quand tu en joues un. En fin de manche, tu marques 1 point si tu es en jeu et seul à avoir un
+        joker devant toi.
     expert:
       original: '0'
       name: Espionne

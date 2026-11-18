@@ -69,6 +69,11 @@ const MINUS_AT_ZERO: Rect[] = [
  * on ignore le cadre de la liste. La vue à balayer des maquettes montre le 7, une carte seule : elle n'a pas d'écart.
  */
 const HAND_LIST: Rect[] = [{ x: 0, y: 215, w: 390, h: 465 }]
+/**
+ * « Gagner la manche » (Love Letter, un tour) : le texte dit la règle de l'Espionne (« seul à avoir un joker devant toi »),
+ * plus longue que celle de la galerie (« le plus de jokers ») : le panneau gagne une ligne.
+ */
+const LL_WIN_PANEL: Rect[] = [{ x: 0, y: 565, w: 390, h: 160 }]
 const HAND_WHY = 'La main de cartes remplace la carte seule : écart voulu (cahier des charges §7.10).'
 
 const TRIO_SCREENS: Screen[] = [
@@ -139,7 +144,14 @@ const LOVE_LETTER_SCREENS: Screen[] = [
     max: 0.01,
   },
   { game: 'love-letter', name: '08-mise-en-place', url: `${LL}/tutoriel/mise-en-place`, max: 0.01 },
-  { game: 'love-letter', name: '09-un-tour', url: `${LL}/tutoriel/tour`, max: 0.01 },
+  {
+    game: 'love-letter',
+    name: '09-un-tour',
+    url: `${LL}/tutoriel/tour`,
+    masks: LL_WIN_PANEL,
+    why: 'Règle de l’Espionne corrigée (cahier des charges §7.10).',
+    max: 0.01,
+  },
   { game: 'love-letter', name: '10-partie', url: `${LL}/partie`, party: PARTY, max: 0.01 },
   { game: 'love-letter', name: '11-scores', url: `${LL}/partie/scores`, party: PARTY, act: ONE_FOR_LEA, max: 0.01 },
 ]
