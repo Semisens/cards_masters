@@ -116,10 +116,33 @@ describe('Love Letter : tutoriel', () => {
     ).toBeInTheDocument()
   })
 
+  it('dessine les cartes d’origine en mode connaisseur seulement', async () => {
+    renderApp('/jeu/love-letter/tutoriel/cartes/3')
+    await screen.findByText('Carte 3 / 10')
+    expect(screen.queryByRole('list', { name: 'Dans le jeu d’origine' })).not.toBeInTheDocument()
+  })
+
+  it('montre la carte d’origine et son nom sur la vue à balayer, en mode connaisseur', async () => {
+    window.localStorage.setItem('mastercards:mode', 'expert')
+    renderApp('/jeu/love-letter/tutoriel/cartes/3')
+    const list = await screen.findByRole('list', { name: 'Dans le jeu d’origine' })
+    expect(list).toHaveTextContent('2')
+    expect(list).toHaveTextContent('Prêtre')
+  })
+
   it('montre le joker sur la vue à balayer du premier groupe', async () => {
     renderApp('/jeu/love-letter/tutoriel/cartes/1')
     expect(await screen.findByText('Carte 1 / 10')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Jokers' })).toBeInTheDocument()
+  })
+
+  it('remplace la carte en pointillés par la carte d’origine en mode connaisseur', async () => {
+    window.localStorage.setItem('mastercards:mode', 'expert')
+    renderApp('/jeu/love-letter/tutoriel/cartes')
+    await screen.findByText('Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet.')
+    const rows = screen.getAllByRole('link').filter((link) => link.getAttribute('href')?.includes('/tutoriel/cartes/'))
+    expect(rows[2]).toHaveTextContent('Prêtre')
+    expect(rows[2].textContent).toMatch(/^2/)
   })
 
   it('montre un « Un tour » avec sa pioche, sa main et la carte posée', async () => {

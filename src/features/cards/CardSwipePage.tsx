@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router'
 import { Button } from '../../components/Button/Button.tsx'
+import { OriginalCard } from '../../components/OriginalCard/OriginalCard.tsx'
 import { Panel } from '../../components/Panel/Panel.tsx'
 import { PlayingCard } from '../../components/PlayingCard/PlayingCard.tsx'
 import { Screen } from '../../components/Screen/Screen.tsx'
@@ -88,14 +89,26 @@ export function CardSwipePage() {
             <>
               <br />
               <br />
-              <span className={styles.note}>
-                {fr.cards.expertNote(
-                  group.expert.original,
-                  group.ranks.length > 1,
-                  group.expert.power,
-                  group.expert.name,
+              <div className={styles.expertRow}>
+                {group.expert.cards && (
+                  <ul className={styles.originals} aria-label={fr.cards.originalCards}>
+                    {group.expert.cards.map((card, i) => (
+                      <li key={`${card.value}-${i}`} className={styles.original}>
+                        <OriginalCard card={card} variant="strip" />
+                        {card.name && <span className={styles.originalName}>{card.name}</span>}
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              </span>
+                <span className={styles.note}>
+                  {fr.cards.expertNote(
+                    group.expert.original,
+                    group.ranks.length > 1,
+                    group.expert.power,
+                    group.expert.name,
+                  )}
+                </span>
+              </div>
             </>
           )}
         </Panel>

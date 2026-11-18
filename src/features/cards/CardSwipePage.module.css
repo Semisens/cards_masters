@@ -37,7 +37,7 @@
 }
 
 .chevron:focus-visible {
-  outline: medium solid var(--mc-color-blanc-carte);
+  outline: medium solid var(--game-screen-fg, var(--mc-color-blanc-carte));
   outline-offset: 2px;
 }
 
@@ -52,13 +52,46 @@
   width: calc(var(--mc-text-min) * 0.625);
   height: calc(var(--mc-text-min) * 0.625);
   border-radius: 50%;
-  background: var(--mc-color-nuit);
+  background: var(--game-pill-bg, var(--mc-color-nuit));
 }
 
 .dotActive {
   background: var(--mc-color-soleil);
+  /* Sur le fond d'un jeu (clair), le jaune seul se perd : un liseré à la couleur du jeu. Sans effet sur le bleu. */
+  outline: calc(var(--mc-space-1) / 4) solid var(--game-pill-bg, transparent);
 }
 
 .note {
+  flex: 1 1 12rem;
+  min-width: 0;
+  color: var(--mc-color-texte-secondaire);
+}
+
+/* Les cartes d'origine à côté de la ligne « Mode connaisseur » ; si elles sont trop larges (cinq cartes), dessous. */
+.expertRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--mc-space-1) var(--mc-space-2);
+}
+
+/* Les cartes d'origine du groupe. */
+.originals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mc-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.original {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--mc-space-1) / 2);
+}
+
+.originalName {
   color: var(--mc-color-texte-secondaire);
 }

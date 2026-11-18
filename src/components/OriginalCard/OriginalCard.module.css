@@ -1,0 +1,65 @@
+.card {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: var(--mc-card-radius);
+  background: var(--original-bg);
+  color: var(--original-fg);
+  font-family: var(--mc-font-title);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Mini-carte des lignes : 44 x 61 px comme la carte du paquet qui la suit. */
+.list {
+  width: var(--mc-touch-min);
+  aspect-ratio: 1 / var(--mc-card-ratio-list);
+  border: var(--mc-card-frame-list) solid var(--mc-color-bordure);
+  font-size: calc(var(--mc-text-min) * 1.375);
+}
+
+/* Carte de la rangée « Dans le jeu d'origine » : 3 rem, pour que cinq cartes (Trio, « 2 à 6 ») tiennent sur une ligne. */
+.strip {
+  width: 3rem;
+  aspect-ratio: 1 / var(--mc-card-ratio);
+  border: var(--mc-card-frame-list) solid var(--mc-color-bordure);
+  font-size: calc(var(--mc-text-min) * 1.5);
+}
+
+/* Une carte en image : l'image fait la carte (bordure, coins, chiffre), sans fond ni cadre de notre part. */
+.picture {
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.value {
+  position: relative;
+}
+
+/* Deux cartes qui se recouvrent : la seconde passe devant, la première reste lisible sur ses 28 px de gauche. */
+.pair {
+  display: inline-flex;
+  flex: none;
+}
+
+.pair > * + * {
+  margin-left: calc((var(--mc-touch-min) - var(--mc-space-3) - var(--mc-space-1) / 2) * -1);
+}
+
+.pair > :first-child:not(:last-child):not(.picture) {
+  justify-content: flex-start;
+  padding-left: var(--mc-space-1);
+}
