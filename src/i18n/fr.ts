@@ -77,9 +77,9 @@ export const fr = {
     /** Quand les cartes à retirer ne se disent pas en une liste (couleurs et valeurs entières). */
     keepOnly: (count: number, jokers = 0) =>
       `Garde ces ${plural(count, 'carte', 'cartes')}${jokers > 0 ? `, dont ${plural(jokers, 'joker', 'jokers')}` : ''}. Retire tout le reste du paquet.`,
-    /** Titre d'une ligne en mode connaisseur : « 2–6 → 2 à 6 ». */
-    mapped: (original: string, label: string) => `${original} → ${label}`,
-    /** Sous le titre d'une ligne : « ×15 · Valent 2 à 6. ». */
+    /** Nombre de cartes d'un groupe, après le titre de la ligne : « 15 cartes ». */
+    count: (count: number) => plural(count, 'carte', 'cartes'),
+    /** Titre de la vue à balayer : « ×15 · Valent 2 à 6. ». */
     countAndShort: (count: number, short: string) => `×${count} · ${short}`,
     groupCounter: (word: string, current: number, total: number) => `${word} ${current} / ${total}`,
     groupWord: 'Groupe',

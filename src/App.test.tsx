@@ -101,9 +101,11 @@ describe('« Tes cartes » : vue liste', () => {
       [1, 2, 3, 4, 5, 6].map((n) => `/jeu/trio/tutoriel/cartes/${n}`),
     )
     expect(rows[1]).toHaveTextContent('2 à 6')
-    expect(rows[1]).toHaveTextContent('×15 · Valent 2 à 6.')
+    expect(rows[1]).toHaveTextContent('15 cartes')
+    expect(rows[1]).toHaveTextContent('Valent 2 à 6.')
     expect(rows[2]).toHaveTextContent('Spécial')
-    expect(rows[2]).toHaveTextContent('×3 · Trio de 7 = victoire.')
+    expect(rows[2]).toHaveTextContent('3 cartes')
+    expect(rows[2]).toHaveTextContent('Trio de 7 = victoire.')
   })
 
   it('annonce ce qu’il faut retirer et garder', async () => {
@@ -121,9 +123,10 @@ describe('« Tes cartes » : vue liste', () => {
     await userEvent.click(await screen.findByRole('radio', { name: 'Connaisseur' }))
     const rows = screen.getAllByRole('link').filter((link) => link.getAttribute('href')?.includes('/tutoriel/cartes/'))
     expect(rows).toHaveLength(6)
-    expect(rows[1]).toHaveTextContent('2–6 → 2 à 6')
-    expect(rows[4]).toHaveTextContent('11 → Valet')
-    expect(rows[5]).toHaveTextContent('12 → Dame')
+    expect(rows[1]).toHaveTextContent('2–6')
+    expect(rows[1]).toHaveTextContent('Valent 2 à 6.')
+    expect(rows[4]).toHaveTextContent('11')
+    expect(rows[5]).toHaveTextContent('12')
     expect(screen.queryByText(/Jeu d’origine/)).not.toBeInTheDocument()
   })
 

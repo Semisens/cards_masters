@@ -123,7 +123,7 @@ card_groups:
     cards:
       - { ranks: [6], suits: [hearts, spades] }
     display: { rank: 6, suit: spades }
-    short: Pioche deux cartes, choisis-en une.
+    short: Pioche 2 cartes, choisis-en 1.
     detail:
       title: Pioche deux cartes, choisis-en une.
       text: Pioche les deux cartes du dessus. Choisis-en une pour ta main. Remets les deux autres sous la pioche, dans l’ordre de ton choix.

@@ -47,7 +47,7 @@ export interface FontConfig {
 
 interface CardGroupBase {
   label: string
-  /** Sous le titre, après « ×3 · ». */
+  /** Ligne 2 de la liste : la valeur ou le pouvoir (« Valent 2 à 6. »), une trentaine de caractères au plus. */
   short: string
   /** Pastille à côté du titre (ex. « Spécial »). */
   badge?: string
@@ -57,7 +57,7 @@ interface CardGroupBase {
   expert: {
     /** Carte(s) du jeu d'origine (ex. « 2–6 »). */
     original: string
-    /** Nom du personnage ou de la carte d'origine (ex. « Prêtre »). Absent : « 2–6 → 2 à 6 ». */
+    /** Nom du personnage ou de la carte d'origine (ex. « Prêtre »). Absent : la ligne dit `original` (« 2–6 »). */
     name?: string
     /** Pouvoir ou règle d'origine, en une proposition. */
     power?: string

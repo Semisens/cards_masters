@@ -85,7 +85,7 @@ card_groups:
       - ranks: [A]
         suits: all
     display: { rank: A, suit: hearts } # carte montrée d'un groupe d'un seul rang ; facultatif (défaut : la première carte). Un groupe de plusieurs rangs montre une « main » de 2 ou 3 cartes, calculée (8-9-10, 2-4-6)
-    short: Vaut 1. # sous le titre, après « ×4 · »
+    short: Vaut 1. # ligne 2 de la liste : la valeur ou le pouvoir, une trentaine de caractères au plus
     badge: Spécial # pastille à côté du titre ; facultatif
     detail: # explication de la vue à balayer
       title: L’As vaut 1.

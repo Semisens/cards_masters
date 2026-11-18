@@ -29,15 +29,16 @@ function HandOfGroup({ group }: { group: CardGroup }) {
 }
 
 /**
- * Une ligne de la vue liste : le groupe de cartes à garder.
- * Mode classique : la main (2 ou 3 cartes), son titre, « ×3 · Vaut 1. ».
- * Mode connaisseur : la main d'origine (dessinée, ou une carte en pointillés sans `expert.cards`), une flèche, puis la main du paquet (« 2–6 → 2 à 6 »).
+ * Une ligne de la vue liste : le groupe de cartes à garder, sur deux lignes, sans retour à la ligne.
+ * Mode classique : la main (2 ou 3 cartes) ; ligne 1 « 2 à 6 15 cartes » (les cartes à garder, leur nombre) ; ligne 2 « Valent 2 à 6. ».
+ * Mode connaisseur : la main d'origine (dessinée, ou une carte en pointillés sans `expert.cards`), une flèche, puis la main du paquet ;
+ * ligne 1 « 2–6 15 cartes » (la carte du jeu d'origine, le nombre de cartes) ; ligne 2 identique (la valeur ou le pouvoir).
  */
 export function CardGroupRow({ group, mode, to }: CardGroupRowProps) {
   const expert = mode === 'expert'
-  const title = expert ? (group.expert.name ?? fr.cards.mapped(group.expert.original, group.label)) : group.label
+  const title = expert ? (group.expert.name ?? group.expert.original) : group.label
   return (
-    <Link to={to} className={styles.row}>
+    <Link to={to} className={expert ? `${styles.row} ${styles.expert}` : styles.row}>
       {expert && (
         <>
           {group.expert.cards ? (
@@ -56,10 +57,11 @@ export function CardGroupRow({ group, mode, to }: CardGroupRowProps) {
       </span>
       <span className={styles.text}>
         <span className={styles.titleLine}>
-          <b>{title}</b>
+          <b className={styles.title}>{title}</b>
+          <span className={styles.count}>{fr.cards.count(group.count)}</span>
           {group.badge && <span className={styles.badge}>{group.badge}</span>}
         </span>
-        <span className={styles.short}>{fr.cards.countAndShort(group.count, group.short)}</span>
+        <span className={styles.short}>{group.short}</span>
       </span>
       <span aria-hidden="true">›</span>
     </Link>

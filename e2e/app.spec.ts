@@ -35,7 +35,7 @@ test.describe('parcours Trio', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Tes cartes' })).toBeVisible()
     await expect(page.getByText('Retire les carreaux et les rois. Garde 36 cartes.')).toBeVisible()
     await page.getByRole('radio', { name: 'Connaisseur' }).check()
-    await expect(page.getByText('2–6 → 2 à 6')).toBeVisible()
+    await expect(page.getByText('2–6', { exact: true })).toBeVisible()
     await page.getByRole('radio', { name: 'Classique' }).check()
 
     // Un clic sur une ligne ouvre la vue à balayer.

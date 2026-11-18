@@ -29,20 +29,26 @@ const renderRow = (g: CardGroup, mode: 'classic' | 'expert') =>
   )
 
 describe('CardGroupRow', () => {
-  it('mode classique : le titre, puis « ×15 · Valent 2 à 6. »', () => {
+  it('mode classique : ligne 1 « 2 à 6 · 15 cartes », ligne 2 « Valent 2 à 6. »', () => {
     renderRow(group, 'classic')
     const row = screen.getByRole('link')
     expect(row).toHaveAttribute('href', '/vers/ici')
-    expect(row).toHaveTextContent('2 à 6')
-    expect(row).toHaveTextContent('×15 · Valent 2 à 6.')
+    expect(screen.getByText('2 à 6')).toBeInTheDocument()
+    expect(screen.getByText('15 cartes')).toBeInTheDocument()
+    expect(screen.getByText('Valent 2 à 6.')).toBeInTheDocument()
     expect(row).not.toHaveTextContent('→')
   })
 
-  it('mode connaisseur : la carte d’origine, une flèche, puis « 2–6 → 2 à 6 »', () => {
+  it('mode connaisseur : la carte d’origine, une flèche ; ligne 1 « 2–6 · 15 cartes », ligne 2 « Valent 2 à 6. »', () => {
     renderRow(group, 'expert')
     const row = screen.getByRole('link')
-    expect(row).toHaveTextContent('2–6 → 2 à 6')
-    expect(row).toHaveTextContent('×15 · Valent 2 à 6.')
+    // « 2–6 » : sur la carte d'origine en pointillés (ce groupe n'a pas d'images) et en titre de la ligne.
+    expect(screen.getAllByText('2–6')).toHaveLength(2)
+    expect(row.querySelector('b')).toHaveTextContent('2–6')
+    expect(screen.getByText('15 cartes')).toBeInTheDocument()
+    expect(screen.getByText('Valent 2 à 6.')).toBeInTheDocument()
+    // La correspondance se lit sur les mains et la flèche : le texte ne répète plus « → 2 à 6 ».
+    expect(screen.queryByText('2 à 6')).not.toBeInTheDocument()
     // Carte d'origine (2–6) et flèche : décoratives.
     expect(row.querySelectorAll('[aria-hidden="true"]').length).toBeGreaterThanOrEqual(3)
   })
