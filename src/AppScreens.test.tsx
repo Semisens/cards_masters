@@ -88,7 +88,7 @@ describe('Love Letter : tutoriel', () => {
     expect(rows()).toHaveLength(10)
     expect(rows()[0]).toHaveTextContent('Jokers')
     expect(rows()[0]).toHaveTextContent('2 cartes')
-    expect(rows()[0]).toHaveTextContent('Valent 0. Sans effet.')
+    expect(rows()[0]).toHaveTextContent('Peut remporter 1 point.')
     expect(rows()[1]).toHaveTextContent('Valets et rois noirs')
     expect(rows()[1]).toHaveTextContent('6 cartes')
     expect(rows()[1]).toHaveTextContent('Devine la carte d’un rival.')

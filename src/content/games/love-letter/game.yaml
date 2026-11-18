@@ -26,18 +26,19 @@ classic_forbidden_terms: [Espionne, Garde, Prêtre, Baron, Servante, Chancelier,
 card_groups:
   - label: Jokers
     jokers: 2
-    short: Valent 0. Sans effet.
+    short: Peut remporter 1 point.
     detail:
-      title: Valent 0. Sans effet.
+      title: Valent 0. Peuvent rapporter 1 point.
       text: >-
-        Pose-les devant toi. À la fin de la manche, celui qui reste en jeu avec le plus de jokers devant lui marque
-        1 point. Égalité : personne ne marque.
+        Rien ne se passe quand tu en joues un. À la fin de la manche, tu marques 1 point si tu es encore en jeu. Il faut
+        aussi être le seul à avoir un joker devant toi. Si un rival en a un, personne ne marque. En avoir deux ne
+        rapporte pas plus.
     expert:
       original: '0'
       name: Espionne
       cards:
         - { value: '0', name: Espionne, color: '#6C767A' }
-      power: marquer un point si l’on en a le plus devant soi
+      power: marquer un point en fin de manche si l’on est en vie et seul à en avoir une devant soi
 
   - label: Valets et rois noirs
     cards:
@@ -216,8 +217,8 @@ tutorial:
     win:
       title: Gagner la manche
       text: >-
-        Sois le dernier en jeu. Ou aie la plus forte carte quand la pioche est vide. Le plus de jokers devant toi : 1
-        point de plus.
+        Sois le dernier en jeu. Ou aie la plus forte carte quand la pioche est vide. Seul à avoir un joker devant toi, et
+        encore en jeu : 1 point de plus.
 
 full_rules:
   - title: But
@@ -240,5 +241,5 @@ full_rules:
       point. Pioche vide : la plus forte carte marque 1 point. Égalité : chacun marque 1 point.
   - title: Jokers
     text: >-
-      Le joueur en jeu qui a le plus de jokers devant lui marque 1 point de plus. Il en faut au moins un. Égalité :
-      personne ne marque. Une manche rapporte donc 2 points au plus.
+      À la fin de la manche, tu marques 1 point de plus si tu es encore en jeu. Il faut aussi être le seul à avoir un
+      joker devant toi. Si un autre joueur en a un, personne ne marque. Une manche rapporte donc 2 points au plus.

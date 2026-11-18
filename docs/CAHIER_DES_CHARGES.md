@@ -285,7 +285,7 @@ card_groups:
   - label: Jokers
     jokers: 2
     display: { joker: true }
-    short: Valent 0. Sans effet.
+    short: Peut remporter 1 point.
     detail:
       title: …
       text: …
@@ -350,7 +350,7 @@ Un test automatisé (`src/data/games.test.ts`, Vitest + Ajv) vérifie **chaque j
 
 ### 9.3 Jeux livrés en v1
 1. **Trio** *(réalisé, d'après les maquettes)*. Fin automatique au 3e trio. 36 cartes d'origine (valeurs 1 à 12 en trois exemplaires) jouées avec le paquet de 52 : on garde pique, cœur et trèfle de l'As à la Dame, et on **retire les carreaux et les rois**. As = 1, Valet = 11, Dame = 12. Six groupes : A, 2 à 6, 7 (« Spécial »), 8 à 10, Valet, Dame. 3 à 6 joueurs, environ 15 minutes. Le mode « Piquant » n'est pas jouable : ses liens entre numéros sont imprimés sur les cartes d'origine.
-2. **Love Letter** *(réalisé, règle de l'édition 2019)*. 2 à 6 joueurs, 20 minutes, nom en Great Vibes, palette bordeaux (tapis #812B2B, ombre #400E0E, texte crème #EEDDC8) et un sceau de cire original (corail, rose, crème) en logo. **21 cartes**, valeur = rang : Espionne 0 = les 2 **jokers** ; Garde 1 = 4 valets et 2 rois noirs (×6) ; Prêtre 2, Baron 3, Servante 4, Prince 5, Chancelier 6 (×2 chacun, cœur et pique) ; Roi 7 = 7♥ ; Comtesse 8 = 8♠ ; Princesse 9 = la **dame de cœur**. Dix groupes. Tout le reste du paquet est retiré. Une manche rapporte 1 point (2 au plus avec les jokers) ; le premier à 6, 5, 4, 3 ou 3 points gagne à 2, 3, 4, 5 ou 6 joueurs.
+2. **Love Letter** *(réalisé, règle de l'édition 2019)*. 2 à 6 joueurs, 20 minutes, nom en Great Vibes, palette bordeaux (tapis #812B2B, ombre #400E0E, texte crème #EEDDC8) et un sceau de cire original (corail, rose, crème) en logo. **21 cartes**, valeur = rang : Espionne 0 = les 2 **jokers** (rien ne se passe quand on la joue ; 1 point en fin de manche si l'on est en vie et **seul** à en avoir une devant soi) ; Garde 1 = 4 valets et 2 rois noirs (×6) ; Prêtre 2, Baron 3, Servante 4, Prince 5, Chancelier 6 (×2 chacun, cœur et pique) ; Roi 7 = 7♥ ; Comtesse 8 = 8♠ ; Princesse 9 = la **dame de cœur**. Dix groupes. Tout le reste du paquet est retiré. Une manche rapporte 1 point (2 au plus avec les jokers) ; le premier à 6, 5, 4, 3 ou 3 points gagne à 2, 3, 4, 5 ou 6 joueurs.
 
 > Les textes viennent des **maquettes, mot pour mot**. Rédigés par nous, à relire : pour Trio, cinq textes de la vue à balayer ; pour Love Letter, les règles complètes, les détails de groupe et les noms de groupe (Jokers, Dame de cœur).
 
