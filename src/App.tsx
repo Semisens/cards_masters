@@ -5,7 +5,7 @@ import { ModeProvider } from './state/ModeProvider.tsx'
 export function App() {
   return (
     <ModeProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <AppRoutes />
       </BrowserRouter>
     </ModeProvider>

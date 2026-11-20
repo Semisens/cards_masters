@@ -8,8 +8,11 @@ import { parse } from 'yaml'
 const charte = JSON.parse(readFileSync(new URL('./charte/mastercards-charte.json', import.meta.url), 'utf8'))
 const ciel: string = charte.colors.ciel
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
+// Adresse de base : `/` par défaut (dev, tests, Capacitor) ; `/cards_masters/` pour GitHub Pages (workflow pages.yml).
+const base = process.env.BASE_PATH ?? '/'
 
 export default defineConfig({
+  base,
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   plugins: [
     react(),
@@ -31,8 +34,8 @@ export default defineConfig({
         short_name: 'MasterCards',
         description: 'Joue à tes jeux de société préférés avec un simple paquet de 52 cartes.',
         lang: 'fr',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         display: 'standalone',
         orientation: 'portrait',
         theme_color: ciel,
@@ -45,7 +48,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2,json}'],
-        navigateFallback: '/index.html',
+        navigateFallback: `${base}index.html`,
       },
     }),
   ],
