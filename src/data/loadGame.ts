@@ -4,11 +4,14 @@ import { expandCards, toRank } from './deck.ts'
 import type {
   CardGroup,
   CardGroupConfig,
+  DeckCard,
+  DeckCardConfig,
   DiagramItem,
   DiagramItemConfig,
   DisplayCard,
   Game,
   GameConfig,
+  TurnReveal,
 } from './types.ts'
 
 /** Remplace `{cards}` (nombre de cartes gardées) dans tous les textes. Les autres `{…}` (`{round}`) restent. */
@@ -20,12 +23,28 @@ function fillTexts<T>(value: T, values: Record<string, number>): T {
   return value
 }
 
-/** Un élément de schéma prêt à l'emploi : la carte visible (si elle est donnée) a un vrai rang. */
+const loadCard = ({ rank, suit }: DeckCardConfig): DeckCard => ({ rank: toRank(rank), suit })
+
+/** Un élément de la table prêt à l'emploi : la carte visible (si elle est donnée) a un vrai rang. */
 function loadDiagramItem({ label, layout, card }: DiagramItemConfig): DiagramItem {
+  return { label, ...(layout ? { layout } : {}), ...(card ? { card: loadCard(card) } : {}) }
+}
+
+/** Les cartes retournées d'« Un tour », avec un vrai rang. */
+function loadTurnReveal({ hand, across, center, played }: TurnReveal<DeckCardConfig>): TurnReveal {
   return {
-    label,
-    ...(layout ? { layout } : {}),
-    ...(card ? { card: { rank: toRank(card.rank), suit: card.suit } } : {}),
+    ...(hand ? { hand: hand.map(loadCard) } : {}),
+    ...(across ? { across: loadCard(across) } : {}),
+    ...(center ? { center: center.map(loadCard) } : {}),
+    ...(played
+      ? {
+          played: {
+            ...(played.across ? { across: loadCard(played.across) } : {}),
+            ...(played.left ? { left: loadCard(played.left) } : {}),
+            ...(played.right ? { right: loadCard(played.right) } : {}),
+          },
+        }
+      : {}),
   }
 }
 
@@ -60,17 +79,21 @@ export function loadGame(config: GameConfig, assetUrl: (file: string) => string 
   const card_groups = config.card_groups.map((group) => loadCardGroup(group, assetUrl))
   const total = card_groups.reduce((sum, group) => sum + group.count, 0)
   const { font, ...rest } = fillTexts(config, { cards: total })
-  const { diagram: turnDiagram, ...turn } = rest.tutorial.turn
+  const { reveal, ...turn } = rest.tutorial.turn
   return {
     ...rest,
     ...(font ? { font: { ...font, url: font.file ? assetUrl(font.file) : undefined } } : {}),
     card_groups: card_groups.map((group) => fillTexts(group, { cards: total })),
     tutorial: {
       ...rest.tutorial,
-      setup: { ...rest.tutorial.setup, diagram: rest.tutorial.setup.diagram.map(loadDiagramItem) },
+      setup: {
+        ...rest.tutorial.setup,
+        hand: loadDiagramItem(rest.tutorial.setup.hand),
+        center: rest.tutorial.setup.center.map(loadDiagramItem),
+      },
       turn: {
         ...turn,
-        ...(turnDiagram ? { diagram: turnDiagram.map(loadDiagramItem) } : {}),
+        ...(reveal ? { reveal: loadTurnReveal(reveal) } : {}),
       },
     },
   }

@@ -190,7 +190,8 @@ scoring:
 tutorial:
   setup:
     title: Mise en place
-    diagram:
+    hand: { label: Ta main, layout: single }
+    center:
       - { label: Pioche, layout: pile }
       - { label: 'Écartée, cachée', layout: single }
     steps:
@@ -200,10 +201,11 @@ tutorial:
       - Le reste forme la pioche.
   turn:
     title: Un tour de jeu
-    diagram:
-      - { label: Pioche, layout: pile }
-      - { label: Ta main, layout: single }
-      - { label: Posée devant toi, card: { rank: 5, suit: hearts } }
+    reveal: # la table de la mise en place : ta main de 2 cartes, de face, et une carte jouée devant deux autres joueur
+      hand: [{ rank: 5, suit: hearts }, { rank: Q, suit: hearts }]
+      played:
+        across: { rank: 3, suit: spades }
+        right: { rank: J, suit: clubs }
     steps:
       - label: Pioche.
         text: Prends la carte du dessus.

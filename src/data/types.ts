@@ -97,8 +97,8 @@ export interface TurnStep {
   text: string
 }
 
-/** Comment on dessine des cartes de dos : une carte, une pile (la pioche), un éventail (une main). */
-export type CardLayout = 'single' | 'pile' | 'spread'
+/** Comment on dessine des cartes de dos : une carte, une pile (la pioche), un éventail (une main), des cartes alignées. */
+export type CardLayout = 'single' | 'pile' | 'spread' | 'grid'
 
 /** Une carte du jeu d'origine : pastille de valeur sur fond de couleur. `image` : fichier du dossier du jeu. */
 export interface OriginalCard {
@@ -110,22 +110,39 @@ export interface OriginalCard {
   imageUrl?: string
 }
 
-/** Un élément d'un schéma (mise en place, un tour) : des cartes de dos (`layout`), ou une carte visible si `card` est donné. */
-export interface DiagramItem {
-  label: string
-  layout?: CardLayout
-  card?: DeckCard
+/** Une carte telle qu'on l'écrit en YAML : `{ rank: 5, suit: hearts }`. */
+export interface DeckCardConfig {
+  rank: RankInput
+  suit: Suit
 }
 
-export interface DiagramItemConfig {
+/** Un élément légendé de la table : des cartes de dos (`layout`), ou une carte visible si `card` est donné. */
+export interface DiagramItem<Card = DeckCard> {
   label: string
   layout?: CardLayout
-  card?: { rank: RankInput; suit: Suit }
+  card?: Card
 }
 
-export interface Tutorial<Item = DiagramItem> {
-  setup: { title: string; diagram: Item[]; steps: string[] }
-  turn: { title: string; diagram?: Item[]; steps: TurnStep[]; win: { title: string; text: string } }
+export type DiagramItemConfig = DiagramItem<DeckCardConfig>
+
+/**
+ * « Un tour » : les cartes retournées sur la table de la mise en place (la même table, au pixel près).
+ * - `hand` : ta main pendant le tour, de face (en éventail si elle a plusieurs cartes) ;
+ * - `across` : la carte du bord de la main d'en face ;
+ * - `center` : une carte par élément du centre, dans l'ordre ;
+ * - `played` : la carte découverte posée à côté de la main d'un autre joueur.
+ */
+export interface TurnReveal<Card = DeckCard> {
+  hand?: Card[]
+  across?: Card
+  center?: Card[]
+  played?: { across?: Card; left?: Card; right?: Card }
+}
+
+export interface Tutorial<Item = DiagramItem, Card = DeckCard> {
+  /** Mise en place : ta main (sa disposition vaut pour les 4 mains de la table) et ce qui se pose au centre. */
+  setup: { title: string; hand: Item; center: Item[]; steps: string[] }
+  turn: { title: string; reveal?: TurnReveal<Card>; steps: TurnStep[]; win: { title: string; text: string } }
 }
 
 export interface RuleSection {
@@ -185,7 +202,7 @@ interface GameBase {
 export interface GameConfig extends GameBase {
   font?: FontConfig
   card_groups: CardGroupConfig[]
-  tutorial: Tutorial<DiagramItemConfig>
+  tutorial: Tutorial<DiagramItemConfig, DeckCardConfig>
 }
 
 /** Un jeu prêt à l'emploi : cartes calculées, textes complétés (`{cards}`), police résolue. */

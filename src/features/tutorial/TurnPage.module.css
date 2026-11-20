@@ -2,8 +2,9 @@
   margin: 0;
 }
 
+/* Étapes resserrées : la table du tour, au-dessus, prend la place. */
 .step + .step {
-  margin-top: calc(var(--mc-text-min) * 1.364);
+  margin-top: var(--mc-space-1);
 }
 
 .spacer {

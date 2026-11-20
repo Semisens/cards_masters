@@ -10,9 +10,9 @@ import styles from './PlayingCard.module.css'
  * - `standard` : la carte de la charte, avec son relief ;
  * - `list` : mini-carte des lignes de liste (maquettes Trio) : cadre bleu clair, sans relief, rang de 14 px ;
  * - `focus` : grande carte de la vue à balayer : cadre soleil, rang de 28 px ;
- * - `diagram` : carte visible du schéma de mise en place : cadre bleu clair, estompée, rang de 18 px.
+ * - `table` : petite carte retournée sur la table (un tour) : relief des dos, rang de 16 px quelle que soit sa taille.
  */
-export type CardVariant = 'standard' | 'list' | 'focus' | 'diagram'
+export type CardVariant = 'standard' | 'list' | 'focus' | 'table'
 
 interface FaceUp {
   rank: Rank
@@ -71,7 +71,7 @@ export function PlayingCard(props: PlayingCardProps) {
     <div
       role="img"
       aria-label={label}
-      className={`${classes} ${color} ${props.variant === 'list' ? styles.list : ''} ${props.variant === 'focus' ? styles.focus : ''} ${props.variant === 'diagram' ? styles.diagram : ''}`}
+      className={`${classes} ${color} ${props.variant === 'list' ? styles.list : ''} ${props.variant === 'focus' ? styles.focus : ''} ${props.variant === 'table' ? styles.table : ''}`}
       style={{ ...style, ...props.style }}
     >
       {!props.joker && (

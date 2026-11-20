@@ -1,0 +1,155 @@
+/*
+ * La table vue de haut : les mains autour (en face, à gauche, à droite, la tienne en bas), ce qui se pose au centre au
+ * milieu. La même sur la mise en place et sur un tour (où quelques cartes sont retournées). Les quatre mains sont à la
+ * même distance des cartes du centre :
+ *   - en haut et en bas : l'écart de la grille, une hauteur de légende (le reflet de la légende au-dessus des cartes
+ *     répond à la vraie légende en dessous) et l'air laissé au relief des cartes, de chaque côté ;
+ *   - à gauche et à droite : les mains se collent à la colonne du centre, à un écart de colonne de la même somme.
+ */
+.table {
+  /*
+   * Une seule taille, la même sur la mise en place et sur un tour. Cartes des mains plus petites que celles du
+   * centre : le centre est le sujet de l'écran.
+   */
+  --hand-card-w: 2rem;
+  --center-card-w: 2.25rem;
+  --table-gap: var(--mc-space-1);
+  /* Hauteur d'une ligne de légende. */
+  --label-line: 1.364;
+  --label-h: calc(var(--mc-text-min) * var(--label-line));
+  /* Une légende du centre peut déborder de ses cartes, de part et d'autre, sans atteindre les mains des côtés. */
+  --label-overhang: calc(var(--label-h) + var(--mc-space-1) / 2);
+  display: grid;
+  /* La colonne du centre prend la largeur de ses cartes, pas celle des légendes : les mains des côtés restent à distance égale. */
+  grid-template-columns: 1fr min-content 1fr;
+  grid-template-areas:
+    '. top .'
+    'left center right'
+    '. bottom .';
+  align-items: center;
+  justify-items: center;
+  row-gap: var(--table-gap);
+  column-gap: calc(var(--table-gap) + var(--label-h) + var(--mc-space-1) / 2);
+  padding: var(--mc-space-1);
+  border-radius: var(--mc-radius-m);
+  background: var(--game-pill-bg, var(--mc-color-nuit));
+  color: var(--game-pill-fg, var(--mc-text-on-nuit));
+  line-height: var(--label-line);
+  text-align: center;
+}
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--mc-space-1) / 2);
+}
+
+.top {
+  position: relative;
+  grid-area: top;
+}
+
+/*
+ * Un tour : la carte découverte posée à côté de la main d'un autre joueur. Hors du flux : la table ne bouge pas.
+ * Droite (le rang se lit), à droite de la main d'en face, sous les mains de gauche et de droite.
+ */
+.top .played,
+.left .played,
+.right .played {
+  position: absolute;
+}
+
+.top .played {
+  top: 50%;
+  left: calc(100% + var(--mc-space-1) / 2);
+  transform: translateY(-50%);
+}
+
+.left .played,
+.right .played {
+  /* Sous la main tournée : la moitié d'un éventail de trois cartes, plus un peu d'air. */
+  top: calc(50% + var(--hand-card-w) * (1 + 2 * var(--mc-hand-step)) / 2 + var(--mc-space-1) / 2);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bottom {
+  grid-area: bottom;
+}
+
+/*
+ * Mains de gauche et de droite : tournées d'un quart de tour, vers le centre, et collées à la colonne du centre.
+ * La rotation ne change pas la boîte : la case prend la hauteur d'une carte en largeur, et la main y est centrée.
+ */
+.left,
+.right {
+  position: relative;
+  align-self: stretch;
+  width: calc(var(--hand-card-w) * var(--mc-card-ratio));
+  /* Assez haut pour un éventail : une carte, deux pas et l'inclinaison (voir CardPile.module.css, `.spread`). */
+  min-height: calc(var(--hand-card-w) * (1 + 2 * var(--mc-hand-step)) + var(--mc-space-1));
+}
+
+.left {
+  grid-area: left;
+  justify-self: end;
+}
+
+.right {
+  grid-area: right;
+  justify-self: start;
+}
+
+.left .hand,
+.right .hand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.left .hand {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.right .hand {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+/*
+ * Le centre : ses éléments côte à côte, en colonnes de même largeur (les cartes restent centrées entre les mains de
+ * gauche et de droite, quelle que soit la longueur des légendes) ; une légende longue passe sur deux lignes.
+ */
+.center {
+  grid-area: center;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: center;
+  /* Assez d'écart pour que les légendes, qui débordent de leurs cartes, ne se touchent pas. */
+  gap: calc(var(--mc-space-1) + 2 * var(--label-overhang));
+}
+
+/* Le reflet de la légende, invisible, au-dessus des cartes : elles restent au milieu, entre la main d'en face et la tienne. */
+.item[data-label]::before {
+  content: attr(data-label);
+  visibility: hidden;
+}
+
+.item[data-label]::before,
+.label {
+  display: block;
+  width: calc(100% + 2 * var(--label-overhang));
+  margin-inline: calc(-1 * var(--label-overhang));
+}
+
+/* Les cartes se posent sur la même ligne de base, quelle que soit leur disposition : les légendes restent alignées. */
+.visual {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  /* De l'air pour le relief des cartes, en dessous, et autant au-dessus : les cartes restent au milieu. */
+  padding: calc(var(--mc-space-1) / 2) 0;
+  /* Une carte du centre, plus les deux décalages de la pile. */
+  min-height: calc(var(--center-card-w) * var(--mc-card-ratio) + var(--mc-space-1) * 1.5);
+}

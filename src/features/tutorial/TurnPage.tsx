@@ -1,8 +1,8 @@
 import { useParams } from 'react-router'
 import { ButtonLink } from '../../components/Button/ButtonLink.tsx'
+import { CardTable } from '../../components/CardTable/CardTable.tsx'
 import { PageTitle } from '../../components/PageTitle/PageTitle.tsx'
 import { Panel } from '../../components/Panel/Panel.tsx'
-import { PileDiagram } from '../../components/PileDiagram/PileDiagram.tsx'
 import { Screen } from '../../components/Screen/Screen.tsx'
 import { StepHeader } from '../../components/StepHeader/StepHeader.tsx'
 import { getGame } from '../../data/games.ts'
@@ -12,7 +12,7 @@ import { NotFoundPage } from '../not-found/NotFoundPage.tsx'
 import { useFromParty } from './useFlow.ts'
 import styles from './TurnPage.module.css'
 
-/** « Un tour de jeu » : les étapes d'un tour, la façon de gagner, puis « Jouer » (qui joue ?). */
+/** « Un tour de jeu » : la table (celle de la mise en place, des cartes retournées), les étapes, la façon de gagner, puis « Jouer ». */
 export function TurnPage() {
   const { gameId } = useParams()
   const fromParty = useFromParty()
@@ -27,7 +27,8 @@ export function TurnPage() {
         quitTo={fromParty ? undefined : paths.game(game.id)}
       />
       <PageTitle>{turn.title}</PageTitle>
-      {turn.diagram && <PileDiagram items={turn.diagram} />}
+      {/* La table de la mise en place, à l'identique : seules quelques cartes sont retournées. */}
+      <CardTable hand={game.tutorial.setup.hand} center={game.tutorial.setup.center} reveal={turn.reveal} />
       <Panel>
         {turn.steps.map((step, index) => (
           <p key={step.label} className={styles.step}>

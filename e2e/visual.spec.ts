@@ -174,7 +174,8 @@ const gameScreens = (game: Game): Screen[] => {
       { name: `groupe ${i + 1}, connaisseur`, url: `${url}/tutoriel/cartes/${i + 1}`, mode: 'expert' },
     ]),
     { name: 'mise en place', url: `${url}/tutoriel/mise-en-place` },
-    { name: 'un tour', url: `${url}/tutoriel/tour` },
+    // Pas « Un tour » : sa table est celle de la mise en place, à l'identique (quelques cartes retournées) ;
+    // la page peut défiler au besoin (choix de l'utilisateur, cahier des charges §5).
     { name: 'qui joue ?', url: `${url}/joueurs` },
     { name: `partie sans prénoms, ${max} joueurs`, url: `${url}/partie`, game: game.id, party: unnamedParty(max) },
     {

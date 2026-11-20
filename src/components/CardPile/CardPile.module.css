@@ -15,8 +15,9 @@
   --dy: calc(var(--mc-space-1) / 2);
 }
 
+/* Une main : les cartes se recouvrent et s'inclinent autour de celle du milieu, comme CardHand (taille `focus`). */
 .spread {
-  --dx: calc(var(--mc-space-1) * 1.75);
+  --dx: calc(var(--pile-card-w) * var(--mc-hand-step));
   --dy: 0px;
 }
 
@@ -25,4 +26,26 @@
   position: absolute;
   top: calc((var(--n) - 1 - var(--i)) * var(--dy));
   left: calc(var(--i) * var(--dx));
+}
+
+.spread .card {
+  transform: rotate(calc((var(--i) - (var(--n) - 1) / 2) * var(--mc-hand-angle)));
+  transform-origin: 50% 100%;
+}
+
+/* Des cartes alignées face cachée, 3 x 2 : le centre de Trio. Le relief d'une carte ne touche pas la rangée suivante. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, var(--pile-card-w));
+  column-gap: calc(var(--mc-space-1) / 2);
+  row-gap: var(--mc-space-1);
+  width: auto;
+  height: auto;
+}
+
+/* Dans la grille, les cartes suivent le flux ; elles restent le repère de leur rang et de leur symbole (carte retournée). */
+.grid .card {
+  position: relative;
+  top: 0;
+  left: 0;
 }

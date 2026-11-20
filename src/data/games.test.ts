@@ -52,7 +52,8 @@ const classicTexts = (game: Game): string[] => [
   game.description,
   ...game.card_groups.flatMap((g) => [g.label, g.short, g.badge ?? '', g.detail.title, g.detail.text]),
   game.tutorial.setup.title,
-  ...game.tutorial.setup.diagram.map((item) => item.label),
+  game.tutorial.setup.hand.label,
+  ...game.tutorial.setup.center.map((item) => item.label),
   ...game.tutorial.setup.steps,
   game.tutorial.turn.title,
   ...game.tutorial.turn.steps.flatMap((s) => [s.label, s.text]),
@@ -271,8 +272,18 @@ describe.each(games.map((game) => [game.id, game] as const))('jeu « %s »', (id
 
   describe('schémas de cartes de dos', () => {
     it('ne posent des cartes de dos que si le jeu n’y met pas une carte visible', () => {
-      const items = [...game.tutorial.setup.diagram, ...(game.tutorial.turn.diagram ?? [])]
-      for (const item of items) if (item.card) expect(item.layout, item.label).toBeUndefined()
+      const { hand, center } = game.tutorial.setup
+      for (const item of [hand, ...center]) if (item.card) expect(item.layout, item.label).toBeUndefined()
+    })
+
+    it('ne retourne dans « Un tour » que des cartes de la table de la mise en place', () => {
+      const { setup, turn } = game.tutorial
+      expect(turn.reveal?.center?.length ?? 0).toBeLessThanOrEqual(setup.center.length)
+      // Une carte retournée au centre : il y a des dos à cet endroit, pas déjà une carte visible.
+      turn.reveal?.center?.forEach((_, index) =>
+        expect(setup.center[index].card, setup.center[index].label).toBeUndefined(),
+      )
+      if (turn.reveal?.hand) expect(setup.hand.card).toBeUndefined()
     })
   })
 
@@ -344,10 +355,17 @@ describe('Trio', () => {
     for (const card of originals) expect(card.imageUrl, card.image).toBeTruthy()
   })
 
-  it('garde le bleu de l’app (pas de fond propre) et pose une main en éventail, le centre en pile', () => {
+  it('garde le bleu de l’app (pas de fond propre) et pose une main en éventail, le centre en cartes alignées', () => {
     expect(resolveGameTheme(trio).screen).toBeUndefined()
-    expect(trio.tutorial.setup.diagram.map((i) => i.layout)).toEqual(['spread', 'pile'])
-    expect(trio.tutorial.turn.diagram?.map((i) => i.layout)).toEqual(['pile', 'spread'])
+    expect(trio.tutorial.setup.hand.layout).toBe('spread')
+    expect(trio.tutorial.setup.center.map((i) => i.layout)).toEqual(['grid'])
+  })
+
+  it('retourne dans « Un tour » une carte du centre (un 4) et la carte du bord de la main d’en face (un as)', () => {
+    expect(trio.tutorial.turn.reveal).toEqual({
+      across: { rank: 'A', suit: 'spades' },
+      center: [{ rank: '4', suit: 'hearts' }],
+    })
   })
 
   it('se joue de 3 à 6 joueurs, en 15 minutes', () => {
@@ -372,7 +390,8 @@ describe('Trio', () => {
   it('reprend les textes de la maquette mot pour mot', () => {
     expect(trio.tagline).toBe('Trouve trois cartes identiques.')
     expect(trio.tutorial.turn.win.text).toBe('Réunis 3 trios. Ou le trio de 7.')
-    expect(trio.tutorial.setup.diagram.map((item) => item.label)).toEqual(['Ta main, triée', 'Au centre, cachées'])
+    expect(trio.tutorial.setup.hand.label).toBe('Ta main, triée')
+    expect(trio.tutorial.setup.center.map((item) => item.label)).toEqual(['Au centre, cachées'])
     expect(trio.full_rules.map((s) => s.title)).toEqual([
       'But',
       'Mise en place',
@@ -483,7 +502,8 @@ describe('Love Letter', () => {
   it('reprend les textes de la maquette', () => {
     expect(ll.tagline).toBe('Une lettre. Une princesse. Un seul gagnant.')
     expect(ll.tutorial.turn.win.title).toBe('Gagner la manche')
-    expect(ll.tutorial.setup.diagram.map((item) => item.label)).toEqual(['Pioche', 'Écartée, cachée'])
+    expect(ll.tutorial.setup.hand.label).toBe('Ta main')
+    expect(ll.tutorial.setup.center.map((item) => item.label)).toEqual(['Pioche', 'Écartée, cachée'])
     expect(ll.full_rules.map((s) => s.title)).toEqual([
       'But',
       'Valeurs des cartes',
@@ -504,7 +524,7 @@ describe('Love Letter', () => {
   it('n’a aucune mise en place particulière à 2 joueurs', () => {
     const texts = [...ll.tutorial.setup.steps, ...ll.full_rules.map((s) => s.text)].join('\n')
     expect(texts).not.toMatch(/face visible au début|À 2 joueurs, pose/)
-    expect(ll.tutorial.setup.diagram.every((item) => !item.card)).toBe(true)
+    expect(ll.tutorial.setup.center.every((item) => !item.card)).toBe(true)
   })
 
   it('prend la palette bordeaux : couleur du jeu, relief, texte et fond crème, dos corail, sceau de cire pour logo', () => {
@@ -525,11 +545,19 @@ describe('Love Letter', () => {
     expect(originals.map((c) => c.name)).toEqual(ll.card_groups.map((g) => g.expert.name))
   })
 
-  it('montre la pioche en pile, la carte écartée seule, et une carte visible posée dans « Un tour »', () => {
-    expect(ll.tutorial.setup.diagram.map((i) => i.layout)).toEqual(['pile', 'single'])
-    const turn = ll.tutorial.turn.diagram!
-    expect(turn.map((i) => i.label)).toEqual(['Pioche', 'Ta main', 'Posée devant toi'])
-    expect(turn[2].card).toEqual({ rank: '5', suit: 'hearts' })
+  it('montre une carte par main, la pioche en pile, la carte écartée seule ; dans « Un tour », ta main de 2 cartes de face et une carte jouée devant les joueurs d’en face et de droite', () => {
+    expect(ll.tutorial.setup.hand.layout).toBe('single')
+    expect(ll.tutorial.setup.center.map((i) => i.layout)).toEqual(['pile', 'single'])
+    expect(ll.tutorial.turn.reveal).toEqual({
+      hand: [
+        { rank: '5', suit: 'hearts' },
+        { rank: 'Q', suit: 'hearts' },
+      ],
+      played: {
+        across: { rank: '3', suit: 'spades' },
+        right: { rank: 'J', suit: 'clubs' },
+      },
+    })
   })
 
   it('annonce 21 cartes dans la mise en place, comme le paquet', () => {

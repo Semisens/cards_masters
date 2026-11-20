@@ -71,18 +71,9 @@
   box-shadow: none;
 }
 
-/* Carte visible du schéma de mise en place : 56 x 78 px, cadre de 4 px, estompée pour dire « pas à jouer ». */
-.diagram {
-  aspect-ratio: 1 / var(--mc-card-ratio-list);
-  border: var(--mc-card-frame-focus) solid var(--mc-color-bordure);
-  box-shadow: none;
-  opacity: 0.6;
-}
-
 /* Rang des cartes de la maquette : taille fixe (14 px, 28 px) et décalage de 2 px / 6 px depuis le coin. */
 .list .rank,
-.focus .rank,
-.diagram .rank {
+.focus .rank {
   top: calc(var(--mc-space-1) / 4);
   left: calc(var(--mc-space-1) * 0.75);
 }
@@ -95,13 +86,23 @@
   font-size: calc(var(--mc-text-min) * 1.75);
 }
 
-.diagram .rank {
-  font-size: calc(var(--mc-text-min) * 1.125);
-}
-
 /* Symbole des cartes de la maquette : le glyphe occupe environ la moitié de la largeur, un peu moins que la carte standard. */
 .list .symbol,
-.focus .symbol,
-.diagram .symbol {
+.focus .symbol {
+  width: calc(var(--mc-card-symbol-ratio-list) * 100%);
+}
+
+/*
+ * Petite carte retournée sur la table (un tour) : même taille et même relief que les dos qui l'entourent. Le rang garde
+ * la taille de texte minimale (16 px) même sur une carte de 2 rem ; le symbole, plus petit, descend un peu sous le rang.
+ */
+.table .rank {
+  top: calc(var(--mc-space-1) / 4);
+  left: calc(var(--mc-space-1) / 2);
+  font-size: var(--mc-text-min);
+}
+
+.table .symbol {
+  top: 62%;
   width: calc(var(--mc-card-symbol-ratio-list) * 100%);
 }

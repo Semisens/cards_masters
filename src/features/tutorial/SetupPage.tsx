@@ -2,8 +2,8 @@ import { useParams } from 'react-router'
 import { ButtonLink } from '../../components/Button/ButtonLink.tsx'
 import { PageTitle } from '../../components/PageTitle/PageTitle.tsx'
 import { Panel } from '../../components/Panel/Panel.tsx'
-import { PileDiagram } from '../../components/PileDiagram/PileDiagram.tsx'
 import { Screen } from '../../components/Screen/Screen.tsx'
+import { CardTable } from '../../components/CardTable/CardTable.tsx'
 import { StepHeader } from '../../components/StepHeader/StepHeader.tsx'
 import { getGame } from '../../data/games.ts'
 import { fr } from '../../i18n/fr.ts'
@@ -11,7 +11,7 @@ import { paths } from '../../routes.ts'
 import { NotFoundPage } from '../not-found/NotFoundPage.tsx'
 import { useFromParty } from './useFlow.ts'
 
-/** « Mise en place » : un schéma (ta main, le centre) et les étapes numérotées. */
+/** « Mise en place » : la table (quatre mains, le centre) et les étapes numérotées. */
 export function SetupPage() {
   const { gameId } = useParams()
   const fromParty = useFromParty()
@@ -26,7 +26,7 @@ export function SetupPage() {
         quitTo={fromParty ? undefined : paths.game(game.id)}
       />
       <PageTitle>{setup.title}</PageTitle>
-      <PileDiagram items={setup.diagram} />
+      <CardTable hand={setup.hand} center={setup.center} />
       <Panel>
         {setup.steps.map((step, index) => (
           <div key={step}>

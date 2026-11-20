@@ -163,11 +163,13 @@ describe('Love Letter : tutoriel', () => {
     expect(rows[2].textContent).toMatch(/^2/)
   })
 
-  it('montre un « Un tour » avec sa pioche, sa main et la carte posée', async () => {
+  it('montre « Un tour » sur la table de la mise en place : ta main de face, des cartes jouées devant les autres', async () => {
     renderApp('/jeu/love-letter/tutoriel/tour')
-    expect(await screen.findByText('Posée devant toi')).toBeInTheDocument()
-    expect(screen.getByText('Ta main')).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'Posée devant toi' })).toBeInTheDocument()
+    expect(await screen.findByText('Ta main')).toBeInTheDocument()
+    expect(screen.getByText('Pioche')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '5 de cœur', hidden: true })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Dame de cœur', hidden: true })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: '3 de pique' })).toBeInTheDocument()
   })
 
   it('dessine les deux éléments de la mise en place, sans cartes visibles à 2 joueurs', async () => {

@@ -75,4 +75,14 @@ describe('PlayingCard', () => {
     expect((list.firstChild as HTMLElement).className).not.toBe((focus.firstChild as HTMLElement).className)
     expect(screen.getByRole('img', { name: 'Jokers' })).toBeInTheDocument()
   })
+
+  it('a une variante pour les cartes retournées sur la table, distincte des autres', () => {
+    const { container: table } = render(<PlayingCard rank="A" suit="spades" variant="table" />)
+    const { container: standard } = render(<PlayingCard rank="A" suit="spades" />)
+    const { container: list } = render(<PlayingCard rank="A" suit="spades" variant="list" />)
+    const className = (table.firstChild as HTMLElement).className
+    expect(className).not.toBe((standard.firstChild as HTMLElement).className)
+    expect(className).not.toBe((list.firstChild as HTMLElement).className)
+    expect(table).toHaveTextContent('A')
+  })
 })

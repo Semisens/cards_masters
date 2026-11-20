@@ -111,9 +111,9 @@ scoring:
 tutorial:
   setup:
     title: Mise en place
-    diagram:
-      - { label: 'Ta main, triée', layout: spread }
-      - { label: 'Au centre, cachées', layout: pile }
+    hand: { label: 'Ta main, triée', layout: spread }
+    center:
+      - { label: 'Au centre, cachées', layout: grid }
     steps:
       - Mélange les {cards} cartes.
       - Donne 9, 7, 6 ou 5 cartes par joueur (3, 4, 5 ou 6 joueurs).
@@ -121,9 +121,9 @@ tutorial:
       - Trie ta main du plus petit au plus grand. Ne la montre à personne.
   turn:
     title: Un tour de jeu
-    diagram:
-      - { label: Au centre, layout: pile }
-      - { label: Mains des joueurs, layout: spread }
+    reveal: # la table de la mise en place, avec ces cartes retournées
+      across: { rank: A, suit: spades }
+      center: [{ rank: 4, suit: hearts }]
     steps:
       - label: Retourne.
         text: Une carte au centre, ou la plus petite ou la plus grande d’une main.
