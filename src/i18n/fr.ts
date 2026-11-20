@@ -4,7 +4,7 @@
 const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`
 
 export const fr = {
-  app: { name: 'MasterCards' },
+  app: { name: 'MastersCards' },
   nav: {
     back: 'Retour',
     backToParty: 'Retour à la partie',

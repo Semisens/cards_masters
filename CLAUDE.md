@@ -1,8 +1,8 @@
-# MasterCards : consignes pour Claude Code
+# MastersCards : consignes pour Claude Code
 
 - Spécification complète : `docs/CAHIER_DES_CHARGES.md`. Lis-le en premier.
-- Tokens de design : `charte/mastercards-charte.json`. Ne jamais écrire une couleur, un rayon, un espacement ou une taille de texte en dur : tout passe par les variables `--mc-*` générées (`npm run tokens`). Le test `scripts/no-hardcoded-values.test.ts` fait échouer le build sinon.
-- Contexte produit : `docs/contexte/mastercards-contexte.md`.
+- Tokens de design : `charte/masterscards-charte.json`. Ne jamais écrire une couleur, un rayon, un espacement ou une taille de texte en dur : tout passe par les variables `--mc-*` générées (`npm run tokens`). Le test `scripts/no-hardcoded-values.test.ts` fait échouer le build sinon.
+- Contexte produit : `docs/contexte/masterscards-contexte.md`.
 - Maquettes : `maquettes/<jeu>/*.png`, rendues par `npm run maquettes` depuis `maquettes/<jeu>/source/*.html` (voir `maquettes/LISEZ-MOI.md`).
 - Stack : **PWA** en Vite + React + TypeScript strict, empaquetée pour iOS et Android avec **Capacitor**. Base 390x844, portrait uniquement.
 - Textes de l'app : tutoiement, phrases courtes, français.
@@ -21,6 +21,7 @@
 | `npm test` | Vitest : unitaires, composants, garde-fou « aucune valeur en dur ». |
 | `npm run test:visual` | Playwright : PWA (hors ligne, manifeste), parcours de l’app sur le build de production (dont `e2e/jeux.spec.ts` : le même parcours pour chaque jeu), captures des écrans à 390x844. |
 | `npm run build` | Build de production dans `dist/` (service worker inclus). |
+| `npm run deploy` | Publie la version de `main` sur GitHub Pages (pousse `main` sur la branche `deploy`). |
 | `npm run cap:sync` | Build puis copie dans les projets natifs `android/` et `ios/`. |
 | `npm run tokens` / `npm run icons` | Régénèrent les tokens et les icônes depuis la charte. |
 | `npm run maquettes` | Rend les maquettes HTML en images de référence (`maquettes/trio/*.png`). |
@@ -33,7 +34,8 @@ Le flux : Jeremy demande → tu développes vite → Jeremy valide avec `npm run
 - On travaille **directement sur `main`** : pas de branche ni de PR par demande.
 - **Ne lance aucun test** : ni `npm test`, ni `npm run test:visual` / Playwright, ni lint, ni typecheck. Écris le code et laisse Jeremy le regarder.
 - **Commit** (seulement quand Jeremy le demande) : le hook `pre-commit` lance les tests unitaires (`npm test`).
-- **Push** (seulement quand Jeremy le demande, après plusieurs commits) : le hook `pre-push` vérifie que les tokens générés sont à jour, puis lance lint, typecheck et `npx playwright test` (PWA, parcours de chaque jeu, fidélité aux maquettes, captures). La CI GitHub (`.github/workflows/ci.yml`) rejoue la même chose en filet de sécurité. Quand elle est verte sur `main`, `.github/workflows/pages.yml` publie la PWA sur GitHub Pages (https://semisens.github.io/cards_masters/, build avec `BASE_PATH=/cards_masters/`).
+- **Push** (seulement quand Jeremy le demande, après plusieurs commits) : le hook `pre-push` vérifie que les tokens générés sont à jour, puis lance lint, typecheck et `npx playwright test` (PWA, parcours de chaque jeu, fidélité aux maquettes, captures). La CI GitHub (`.github/workflows/ci.yml`) rejoue la même chose en filet de sécurité.
+- **Déploiement** (seulement quand Jeremy le demande) : `npm run deploy` pousse `main` sur la branche `deploy` (le `pre-push` teste tout avant) ; `.github/workflows/pages.yml` publie alors la PWA sur GitHub Pages : https://semisens.github.io/masterscards/ (build avec `BASE_PATH=/masterscards/`).
 - **Un hook échoue** : lis son message, corrige, recommite ou repousse. Jamais `--no-verify`, sauf demande explicite de Jeremy.
 - **Une capture a changé volontairement** (le pre-push échoue sur un écran modifié) : montre l'écart à Jeremy et attends son accord. Ensuite seulement : `npx playwright test --update-snapshots`, regarde les images, commite la mise à jour, repousse.
 - Le tableau « Commandes » ci-dessus sert à Jeremy et aux hooks.
@@ -66,5 +68,5 @@ Tous les jeux ont les mêmes écrans et le même fonctionnement. **Un jeu = une 
 - Fichiers `*.generated.*` : jamais édités à la main, régénérés par `npm run tokens`.
 - `.npmrc` active `legacy-peer-deps` (conflit de peer optionnel entre `@vitejs/plugin-react` et Workbox). Ne pas le retirer sans vérifier que `npm install` passe.
 - Les rangs de cartes et valeurs de jetons sont des éléments graphiques proportionnels à l'objet. Sous environ 3,9 rem de largeur de carte, le rang passe sous 16 px : pour les cartes d’illustration, utiliser `READABLE_CARD_WIDTH` (`components/PlayingCard/sizes.ts`).
-- `capacitor.config.ts` : l'identifiant `io.mastercards.app` est provisoire. Il ne peut plus changer une fois l'app publiée sur un store.
+- `capacitor.config.ts` : l'identifiant `io.masterscards.app` est provisoire. Il ne peut plus changer une fois l'app publiée sur un store.
 - iOS ne se compile que sur Mac (Xcode). Android demande le SDK Android (Android Studio). Sans eux, on vérifie seulement `npx cap sync`.

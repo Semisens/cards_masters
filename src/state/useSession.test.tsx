@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { useSession } from './useSession.ts'
 
-const KEY = 'mastercards:session:trio'
+const KEY = 'masterscards:session:trio'
 const PARTY = { players: [{ name: 'Léa', score: 2 }], round: 1 }
 
 beforeEach(() => window.localStorage.clear())
@@ -46,7 +46,7 @@ describe('useSession', () => {
   })
 
   it('garde les parties de deux jeux séparées', async () => {
-    window.localStorage.setItem('mastercards:session:autre', JSON.stringify(PARTY))
+    window.localStorage.setItem('masterscards:session:autre', JSON.stringify(PARTY))
     const { result } = renderHook(() => useSession('trio'))
     await waitFor(() => expect(result.current.status).toBe('ready'))
     expect(result.current.session).toBeNull()

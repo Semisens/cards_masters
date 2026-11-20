@@ -1,5 +1,5 @@
 {
-  "name": "mastercards",
+  "name": "masterscards",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:visual": "playwright test",
     "cap:sync": "npm run build && cap sync",
+    "deploy": "git push origin main:deploy",
     "icons": "node scripts/gen-icons.ts",
     "phone": "sh scripts/phone.sh",
     "dev:phone": "sh scripts/dev-phone.sh",

@@ -28,7 +28,7 @@ describe('ModeProvider', () => {
   })
 
   it('retrouve le mode mémorisé', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     render(
       <ModeProvider>
         <Probe />
@@ -45,11 +45,11 @@ describe('ModeProvider', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: 'expert' }))
     expect(screen.getByText('mode:expert')).toBeInTheDocument()
-    expect(window.localStorage.getItem('mastercards:mode')).toBe('expert')
+    expect(window.localStorage.getItem('masterscards:mode')).toBe('expert')
   })
 
   it('ignore une valeur mémorisée invalide', async () => {
-    window.localStorage.setItem('mastercards:mode', 'nimporte-quoi')
+    window.localStorage.setItem('masterscards:mode', 'nimporte-quoi')
     render(
       <ModeProvider>
         <Probe />

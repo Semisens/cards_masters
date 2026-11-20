@@ -1,4 +1,4 @@
-package io.mastercards.app;
+package io.masterscards.app;
 
 import com.getcapacitor.BridgeActivity;
 

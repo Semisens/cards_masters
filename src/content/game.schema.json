@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mastercards.local/game.schema.json",
-  "title": "Jeu MasterCards",
+  "$id": "https://masterscards.local/game.schema.json",
+  "title": "Jeu MastersCards",
   "description": "Un fichier game.yaml par jeu, dans src/content/games/<id>/. Ajouter un jeu = ajouter ce dossier, sans toucher au code. Validé par src/data/games.test.ts. Modèle commenté : docs/modele-jeu.yaml.",
   "type": "object",
   "additionalProperties": false,

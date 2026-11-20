@@ -7,7 +7,7 @@ test.describe('PWA (build de production)', () => {
     expect(href).toBeTruthy()
 
     const manifest = await (await request.get(new URL(href!, page.url()).toString())).json()
-    expect(manifest.name).toBe('MasterCards')
+    expect(manifest.name).toBe('MastersCards')
     expect(manifest.display).toBe('standalone')
     expect(manifest.orientation).toBe('portrait')
     const sizes = manifest.icons.map((i: { sizes: string }) => i.sizes)

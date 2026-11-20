@@ -1,12 +1,11 @@
-# Publie la PWA sur GitHub Pages, seulement quand la CI de `main` est verte.
-# Adresse : https://semisens.github.io/cards_masters/
+# Publie la PWA sur GitHub Pages à chaque push sur la branche `deploy` (`npm run deploy`).
+# Le hook pre-push a déjà lancé toute la suite de tests avant le push.
+# Adresse : https://semisens.github.io/masterscards/
 name: Pages
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
+  push:
+    branches: [deploy]
   workflow_dispatch:
 
 permissions:
@@ -20,12 +19,9 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -34,7 +30,7 @@ jobs:
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
-      # Une adresse profonde (/cards_masters/jeu/trio) ouverte sans service worker : Pages sert 404.html, donc l'app.
+      # Une adresse profonde (/masterscards/jeu/trio) ouverte sans service worker : Pages sert 404.html, donc l'app.
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">MasterCards</string>
-    <string name="title_activity_main">MasterCards</string>
-    <string name="package_name">io.mastercards.app</string>
-    <string name="custom_url_scheme">io.mastercards.app</string>
+    <string name="app_name">MastersCards</string>
+    <string name="title_activity_main">MastersCards</string>
+    <string name="package_name">io.masterscards.app</string>
+    <string name="custom_url_scheme">io.masterscards.app</string>
 </resources>

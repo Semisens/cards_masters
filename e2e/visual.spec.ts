@@ -111,7 +111,7 @@ test.describe('écrans sans maquette', () => {
 
   test('partie en cours à six joueurs', async ({ page }) => {
     await page.addInitScript(
-      (party) => window.localStorage.setItem('mastercards:session:trio', JSON.stringify(party)),
+      (party) => window.localStorage.setItem('masterscards:session:trio', JSON.stringify(party)),
       PARTY_6,
     )
     await page.goto('/jeu/trio/partie')
@@ -217,10 +217,10 @@ test.describe('aucun défilement vertical', () => {
           await page.addInitScript(
             ({ mode, party, game, history }) => {
               window.localStorage.clear()
-              window.localStorage.setItem('mastercards:welcomed', '1')
-              if (mode) window.localStorage.setItem('mastercards:mode', mode)
-              if (party) window.localStorage.setItem(`mastercards:session:${game}`, JSON.stringify(party))
-              if (history) window.localStorage.setItem('mastercards:history', JSON.stringify(history))
+              window.localStorage.setItem('masterscards:welcomed', '1')
+              if (mode) window.localStorage.setItem('masterscards:mode', mode)
+              if (party) window.localStorage.setItem(`masterscards:session:${game}`, JSON.stringify(party))
+              if (history) window.localStorage.setItem('masterscards:history', JSON.stringify(history))
             },
             {
               mode: screen.mode,

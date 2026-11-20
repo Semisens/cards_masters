@@ -34,7 +34,7 @@ describe('GameScope', () => {
   })
 
   it('ne pose rien hors d’un jeu : l’accueil garde le bleu', async () => {
-    window.localStorage.setItem('mastercards:welcomed', '1')
+    window.localStorage.setItem('masterscards:welcomed', '1')
     renderApp('/')
     await screen.findByRole('heading', { level: 1, name: 'Tes jeux' })
     expect(root().getPropertyValue('--game-pill-bg')).toBe('')
@@ -42,7 +42,7 @@ describe('GameScope', () => {
   })
 
   it('retire les couleurs en quittant le jeu', async () => {
-    window.localStorage.setItem('mastercards:welcomed', '1')
+    window.localStorage.setItem('masterscards:welcomed', '1')
     renderApp('/jeu/love-letter')
     await screen.findByRole('heading', { level: 1, name: 'Love Letter' })
     expect(root().getPropertyValue('--game-pill-bg')).not.toBe('')

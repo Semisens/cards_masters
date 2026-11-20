@@ -1,21 +1,21 @@
-# Cahier des charges : MasterCards
+# Cahier des charges : MastersCards
 
 Version 1.4 · Plateformes : PWA installable (web) + iOS et Android via Capacitor · Base écran : 390 × 844
 
 > Version 1.1 : passage de Flutter à une PWA (Vite + React + TypeScript) empaquetée avec Capacitor. Version 1.2 : écrans de Trio alignés sur les maquettes (charte v6). Version 1.3 : second jeu Love Letter, podium, historique, réglages, accueil « Tes jeux » à onglets ; moteur généralisé. Version 1.4 : un seul fonctionnement pour tous les jeux ; un jeu = une configuration YAML, sans code. Version 1.7 : couleurs par jeu (`main_color`, `background_color` : le fond de tous les écrans du jeu, `card_back_color`), dos de carte (piles, éventails) dans la mise en place, un tour et la partie, cartes d'origine dessinées en mode Connaisseur (`expert.cards`). Version 1.6 : palette bordeaux et sceau de cire pour Love Letter (`shadow_color`, `text_color`), plus de mise en place à 2 joueurs. Version 1.5 : Love Letter selon la règle de l'édition 2019 (10 personnages, 21 cartes dont 2 jokers, 2 à 6 joueurs) ; les jeux peuvent demander des jokers (`jokers`).
-> Raisons : contenu statique et hors ligne, aucune API native nécessaire, partage par lien, référencement web, pas de review de store pour la v1. Voir `docs/contexte/mastercards-contexte.md`.
+> Raisons : contenu statique et hors ligne, aucune API native nécessaire, partage par lien, référencement web, pas de review de store pour la v1. Voir `docs/contexte/masterscards-contexte.md`.
 
 ---
 
 ## 1. Présentation
 
 ### 1.1 Concept
-MasterCards est une application mobile qui explique comment jouer à des **jeux de société** (Love Letter, Trio, etc.) **avec un jeu de cartes classique** (52 cartes, plus les jokers si un jeu en demande).
+MastersCards est une application mobile qui explique comment jouer à des **jeux de société** (Love Letter, Trio, etc.) **avec un jeu de cartes classique** (52 cartes, plus les jokers si un jeu en demande).
 
 L'app ne sert **pas** à apprendre des jeux de cartes classiques (belote, tarot…).
 
 ### 1.2 Problème résolu
-Tu as envie de jouer à un jeu de société mais tu n'as pas la boîte. Tu as un paquet de cartes. MasterCards te dit quelles cartes garder et comment jouer.
+Tu as envie de jouer à un jeu de société mais tu n'as pas la boîte. Tu as un paquet de cartes. MastersCards te dit quelles cartes garder et comment jouer.
 
 ### 1.3 Cible
 Joueurs occasionnels et amateurs de jeux de société, en soirée, en voyage ou en vacances.
@@ -83,7 +83,7 @@ Jaune, vert, rouge, bleu. Bord conique rayé blanc/couleur, bordure intérieure 
 ### 4.4 Tapis
 Un tapis (couleur) par jeu : jaune, vert, rouge, bleu.
 
-### 4.5 Tokens (source : `charte/mastercards-charte.json`)
+### 4.5 Tokens (source : `charte/masterscards-charte.json`)
 
 **Couleurs**
 | Token | Valeur | Usage |
@@ -110,7 +110,7 @@ Un tapis (couleur) par jeu : jaune, vert, rouge, bleu.
 **Icônes** : trait 2,5, extrémités arrondies, couleur `#0E2F86`.
 
 ### 4.6 Implémentation
-- `scripts/gen-tokens.ts` lit `charte/mastercards-charte.json` et génère `src/styles/tokens.generated.css` (variables CSS `--mc-*`) et `src/core/tokens.generated.ts` (mêmes valeurs côté TypeScript). La charte reste **la seule source** : on modifie le JSON, jamais les fichiers générés.
+- `scripts/gen-tokens.ts` lit `charte/masterscards-charte.json` et génère `src/styles/tokens.generated.css` (variables CSS `--mc-*`) et `src/core/tokens.generated.ts` (mêmes valeurs côté TypeScript). La charte reste **la seule source** : on modifie le JSON, jamais les fichiers générés.
 - **Aucune valeur de couleur, rayon, espacement ou taille de texte en dur** dans le CSS ni le TSX. Un test automatisé (`scripts/no-hardcoded-values.test.ts`) fait échouer la CI sinon.
 - Les espacements et la taille de texte minimale sont exprimés en `rem`, pour suivre la taille de texte choisie par l'utilisateur.
 - Polices **embarquées** : Fredoka et Nunito via `@fontsource`, la police du nom de chaque jeu dans son dossier (ex. Great Vibes, `love-letter/great-vibes.woff2`, avec sa licence OFL) ; sous-ensemble latin uniquement, précachées par le service worker. Aucune requête vers Google Fonts : l'app reste fidèle hors ligne.
@@ -260,7 +260,7 @@ Hook `useSwipe` (`src/core/`) : balayage tactile et flèches du clavier. Les sym
 ### 9.1 Principe
 **Tous les jeux ont les mêmes écrans et le même fonctionnement.** Un jeu n'est qu'une **configuration** : un dossier `src/content/games/<id>/` avec un `game.yaml` et, si besoin, un logo (`svg` ou `png`) et la police de son nom (`woff2`, licence libre). Ajouter un jeu = ajouter ce dossier, **sans toucher au code**, sauf demande de nouvelle fonction. Modèle commenté à copier : `docs/modele-jeu.yaml`.
 
-Les fichiers sont lus au build (`import.meta.glob`, plugin `mastercards-yaml` de `vite.config.ts`) : ils sont donc **embarqués** et précachés pour le hors ligne. `src/data/loadGame.ts` prépare chaque jeu (cartes exactes, nombre de cartes, `{cards}` dans les textes, police). C'est vérifié : le modèle, déposé tel quel comme troisième jeu, passe le schéma, le parcours complet jusqu'au podium (`e2e/jeux.spec.ts`) et le test « aucun défilement » (`e2e/visual.spec.ts`), qui parcourent **tous** les dossiers de jeux.
+Les fichiers sont lus au build (`import.meta.glob`, plugin `masterscards-yaml` de `vite.config.ts`) : ils sont donc **embarqués** et précachés pour le hors ligne. `src/data/loadGame.ts` prépare chaque jeu (cartes exactes, nombre de cartes, `{cards}` dans les textes, police). C'est vérifié : le modèle, déposé tel quel comme troisième jeu, passe le schéma, le parcours complet jusqu'au podium (`e2e/jeux.spec.ts`) et le test « aucun défilement » (`e2e/visual.spec.ts`), qui parcourent **tous** les dossiers de jeux.
 
 ### 9.2 Modèle
 
@@ -494,7 +494,7 @@ Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capa
 
 ### Prompt de démarrage conseillé pour Claude Code
 
-> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (finitions) ou ajoute un troisième jeu (copie `docs/modele-jeu.yaml` dans `src/content/games/<id>/game.yaml`, sans toucher au code). Utilise `charte/mastercards-charte.json` comme seule source des tokens et les images de `maquettes/<jeu>/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
+> Lis `CLAUDE.md` puis `docs/CAHIER_DES_CHARGES.md`. Reprends au jalon 5 (finitions) ou ajoute un troisième jeu (copie `docs/modele-jeu.yaml` dans `src/content/games/<id>/game.yaml`, sans toucher au code). Utilise `charte/masterscards-charte.json` comme seule source des tokens et les images de `maquettes/<jeu>/` comme référence. Avant de coder, propose-moi la liste des fichiers que tu vas créer.
 
 ---
 
@@ -508,7 +508,7 @@ Hébergement web et nom de domaine, icône et écran de lancement natifs (`@capa
 6. Où sont hébergées les maquettes définitives ? Lien du canvas à conserver dans le dépôt.
 7. Validation juridique des noms de jeux avant publication.
 8. Hébergement web et nom de domaine.
-9. Identifiant d'application définitif (`io.mastercards.app` est provisoire) : à fixer avant toute publication sur un store.
+9. Identifiant d'application définitif (`io.masterscards.app` est provisoire) : à fixer avant toute publication sur un store.
 10. Prérendu statique des pages par jeu pour le référencement : nécessaire ou non ?
 11. ~~Love Letter : comment représenter les cartes avec un paquet de 52 ?~~ *Tranché : 6 Gardes = 4 valets + 2 rois noirs ; avec la règle de 2019 : Espionnes = jokers, Princesse = dame de cœur, 21 cartes (7.10).*
 12. Relecture éditoriale de Trio : les textes viennent des maquettes ; cinq textes de la vue à balayer (A, 2 à 6, 8 à 10, Valet, Dame) ont été rédigés sur le même modèle. « Un tour » (maquette) dit « puis une deuxième » alors qu'on peut retourner jusqu'à trois cartes : à confirmer.

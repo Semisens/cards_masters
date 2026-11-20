@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=../src/content/game.schema.json
 #
-# MODÈLE DE JEU — à copier pour ajouter un jeu à MasterCards, sans toucher au code.
+# MODÈLE DE JEU — à copier pour ajouter un jeu à MastersCards, sans toucher au code.
 #
 # 1. Crée le dossier src/content/games/<id>/ (id en minuscules, avec des tirets : « mon-jeu »).
 # 2. Copie ce fichier dedans sous le nom game.yaml, puis remplace chaque valeur.

@@ -1,4 +1,4 @@
-// Fichier généré par scripts/gen-tokens.ts depuis charte/mastercards-charte.json. Ne pas éditer.
+// Fichier généré par scripts/gen-tokens.ts depuis charte/masterscards-charte.json. Ne pas éditer.
 export const tokens = {
   "colors": {
     "ciel": "#1E5BD6",

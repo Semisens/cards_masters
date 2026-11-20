@@ -70,9 +70,9 @@ test.describe('parcours Trio', () => {
 
   test('la partie est mémorisée après un rechargement, puis se termine', async ({ page }) => {
     await page.addInitScript(() => {
-      if (!window.localStorage.getItem('mastercards:session:trio'))
+      if (!window.localStorage.getItem('masterscards:session:trio'))
         window.localStorage.setItem(
-          'mastercards:session:trio',
+          'masterscards:session:trio',
           JSON.stringify({
             players: [
               { name: 'Léa', score: 2 },
@@ -90,14 +90,14 @@ test.describe('parcours Trio', () => {
     await page.getByRole('button', { name: 'Terminer la partie' }).click()
     await expect(page).toHaveURL(/\/jeu\/trio\/resultat\/\d+$/)
     await expect(page.getByText('Partie interrompue')).toBeVisible()
-    expect(await page.evaluate(() => window.localStorage.getItem('mastercards:session:trio'))).toBeNull()
-    expect(await page.evaluate(() => window.localStorage.getItem('mastercards:history'))).toContain('"interrupted"')
+    expect(await page.evaluate(() => window.localStorage.getItem('masterscards:session:trio'))).toBeNull()
+    expect(await page.evaluate(() => window.localStorage.getItem('masterscards:history'))).toContain('"interrupted"')
   })
 
   test('les raccourcis de la partie y ramènent', async ({ page }) => {
     await page.addInitScript(() =>
       window.localStorage.setItem(
-        'mastercards:session:trio',
+        'masterscards:session:trio',
         JSON.stringify({
           players: [
             { name: 'Léa', score: 0 },
@@ -214,7 +214,7 @@ test.describe('parcours Love Letter', () => {
       if (window.sessionStorage.getItem('test-init')) return
       window.sessionStorage.setItem('test-init', '1')
       window.localStorage.clear()
-      window.localStorage.setItem('mastercards:welcomed', '1')
+      window.localStorage.setItem('masterscards:welcomed', '1')
     })
   })
 
@@ -264,7 +264,7 @@ test.describe('parcours Love Letter', () => {
   test('la partie se termine d’elle-même au score visé : 6 points à deux joueurs', async ({ page }) => {
     await page.addInitScript(() =>
       window.localStorage.setItem(
-        'mastercards:session:love-letter',
+        'masterscards:session:love-letter',
         JSON.stringify({
           players: [
             { name: 'Léa', score: 5 },
@@ -284,7 +284,7 @@ test.describe('parcours Love Letter', () => {
   test('à six joueurs, la partie se termine à 3 points', async ({ page }) => {
     await page.addInitScript(() =>
       window.localStorage.setItem(
-        'mastercards:session:love-letter',
+        'masterscards:session:love-letter',
         JSON.stringify({
           players: ['Léa', 'Tom', 'Zoé', 'Max', 'Ana', 'Lou'].map((name, i) => ({ name, score: i === 0 ? 2 : 1 })),
           round: 5,

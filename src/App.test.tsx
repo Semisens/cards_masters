@@ -5,7 +5,7 @@ import { getGame } from './data/games.ts'
 import { renderApp } from './test/renderApp.tsx'
 
 const trio = getGame('trio')!
-const SESSION_KEY = 'mastercards:session:trio'
+const SESSION_KEY = 'masterscards:session:trio'
 const PARTY = {
   players: [
     { name: 'Léa', score: 2 },
@@ -133,7 +133,7 @@ describe('« Tes cartes » : vue liste', () => {
   it('mémorise le mode choisi', async () => {
     const first = renderApp('/jeu/trio/tutoriel/cartes')
     await userEvent.click(await screen.findByRole('radio', { name: 'Connaisseur' }))
-    expect(window.localStorage.getItem('mastercards:mode')).toBe('expert')
+    expect(window.localStorage.getItem('masterscards:mode')).toBe('expert')
     first.unmount()
 
     renderApp('/jeu/trio/tutoriel/cartes')
@@ -199,7 +199,7 @@ describe('vue à balayer', () => {
   })
 
   it('mode connaisseur : ajoute la carte d’origine et son pouvoir', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/trio/tutoriel/cartes/3')
     expect(
       await screen.findByText(
@@ -209,7 +209,7 @@ describe('vue à balayer', () => {
   })
 
   it('mode connaisseur : accorde « cartes » quand le groupe en réunit plusieurs', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/trio/tutoriel/cartes/2')
     expect(await screen.findByText(/Mode connaisseur : cartes 2–6 du jeu d’origine\./)).toBeInTheDocument()
   })
@@ -496,7 +496,7 @@ describe('partie en cours', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Terminer la partie' }))
     await waitFor(() => expect(app.location()).toMatch(/^\/jeu\/trio\/resultat\/\d+$/))
     expect(savedParty()).toBeNull()
-    const history = JSON.parse(window.localStorage.getItem('mastercards:history') ?? '[]')
+    const history = JSON.parse(window.localStorage.getItem('masterscards:history') ?? '[]')
     expect(history).toHaveLength(1)
     expect(history[0]).toMatchObject({ gameId: 'trio', status: 'interrupted' })
     expect(await screen.findByText('Partie interrompue')).toBeInTheDocument()

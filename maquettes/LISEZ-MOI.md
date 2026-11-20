@@ -63,4 +63,4 @@ La galerie est une version antérieure aux maquettes de Trio. Les sources ont é
 2. `npm run maquettes` (ou `npm run maquettes -- love-letter`) régénère les images.
 3. `npx playwright test --project=visual e2e/maquettes.spec.ts` montre ce que l'app doit rattraper (images d'écart dans `test-results/maquettes/`).
 
-La source de vérité des valeurs (couleurs, rayons, polices) reste `../charte/mastercards-charte.json`.
+La source de vérité des valeurs (couleurs, rayons, polices) reste `../charte/masterscards-charte.json`.

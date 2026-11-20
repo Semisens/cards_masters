@@ -11,7 +11,7 @@ test.describe('parcours de chaque jeu', () => {
       if (window.sessionStorage.getItem('test-init')) return
       window.sessionStorage.setItem('test-init', '1')
       window.localStorage.clear()
-      window.localStorage.setItem('mastercards:welcomed', '1')
+      window.localStorage.setItem('masterscards:welcomed', '1')
     })
   })
 

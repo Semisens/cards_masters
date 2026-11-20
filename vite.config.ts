@@ -5,10 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { parse } from 'yaml'
 
 // Les couleurs viennent de la charte, jamais écrites ici.
-const charte = JSON.parse(readFileSync(new URL('./charte/mastercards-charte.json', import.meta.url), 'utf8'))
+const charte = JSON.parse(readFileSync(new URL('./charte/masterscards-charte.json', import.meta.url), 'utf8'))
 const ciel: string = charte.colors.ciel
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
-// Adresse de base : `/` par défaut (dev, tests, Capacitor) ; `/cards_masters/` pour GitHub Pages (workflow pages.yml).
+// Adresse de base : `/` par défaut (dev, tests, Capacitor) ; `/masterscards/` pour GitHub Pages (workflow pages.yml).
 const base = process.env.BASE_PATH ?? '/'
 
 export default defineConfig({
@@ -18,20 +18,20 @@ export default defineConfig({
     react(),
     {
       // Configurations des jeux (src/content/games/<id>/game.yaml) : lues au build, embarquées en JSON.
-      name: 'mastercards-yaml',
+      name: 'masterscards-yaml',
       transform: (code, id) =>
         id.endsWith('.yaml') ? { code: `export default ${JSON.stringify(parse(code))}`, map: null } : undefined,
     },
     {
-      name: 'mastercards-theme-color',
+      name: 'masterscards-theme-color',
       transformIndexHtml: () => [{ tag: 'meta', attrs: { name: 'theme-color', content: ciel }, injectTo: 'head' }],
     },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'MasterCards',
-        short_name: 'MasterCards',
+        name: 'MastersCards',
+        short_name: 'MastersCards',
         description: 'Joue à tes jeux de société préférés avec un simple paquet de 52 cartes.',
         lang: 'fr',
         start_url: base,

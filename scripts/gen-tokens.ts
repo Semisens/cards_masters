@@ -1,4 +1,4 @@
-// Génère les tokens de design depuis charte/mastercards-charte.json.
+// Génère les tokens de design depuis charte/masterscards-charte.json.
 // Sorties (ne jamais éditer à la main) :
 //   - src/styles/tokens.generated.css  : variables CSS --mc-*
 //   - src/core/tokens.generated.ts     : mêmes valeurs côté TypeScript
@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { rgba, shadowOf } from '../src/core/color.ts'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const charte = JSON.parse(readFileSync(resolve(root, 'charte/mastercards-charte.json'), 'utf8'))
+const charte = JSON.parse(readFileSync(resolve(root, 'charte/masterscards-charte.json'), 'utf8'))
 
 const kebab = (s: string) => s.replace(/_/g, '-')
 const PX_PER_REM = 16
@@ -76,10 +76,10 @@ add('veil-shadow', charte.voile.ombre)
 add('chip-inner-color', rgba(charte.colors.blanc_carte, charte.chip_jeton.inner_border_alpha))
 add('card-back-stripe', rgba(charte.colors.blanc_carte, WHITE_STRIPE_ALPHA))
 
-const banner = '/* Fichier généré par scripts/gen-tokens.ts depuis charte/mastercards-charte.json. Ne pas éditer. */'
+const banner = '/* Fichier généré par scripts/gen-tokens.ts depuis charte/masterscards-charte.json. Ne pas éditer. */'
 const cssOut = `${banner}\n:root {\n${css.map(([n, v]) => `  ${n}: ${v};`).join('\n')}\n}\n`
 
-const tsOut = `// Fichier généré par scripts/gen-tokens.ts depuis charte/mastercards-charte.json. Ne pas éditer.
+const tsOut = `// Fichier généré par scripts/gen-tokens.ts depuis charte/masterscards-charte.json. Ne pas éditer.
 export const tokens = ${JSON.stringify(
   {
     colors: charte.colors,

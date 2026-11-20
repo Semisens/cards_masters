@@ -8,7 +8,7 @@ import sharp from 'sharp'
 import { SUIT_PATHS, SYMBOL_VIEWBOX } from '../src/components/PlayingCard/symbols.ts'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const charte = JSON.parse(readFileSync(resolve(root, 'charte/mastercards-charte.json'), 'utf8'))
+const charte = JSON.parse(readFileSync(resolve(root, 'charte/masterscards-charte.json'), 'utf8'))
 
 const SIZE = 512
 const CARD_W = 230

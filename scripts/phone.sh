@@ -29,7 +29,7 @@ if [ -z "${BROWSER:-}" ]; then
 fi
 
 # Un profil séparé est indispensable : sans lui, Chrome rouvre une fenêtre dans la session existante et ignore la taille demandée.
-PROFILE="${TMPDIR:-/tmp}/mastercards-phone-profile"
+PROFILE="${TMPDIR:-/tmp}/masterscards-phone-profile"
 
 exec "$BROWSER" \
   --user-data-dir="$PROFILE" \

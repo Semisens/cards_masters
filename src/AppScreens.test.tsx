@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { games } from './data/games.ts'
 import { renderApp } from './test/renderApp.tsx'
 
-const LL_KEY = 'mastercards:session:love-letter'
+const LL_KEY = 'masterscards:session:love-letter'
 const store = (key: string, value: unknown) => window.localStorage.setItem(key, JSON.stringify(value))
 const stored = (key: string) => JSON.parse(window.localStorage.getItem(key) ?? 'null')
 
@@ -109,7 +109,7 @@ describe('Love Letter : tutoriel', () => {
   })
 
   it('numérote la vue à balayer « Carte 3 / 10 » et explique le pouvoir en mode connaisseur', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/love-letter/tutoriel/cartes/3')
     expect(await screen.findByText('Carte 3 / 10')).toBeInTheDocument()
     expect(screen.getByText('Choisis un rival. Il te montre sa carte. Ne la répète à personne.')).toBeInTheDocument()
@@ -125,7 +125,7 @@ describe('Love Letter : tutoriel', () => {
   })
 
   it('montre la carte d’origine et son nom sur la vue à balayer, en mode connaisseur', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/love-letter/tutoriel/cartes/3')
     const list = await screen.findByRole('list', { name: 'Dans le jeu d’origine' })
     expect(list).toHaveTextContent('2')
@@ -133,14 +133,14 @@ describe('Love Letter : tutoriel', () => {
   })
 
   it('Trio : une image par carte d’origine en mode connaisseur, cinq pour « 2 à 6 »', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/trio/tutoriel/cartes/2')
     const list = await screen.findByRole('list', { name: 'Dans le jeu d’origine' })
     expect(list.querySelectorAll('img')).toHaveLength(5)
   })
 
   it('Trio : la liste montre une main de trois cartes pour un groupe en image', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/trio/tutoriel/cartes')
     await screen.findByText('Retire les carreaux et les rois. Garde 36 cartes.')
     const rows = screen.getAllByRole('link').filter((link) => link.getAttribute('href')?.includes('/tutoriel/cartes/'))
@@ -155,7 +155,7 @@ describe('Love Letter : tutoriel', () => {
   })
 
   it('remplace la carte en pointillés par la carte d’origine en mode connaisseur', async () => {
-    window.localStorage.setItem('mastercards:mode', 'expert')
+    window.localStorage.setItem('masterscards:mode', 'expert')
     renderApp('/jeu/love-letter/tutoriel/cartes')
     await screen.findByText('Garde ces 21 cartes, dont 2 jokers. Retire tout le reste du paquet.')
     const rows = screen.getAllByRole('link').filter((link) => link.getAttribute('href')?.includes('/tutoriel/cartes/'))
@@ -212,8 +212,8 @@ describe('Love Letter : partie en manches', () => {
     await waitFor(() => expect(app.location()).toMatch(/^\/jeu\/love-letter\/resultat\/\d+$/))
     expect(await screen.findByText('Partie terminée')).toBeInTheDocument()
     expect(stored(LL_KEY)).toBeNull()
-    expect(stored('mastercards:history')).toHaveLength(1)
-    expect(stored('mastercards:history')[0]).toMatchObject({ gameId: 'love-letter', status: 'finished' })
+    expect(stored('masterscards:history')).toHaveLength(1)
+    expect(stored('masterscards:history')[0]).toMatchObject({ gameId: 'love-letter', status: 'finished' })
   })
 
   it('ne termine pas la partie tant que personne n’a le score visé', async () => {
@@ -222,13 +222,13 @@ describe('Love Letter : partie en manches', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Un point de plus pour Léa' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider la manche' }))
     await waitFor(() => expect(app.location()).toBe('/jeu/love-letter/partie'))
-    expect(stored('mastercards:history')).toBeNull()
+    expect(stored('masterscards:history')).toBeNull()
   })
 })
 
 describe('podium', () => {
   it('place le premier au centre, le deuxième à gauche, le troisième à droite, puis la liste', async () => {
-    store('mastercards:history', [
+    store('masterscards:history', [
       ENTRY('1', {
         players: [
           { name: 'Tom', score: 2 },
@@ -248,13 +248,13 @@ describe('podium', () => {
   })
 
   it('dit « Partie interrompue » quand la partie a été arrêtée', async () => {
-    store('mastercards:history', [ENTRY('1', { status: 'interrupted' })])
+    store('masterscards:history', [ENTRY('1', { status: 'interrupted' })])
     renderApp('/jeu/love-letter/resultat/1')
     expect(await screen.findByText('Partie interrompue')).toBeInTheDocument()
   })
 
   it('mène à l’historique et à l’accueil', async () => {
-    store('mastercards:history', [ENTRY('1')])
+    store('masterscards:history', [ENTRY('1')])
     renderApp('/jeu/love-letter/resultat/1')
     expect(await screen.findByRole('link', { name: 'Voir l’historique' })).toHaveAttribute('href', '/scores')
     expect(screen.getByRole('link', { name: 'Retour aux jeux' })).toHaveAttribute('href', '/')
@@ -273,7 +273,7 @@ describe('historique « Tes scores »', () => {
   })
 
   it('ouvre le jeu le plus récent : date, deux meilleurs, état', async () => {
-    store('mastercards:history', [
+    store('masterscards:history', [
       ENTRY('2', { date: '2026-10-12T10:00:00.000Z' }),
       ENTRY('1', { date: '2026-10-03T10:00:00.000Z', status: 'interrupted' }),
       ENTRY('3', { gameId: 'trio', date: '2026-09-28T10:00:00.000Z' }),
@@ -292,7 +292,7 @@ describe('historique « Tes scores »', () => {
   })
 
   it('ouvre un autre jeu au toucher, et referme le premier', async () => {
-    store('mastercards:history', [ENTRY('2'), ENTRY('3', { gameId: 'trio', date: '2026-09-28T10:00:00.000Z' })])
+    store('masterscards:history', [ENTRY('2'), ENTRY('3', { gameId: 'trio', date: '2026-09-28T10:00:00.000Z' })])
     renderApp('/scores')
     await userEvent.click(await screen.findByRole('button', { name: /Trio/ }))
     expect(screen.getByRole('button', { name: /Trio/ })).toHaveAttribute('aria-expanded', 'true')
@@ -300,7 +300,7 @@ describe('historique « Tes scores »', () => {
   })
 
   it('ignore les parties d’un jeu qui n’existe plus', async () => {
-    store('mastercards:history', [ENTRY('1', { gameId: 'inconnu' })])
+    store('masterscards:history', [ENTRY('1', { gameId: 'inconnu' })])
     renderApp('/scores')
     expect(await screen.findByText('Aucune partie pour le moment')).toBeInTheDocument()
   })

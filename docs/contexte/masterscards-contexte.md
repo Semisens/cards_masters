@@ -1,4 +1,4 @@
-# MasterCards : contexte du projet
+# MastersCards : contexte du projet
 
 ## Concept
 Application mobile (PWA installable, puis iOS + Android via Capacitor) qui explique comment jouer à des jeux de société
@@ -26,7 +26,7 @@ Tous les jeux ont les mêmes écrans et le même fonctionnement : ajouter un jeu
 ## Décisions
 - Logos et lettrages officiels non reproduits : évocation originale seulement
   (ex. Love Letter : police calligraphique + sceau de cire redessiné). Droits à vérifier avant publication.
-- Ressources : canvas de maquettes (charte, 5 planches) + mastercards-charte.json (tokens).
+- Ressources : canvas de maquettes (charte, 5 planches) + masterscards-charte.json (tokens).
 
 ## Décision technique
 PWA en Vite + React + TypeScript, empaquetée avec Capacitor pour les stores. Raisons : contenu statique et hors ligne,
