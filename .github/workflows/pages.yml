@@ -1,11 +1,9 @@
-# Publie la PWA sur GitHub Pages à chaque push sur la branche `deploy` (`npm run deploy`).
-# Le hook pre-push a déjà lancé toute la suite de tests avant le push.
+# Publie la PWA sur GitHub Pages, lancé à la main : onglet Actions → Pages → Run workflow (branche main).
+# Le hook pre-push a déjà lancé toute la suite de tests avant que `main` arrive sur GitHub.
 # Adresse : https://semisens.github.io/masterscards/
 name: Pages
 
 on:
-  push:
-    branches: [deploy]
   workflow_dispatch:
 
 permissions:
