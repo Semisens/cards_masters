@@ -1,5 +1,5 @@
 #!/bin/sh
-# Avant chaque push : tout le reste, comme la CI (.github/workflows/ci.yml).
+# Avant chaque push : tout le reste (le pre-commit a lancé les tests unitaires).
 # Chaque version qui arrive sur GitHub est donc passée par la suite complète.
 fail() {
   echo "Push refusé : $1" >&2

@@ -111,7 +111,7 @@ Un tapis (couleur) par jeu : jaune, vert, rouge, bleu.
 
 ### 4.6 Implémentation
 - `scripts/gen-tokens.ts` lit `charte/masterscards-charte.json` et génère `src/styles/tokens.generated.css` (variables CSS `--mc-*`) et `src/core/tokens.generated.ts` (mêmes valeurs côté TypeScript). La charte reste **la seule source** : on modifie le JSON, jamais les fichiers générés.
-- **Aucune valeur de couleur, rayon, espacement ou taille de texte en dur** dans le CSS ni le TSX. Un test automatisé (`scripts/no-hardcoded-values.test.ts`) fait échouer la CI sinon.
+- **Aucune valeur de couleur, rayon, espacement ou taille de texte en dur** dans le CSS ni le TSX. Un test automatisé (`scripts/no-hardcoded-values.test.ts`) fait échouer le commit sinon (hook pre-commit).
 - Les espacements et la taille de texte minimale sont exprimés en `rem`, pour suivre la taille de texte choisie par l'utilisateur.
 - Polices **embarquées** : Fredoka et Nunito via `@fontsource`, la police du nom de chaque jeu dans son dossier (ex. Great Vibes, `love-letter/great-vibes.woff2`, avec sa licence OFL) ; sous-ensemble latin uniquement, précachées par le service worker. Aucune requête vers Google Fonts : l'app reste fidèle hors ligne.
 - Les ombres des boutons et des jetons sont des teintes **dérivées de la charte**, calculées par le générateur (`--mc-color-cerise-ombre`, `--mc-tapis-*-ombre`). On n'utilise pas `color-mix()` en CSS : il n'existe pas avant iOS 16.2 et l'app vise iOS 15.

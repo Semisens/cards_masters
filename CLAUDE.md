@@ -33,7 +33,7 @@ Le flux : Jeremy demande → tu développes vite → Jeremy valide avec `npm run
 - On travaille **directement sur `main`** : pas de branche ni de PR par demande.
 - **Ne lance aucun test** : ni `npm test`, ni `npm run test:visual` / Playwright, ni lint, ni typecheck. Écris le code et laisse Jeremy le regarder.
 - **Commit** (seulement quand Jeremy le demande) : le hook `pre-commit` lance les tests unitaires (`npm test`).
-- **Push** (seulement quand Jeremy le demande, après plusieurs commits) : le hook `pre-push` vérifie que les tokens générés sont à jour, puis lance lint, typecheck et `npx playwright test` (PWA, parcours de chaque jeu, fidélité aux maquettes, captures). La CI GitHub (`.github/workflows/ci.yml`) rejoue la même chose en filet de sécurité.
+- **Push** (seulement quand Jeremy le demande, après plusieurs commits) : le hook `pre-push` vérifie que les tokens générés sont à jour, puis lance lint, typecheck et `npx playwright test` (PWA, parcours de chaque jeu, fidélité aux maquettes, captures).
 - **Déploiement** : lancé à la main par Jeremy, onglet Actions → « Pages » → « Run workflow » sur `main` (ou `gh workflow run Pages --ref main`). `.github/workflows/pages.yml` construit `main` et publie la PWA sur GitHub Pages : https://semisens.github.io/masterscards/ (build avec `BASE_PATH=/masterscards/`). Pousse `main` avant.
 - **Un hook échoue** : lis son message, corrige, recommite ou repousse. Jamais `--no-verify`, sauf demande explicite de Jeremy.
 - **Une capture a changé volontairement** (le pre-push échoue sur un écran modifié) : montre l'écart à Jeremy et attends son accord. Ensuite seulement : `npx playwright test --update-snapshots`, regarde les images, commite la mise à jour, repousse.
