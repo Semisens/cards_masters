@@ -24,13 +24,11 @@ export function PlayersPage() {
   const game = getGame(gameId)
   const fromParty = useFromParty()
   const { status, session, save } = useSession(gameId ?? '')
-  // Les prénoms modifiés par l'utilisateur ; tant qu'il n'a rien changé, on part de la dernière partie
-  // ou, à défaut, du minimum de joueurs du jeu avec des champs vides.
+  // Les prénoms modifiés par l'utilisateur ; tant qu'il n'a rien changé, les champs sont vides.
   const [edited, setEdited] = useState<string[] | null>(null)
-  // Une partie sans prénoms garde son nombre de joueurs, mais les champs restent vides (« Joueur 1 » n'est qu'un repli).
-  const initial = session
-    ? session.players.map((p) => (session.unnamed ? '' : p.name))
-    : Array.from({ length: game?.players.min ?? 0 }, () => '')
+  // Les champs partent toujours vides (« Joueur 1 » n'est qu'un repli) ; seul le nombre de joueurs
+  // de la partie en cours est repris, à défaut le minimum du jeu.
+  const initial = Array.from({ length: session?.players.length ?? game?.players.min ?? 0 }, () => '')
   const names = edited ?? initial
   const setNames = (update: (current: string[]) => string[]) => setEdited(update(names))
   // Sans aucun prénom, on ne valide pas ici : « Passer cette étape » (en haut) est le chemin des parties sans prénoms.

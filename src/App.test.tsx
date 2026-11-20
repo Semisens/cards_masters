@@ -428,10 +428,12 @@ describe('qui joue ?', () => {
     expect(screen.queryByRole('button', { name: 'Passer cette étape' })).not.toBeInTheDocument()
   })
 
-  it('reprend les prénoms de la dernière partie', async () => {
+  it('ne reprend pas les prénoms de la partie en cours, seulement leur nombre', async () => {
     seedParty()
     renderApp('/jeu/trio/joueurs')
-    expect(await screen.findByRole('textbox', { name: 'Prénom du joueur 2' })).toHaveValue('Tom')
+    expect(await screen.findByRole('textbox', { name: 'Prénom du joueur 2' })).toHaveValue('')
+    expect(screen.getAllByRole('textbox')).toHaveLength(PARTY.players.length)
+    expect(screen.getByRole('button', { name: 'C’est parti' })).toBeDisabled()
   })
 
   it('revient à « un tour de jeu »', async () => {
